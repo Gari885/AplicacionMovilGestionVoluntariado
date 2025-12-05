@@ -10,20 +10,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.appgestionvoluntariado.R;
 
-public class OrgRegistroActivity extends AppCompatActivity {
+public class VolRegistroActivity extends AppCompatActivity {
 
     private ImageView logo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_org_registro);
+        setContentView(R.layout.activity_vol_registro);
 
         logo = (ImageView) findViewById(R.id.ivLogo);
         logo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(OrgRegistroActivity.this, MainActivity.class);
+                Intent intent = new Intent(VolRegistroActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });

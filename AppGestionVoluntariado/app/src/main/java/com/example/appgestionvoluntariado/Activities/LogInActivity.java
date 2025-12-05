@@ -24,7 +24,7 @@ public class LogInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_log_in);
 
 
-        logoImagen = findViewById(R.id.logo);
+        logoImagen = findViewById(R.id.ivLogo);
         logoImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:fillViewport="true">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="50dp">
+
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/logo4vnofondo"
+            android:scaleType="fitStart"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:layout_gravity="center_horizontal"
+            android:text="Registrarse"
+            android:textColor="#1A3B85"
+            android:textSize="38dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="150dp"
+            android:layout_marginStart="20dp"
+            android:text="Nombre Completo"
+            android:textColor="#000000"
+            android:textSize="16sp"/>
+
+        <EditText
+            android:id="@+id/etNombre"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="175dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/input_rounded_bg"
+            android:hint="Juan Pérez"
+            android:paddingStart="16dp"
+            android:inputType="textPersonName"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="245dp"
+            android:layout_marginStart="20dp"
+            android:text="Correo Electrónico"
+            android:textColor="#000000"
+            android:textSize="16sp"/>
+
+        <EditText
+            android:id="@+id/etCorreo"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="270dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/input_rounded_bg"
+            android:hint="juan@gmail.com"
+            android:paddingStart="16dp"
+            android:inputType="textEmailAddress"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="340dp"
+            android:layout_marginStart="20dp"
+            android:text="Zona"
+            android:textColor="#000000"
+            android:textSize="16sp"/>
+
+        <EditText
+            android:id="@+id/etZona"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="365dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/input_rounded_bg"
+            android:hint="Pamplona"
+            android:paddingStart="16dp"
+            android:inputType="text"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="435dp"
+            android:layout_marginStart="20dp"
+            android:text="Disponibilidad"
+            android:textColor="#000000"
+            android:textSize="16sp"/>
+
+        <Spinner
+            android:id="@+id/spinnerDia"
+            android:layout_width="170dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="460dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/input_rounded_bg"
+            android:paddingStart="10dp"
+            tools:listitem="@android:layout/simple_spinner_item"/>
+        <Spinner
+            android:id="@+id/spinnerHorario"
+            android:layout_width="170dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="460dp"
+            android:layout_marginStart="210dp"
+            android:background="@drawable/input_rounded_bg"
+            android:paddingStart="10dp"
+            tools:listitem="@android:layout/simple_spinner_item"/>
+
+        <Button
+            android:id="@+id/btnAddHabilidades"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="530dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="@color/azul"
+            android:text="  Añadir Habilidades"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:drawableStart="@android:drawable/ic_input_add"
+            android:drawableTint="#FFFFFF"
+            android:paddingStart="20dp"/>
+
+        <Button
+            android:id="@+id/btnAddIntereses"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="600dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="@color/azul"
+            android:text="  Añadir Intereses"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:drawableStart="@android:drawable/ic_input_add"
+            android:drawableTint="#FFFFFF"
+            android:paddingStart="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="670dp"
+            android:layout_marginStart="20dp"
+            android:text="Datos Añadidos"
+            android:textColor="#000000"
+            android:textSize="16sp"/>
+
+        <EditText
+            android:id="@+id/etDatosAñadidos"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="695dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/input_rounded_bg"
+            android:gravity="top|start"
+            android:padding="16dp"
+            android:focusable="false"
+            android:inputType="none"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnRegistrar"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="830dp"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="@color/azul"
+            android:text="Registrarme"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"/>
+
+    </FrameLayout>
+</ScrollView>

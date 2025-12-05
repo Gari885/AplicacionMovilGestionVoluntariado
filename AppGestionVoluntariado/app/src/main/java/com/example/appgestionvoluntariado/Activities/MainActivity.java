@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        logoImagen = findViewById(R.id.logo);
+        logoImagen = findViewById(R.id.ivLogo);
         logoImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

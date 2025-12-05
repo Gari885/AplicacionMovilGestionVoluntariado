@@ -8,13 +8,13 @@
     tools:context=".Activities.RegistrarseActivity">
 
     <ImageView
-        android:id="@+id/logo"
-        android:layout_width="163dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="30dp"
+        android:id="@+id/ivLogo"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
         android:src="@drawable/logo4vnofondo"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="16dp" />
+        android:scaleType="fitStart"/>
 
     <Button
         android:id="@+id/btnVolutnario"
