@@ -3,6 +3,7 @@ package com.example.appgestionvoluntariado.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ import com.example.appgestionvoluntariado.R;
 public class LogInActivity extends AppCompatActivity {
     private ImageView logoImagen;
     private TextView txtRegistrar;
+
+    private Button login;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +41,16 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LogInActivity.this, RegistrarseActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+        login = findViewById(R.id.btnLogin);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LogInActivity.this, OrgDashboardActivity.class);
                 startActivity(intent);
             }
         });

@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppGestionVoluntariado">
         <activity
+            android:name=".OrgVoluntariosActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.OrgDashboardActivity"
             android:exported="false" />
         <activity
