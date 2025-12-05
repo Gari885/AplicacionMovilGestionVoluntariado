@@ -3,7 +3,6 @@ package com.example.appgestionvoluntariado.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
@@ -14,30 +13,20 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.appgestionvoluntariado.R;
 
-public class MainActivity extends AppCompatActivity {
-    private Button botonlogIn;
+public class RegistrarseActivity extends AppCompatActivity {
+
     private ImageView logoImagen;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-
-
-        botonlogIn = findViewById(R.id.logIn);
-        botonlogIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, LogInActivity.class);
-                startActivity(intent);
-            }
-        });
+        setContentView(R.layout.activity_registrarse);
 
         logoImagen = findViewById(R.id.logo);
         logoImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                Intent intent = new Intent(RegistrarseActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });

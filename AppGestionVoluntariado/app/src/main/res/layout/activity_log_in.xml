@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.LogInActivity">
+
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="163dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/logo4vnofondo"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <TextView
+        android:id="@+id/logIn"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        android:textColor="@color/azul"
+        android:layout_marginTop="130dp"
+        android:layout_marginStart="150dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/logIn" />
+
+    <EditText
+        android:id="@+id/editTextTextEmailAddress"
+        android:layout_width="370dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="230dp"
+        android:hint="Ejemplo@gmail.com"
+        android:ems="10"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/editTextTextPassword"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="310dp"
+        android:layout_width="370dp"
+        android:layout_height="wrap_content"
+        android:hint="Contraseña"
+        android:ems="10"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="380dp"
+        android:layout_width="370dp"
+        android:backgroundTint="@color/azul"
+        android:layout_height="wrap_content"
+        android:text="@string/logIn" />
+
+    <TextView
+        android:id="@+id/registar"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="450dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/azul"
+        android:text="@string/noRegistrado" />
+</FrameLayout>

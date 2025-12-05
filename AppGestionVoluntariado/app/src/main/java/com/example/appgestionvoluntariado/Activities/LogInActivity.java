@@ -3,8 +3,8 @@ package com.example.appgestionvoluntariado.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,33 +14,32 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.appgestionvoluntariado.R;
 
-public class MainActivity extends AppCompatActivity {
-    private Button botonlogIn;
+public class LogInActivity extends AppCompatActivity {
     private ImageView logoImagen;
+    private TextView txtRegistrar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_log_in);
 
-
-        botonlogIn = findViewById(R.id.logIn);
-        botonlogIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, LogInActivity.class);
-                startActivity(intent);
-            }
-        });
 
         logoImagen = findViewById(R.id.logo);
         logoImagen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                Intent intent = new Intent(LogInActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
 
+        txtRegistrar = findViewById(R.id.registar);
+        txtRegistrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LogInActivity.this, RegistrarseActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

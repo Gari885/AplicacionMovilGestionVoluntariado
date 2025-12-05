@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppGestionVoluntariado">
         <activity
+            android:name=".Activities.RegistrarseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.LogInActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.MainActivity"
             android:exported="true">
             <intent-filter>
