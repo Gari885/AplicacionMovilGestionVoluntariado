@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado;
+package com.example.appgestionvoluntariado.Activities;
 
 import android.os.Bundle;
 
@@ -8,13 +8,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class OrgVoluntariosActivity extends AppCompatActivity {
+import com.example.appgestionvoluntariado.R;
+
+public class OrgOrganizacionesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_org_voluntarios);
+        setContentView(R.layout.activity_org_organizaciones);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/ivIconoOrg"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/background_icon_blue"
+            android:padding="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/apartamento"
+            app:tint="#FFFFFF" />
+        <TextView
+            android:id="@+id/tvNombreOrg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Hogares Verdes"
+            android:textColor="#1A3B85"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ivIconoOrg"
+            app:layout_constraintTop_toTopOf="@+id/ivIconoOrg" />
+
+        <TextView
+            android:id="@+id/tvCorreoOrg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="hogares.verdes@gmail.com"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvNombreOrg"
+            app:layout_constraintTop_toBottomOf="@+id/tvNombreOrg" />
+        <ImageView
+            android:id="@+id/btnInfoOrg"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/button_square_gris"
+            android:padding="10dp"
+            app:srcCompat="@drawable/info"
+            app:tint="#FFFFFF"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivIconoOrg" />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAceptarOrg"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+
+            android:background="@drawable/button_square_blue"
+            app:backgroundTint="@null"
+
+            android:text="✔"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/btnInfoOrg"
+            app:layout_constraintEnd_toStartOf="@+id/btnRechazarOrg"
+            app:layout_constraintStart_toEndOf="@+id/btnInfoOrg"
+            app:layout_constraintTop_toTopOf="@+id/btnInfoOrg" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnRechazarOrg"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+
+            android:background="@drawable/button_square_white"
+            app:backgroundTint="@null"
+
+            android:text="X"
+            android:textColor="#1A3B85"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/btnInfoOrg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnAceptarOrg"
+            app:layout_constraintTop_toTopOf="@+id/btnInfoOrg" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
