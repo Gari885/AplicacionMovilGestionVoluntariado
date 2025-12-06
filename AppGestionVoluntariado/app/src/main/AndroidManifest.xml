@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppGestionVoluntariado">
         <activity
+            android:name=".Activities.OrgMatchesAceptadosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.OrgMatchesPendientesActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.OrgMatchesMenuActivity"
             android:exported="false" />
         <activity

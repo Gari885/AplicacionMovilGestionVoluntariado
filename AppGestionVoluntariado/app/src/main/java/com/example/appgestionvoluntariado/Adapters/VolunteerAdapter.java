@@ -30,7 +30,7 @@ public class VolunteerAdapter extends RecyclerView.Adapter<VolunteerAdapter.Grid
     @Override
     public GridHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView;
-        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_org_voluntarios, parent, false);
+        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.org_voluntario_item, parent, false);
         return new GridHolder(itemView);
     }
 

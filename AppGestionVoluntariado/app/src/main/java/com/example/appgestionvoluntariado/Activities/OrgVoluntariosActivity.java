@@ -3,7 +3,9 @@ package com.example.appgestionvoluntariado.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +30,9 @@ public class OrgVoluntariosActivity extends AppCompatActivity {
     private ArrayList<Voluntario> voluntarios;
 
     private ImageView logo;
+
+    private Button anadirVoluntario;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,19 @@ public class OrgVoluntariosActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
+        anadirVoluntario = findViewById(R.id.btnAnadirVoluntario);
+        anadirVoluntario.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OrgVoluntariosActivity.this, VolRegistroActivity.class);
+                intent.putExtra("tipo","Anadir");
+                startActivity(intent);
+            }
+        });
+
+
 
     }
 }
