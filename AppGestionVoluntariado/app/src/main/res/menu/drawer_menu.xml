@@ -17,5 +17,9 @@
             android:id="@+id/nav_matches"
             android:icon="@drawable/persona"
             android:title="Matches"/>
+        <item
+            android:id="@+id/nav_voluntariados"
+            android:icon="@drawable/persona"
+            android:title="Voluntariados"/>
     </group>
 </menu>
