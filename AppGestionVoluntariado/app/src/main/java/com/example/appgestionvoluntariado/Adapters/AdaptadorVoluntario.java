@@ -1,8 +1,6 @@
 package com.example.appgestionvoluntariado.Adapters;
 
 
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,18 +9,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appgestionvoluntariado.Models.Stat;
 import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.R;
 
 import java.util.List;
 
-public class VolunteerAdapter extends RecyclerView.Adapter<VolunteerAdapter.GridHolder> {
+public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntario.GridHolder> {
 
     private List<Voluntario> voluntarios;
 
 
-    public VolunteerAdapter(List<Voluntario> voluntarios) {
+    public AdaptadorVoluntario(List<Voluntario> voluntarios) {
         this.voluntarios  = voluntarios;
 
     }

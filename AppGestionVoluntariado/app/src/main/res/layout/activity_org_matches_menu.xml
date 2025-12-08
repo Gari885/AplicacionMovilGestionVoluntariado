@@ -13,12 +13,7 @@
         android:background="@android:color/white">
         <include
             android:id="@+id/miToolbar"
-            layout="@layout/componente_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            layout="@layout/componente_toolbar"/>
 
         <TextView
             android:id="@+id/tvTituloMatches"

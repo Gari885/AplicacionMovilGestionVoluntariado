@@ -5,17 +5,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appgestionvoluntariado.Adapters.StatAdapter;
-import com.example.appgestionvoluntariado.Adapters.VolunteerAdapter;
-import com.example.appgestionvoluntariado.Models.Stat;
+import com.example.appgestionvoluntariado.Adapters.AdaptadorVoluntario;
 import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.R;
 
@@ -25,7 +21,7 @@ public class OrgVoluntariosActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
 
-    private VolunteerAdapter volunteerAdapter;
+    private AdaptadorVoluntario volunteerAdapter;
 
     private ArrayList<Voluntario> voluntarios;
 
@@ -50,7 +46,7 @@ public class OrgVoluntariosActivity extends AppCompatActivity {
         voluntarios.add(new Voluntario("Maria", "maria@gmail.com"));
 
 
-        volunteerAdapter = new VolunteerAdapter(voluntarios);
+        volunteerAdapter = new AdaptadorVoluntario(voluntarios);
 
         recyclerView.setAdapter(volunteerAdapter);
 
