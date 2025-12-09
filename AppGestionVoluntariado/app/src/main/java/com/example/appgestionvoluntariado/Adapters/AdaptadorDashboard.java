@@ -1,7 +1,5 @@
 package com.example.appgestionvoluntariado.Adapters;
 
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +13,12 @@ import com.example.appgestionvoluntariado.R;
 
 import java.util.List;
 
-public class StatAdapter extends RecyclerView.Adapter<StatAdapter.GridHolder> {
+public class AdaptadorDashboard extends RecyclerView.Adapter<AdaptadorDashboard.GridHolder> {
 
     private List<Stat> stats;
 
 
-    public StatAdapter(List<Stat> stats) {
+    public AdaptadorDashboard(List<Stat> stats) {
         this.stats  = stats;
 
     }

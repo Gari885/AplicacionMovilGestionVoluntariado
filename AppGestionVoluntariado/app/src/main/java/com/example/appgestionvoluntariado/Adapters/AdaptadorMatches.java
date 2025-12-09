@@ -1,4 +1,4 @@
 package com.example.appgestionvoluntariado.Adapters;
 
-public class VoluntariadoAdapter {
+public class AdaptadorMatches {
 }

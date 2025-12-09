@@ -4,30 +4,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appgestionvoluntariado.Adapters.StatAdapter;
+import com.example.appgestionvoluntariado.Adapters.AdaptadorDashboard;
 import com.example.appgestionvoluntariado.Models.Stat;
 import com.example.appgestionvoluntariado.R;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class OrgDashboardActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
 
-    private StatAdapter statAdapter;
+    private AdaptadorDashboard statAdapter;
 
     private ArrayList<Stat> stats;
 
@@ -60,7 +55,7 @@ public class OrgDashboardActivity extends AppCompatActivity {
         stats.add(new Stat("TOTAL MATCHES", 2, "", "matches"));
         stats.add(new Stat("PENDIENTES", 4, "", "pendientes"));
 
-        statAdapter = new StatAdapter(stats);
+        statAdapter = new AdaptadorDashboard(stats);
 
         recyclerView.setAdapter(statAdapter);
 

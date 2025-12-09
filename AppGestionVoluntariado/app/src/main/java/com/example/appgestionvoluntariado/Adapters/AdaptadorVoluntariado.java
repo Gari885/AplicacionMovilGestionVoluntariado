@@ -1,6 +1,5 @@
 package com.example.appgestionvoluntariado.Adapters;
 
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -8,7 +7,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,73 +14,78 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appgestionvoluntariado.Models.Voluntario;
+import com.example.appgestionvoluntariado.Models.Voluntariado;
 import com.example.appgestionvoluntariado.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntario.GridHolder> {
+public class AdaptadorVoluntariado extends RecyclerView.Adapter<AdaptadorVoluntariado.GridHolder> {
 
-    private List<Voluntario> voluntarios;
+    private List<Voluntariado> voluntariados;
 
-
-    public AdaptadorVoluntario(List<Voluntario> voluntarios) {
-        this.voluntarios  = voluntarios;
-
+    public AdaptadorVoluntariado(List<Voluntariado> voluntariados) {
+        this.voluntariados  = voluntariados;
     }
     @NonNull
     @Override
     public GridHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView;
-        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.org_voluntario_item, parent, false);
+        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.org_voluntariado_item, parent, false);
         return new GridHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull GridHolder holder, int position) {
-        holder.assingData(voluntarios.get(position));
+        holder.assingData(voluntariados.get(position));
+
     }
+
 
     @Override
     public int getItemCount() {
-        return voluntarios.size();
+        return voluntariados.size();
     }
 
     public class GridHolder extends RecyclerView.ViewHolder {
-        TextView nombre;
-        TextView email;
+        TextView titulo;
+
+        TextView zona;
+        TextView fecha;
 
         ImageView info;
 
 
         public GridHolder(@NonNull View itemView) {
             super(itemView);
-            nombre = itemView.findViewById(R.id.tvNombre);
-            email = itemView.findViewById(R.id.tvCorreo);
-            info = itemView.findViewById(R.id.btnInfo);
-
+            titulo = itemView.findViewById(R.id.tvTituloVoluntariado);
+            zona = itemView.findViewById(R.id.tvZonaVoluntariado);
+            fecha = itemView.findViewById(R.id.tvFechaVoluntariado);
+            info = itemView.findViewById(R.id.btnInfoVoluntariado);
         }
-        public void assingData(Voluntario voluntario) {
-            nombre.setText(voluntario.getNombre());
-            email.setText(voluntario.getEmail());
+        public void assingData(Voluntariado voluntariado) {
+            titulo.setText(voluntariado.getTitulo());
+            zona.setText(voluntariado.getZona());
+            fecha.setText(voluntariado.getFecha());
             info.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Context context = v.getContext();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    View popupView = LayoutInflater.from(context).inflate(R.layout.dialog_info_voluntario,null);
+                    View popupView = LayoutInflater.from(context).inflate(R.layout.org_dialog_info_voluntariado,null);
 
-                    TextView disponibilidad = popupView.findViewById(R.id.lblDisponibilidad);
-                    LinearLayout habilidades = popupView.findViewById(R.id.containerHabilidades);
-                    LinearLayout intereses = popupView.findViewById(R.id.containerIntereses);
+                    TextView descripcion = popupView.findViewById(R.id.tvDescripcionVolVal);
+                    TextView fecha = popupView.findViewById(R.id.tvFechaVal);
+                    LinearLayout necesidades = popupView.findViewById(R.id.containerNecesidadesVol);
+                    LinearLayout ods = popupView.findViewById(R.id.containerODS);
                     LinearLayout cerrar = popupView.findViewById(R.id.btnCerrarPopup);
 
-                    disponibilidad.setText(voluntario.getDisponibilidad());
+                    descripcion.setText(voluntariado.getDescripcion());
+                    fecha.setText(voluntariado.getFecha());
 
-                    rellenarTags(context,habilidades,voluntario.getHabilidades());
-                    rellenarTags(context,intereses,voluntario.getIntereses());
+                    rellenarTags(context,necesidades,voluntariado.getNecesidades());
+                    rellenarTags(context,ods,voluntariado.getOds());
 
                     // 4. Mostrar
                     builder.setView(popupView);
