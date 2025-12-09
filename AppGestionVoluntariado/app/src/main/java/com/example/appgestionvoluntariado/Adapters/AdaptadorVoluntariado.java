@@ -38,7 +38,6 @@ public class AdaptadorVoluntariado extends RecyclerView.Adapter<AdaptadorVolunta
     @Override
     public void onBindViewHolder(@NonNull GridHolder holder, int position) {
         holder.assingData(voluntariados.get(position));
-
     }
 
 
@@ -119,6 +118,9 @@ public class AdaptadorVoluntariado extends RecyclerView.Adapter<AdaptadorVolunta
                 container.addView(tag);
             }
         }
+
+
+
 
     }
 
