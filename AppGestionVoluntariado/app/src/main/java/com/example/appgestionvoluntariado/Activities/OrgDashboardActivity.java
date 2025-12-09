@@ -50,7 +50,6 @@ public class OrgDashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // GravityCompat.END porque el menú está a la derecha
-
                     drawerLayout.openDrawer(GravityCompat.END);
             }
         });
@@ -89,6 +88,12 @@ public class OrgDashboardActivity extends AppCompatActivity {
                 startActivity(intent);
             } else if (id == R.id.nav_matches){
                 Intent intent = new Intent(OrgDashboardActivity.this, OrgMatchesMenuActivity.class);
+                startActivity(intent);
+            }else if (id == R.id.nav_voluntariados){
+                Intent intent = new Intent(OrgDashboardActivity.this, OrgVoluntariadosActivity.class);
+                startActivity(intent);
+            }else if (id == R.id.nav_dashboard){
+                Intent intent = new Intent(OrgDashboardActivity.this, OrgDashboardActivity.class);
                 startActivity(intent);
             }
             drawerLayout.closeDrawer(GravityCompat.END); // Cerrar menú

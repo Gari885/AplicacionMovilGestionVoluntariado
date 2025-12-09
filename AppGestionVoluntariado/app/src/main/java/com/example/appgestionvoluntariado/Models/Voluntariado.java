@@ -8,6 +8,4 @@ public class Voluntariado {
 
     private String fecha;
 
-    private
-
 }
