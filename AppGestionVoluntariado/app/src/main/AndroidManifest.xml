@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppGestionVoluntariado">
         <activity
+            android:name=".Activities.OrganizadorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.VoluntarioActivity"
+            android:exported="false" />
+        <activity
             android:name=".OrgVoluntariadosActivity2"
             android:exported="false" />
         <activity
@@ -33,7 +39,7 @@
             android:name=".Activities.OrgVoluntariosActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.OrgDashboardActivity"
+            android:name=".Activities.OrganizadorActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.VolRegistroActivity"
