@@ -46,7 +46,7 @@ public class LogInActivity extends AppCompatActivity {
 
         credenciales = new HashMap<>();
         credenciales.put("admin@gmail.com", "admin");
-        credenciales.put("usuario","usuario");
+        credenciales.put("usuario@gmail.com","usuario");
         credenciales.put("org","org");
 
         correo = findViewById(R.id.editTextTextEmailAddress);
@@ -111,6 +111,7 @@ public class LogInActivity extends AppCompatActivity {
 
     private void logearUsuario(String email, String contraseña){
         if (credenciales.containsKey(email)) {
+            if (email == "")
             Intent intent = new Intent(LogInActivity.this, OrganizadorActivity.class);
             startActivity(intent);
         }

@@ -34,7 +34,7 @@ public class AdaptadorMatches extends RecyclerView.Adapter<AdaptadorMatches.Grid
     @Override
     public GridHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView;
-        itemView = LayoutInflater.from(parent.getContext()).inflate(aceptado ? R.layout.activity_org_matches_aceptados : R.layout.activity_org_matches_pendientes, parent, false);
+        itemView = LayoutInflater.from(parent.getContext()).inflate(aceptado ? R.layout.org_matches_aceptados_item : R.layout.org_matches_pendientes_item, parent, false);
         return new GridHolder(itemView);
     }
 

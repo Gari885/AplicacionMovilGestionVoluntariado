@@ -22,7 +22,6 @@
             android:textSize="38dp"
             android:textStyle="bold" />
 
-
         <EditText
             android:id="@+id/etBuscadorVoluntariado"
             android:layout_width="match_parent"

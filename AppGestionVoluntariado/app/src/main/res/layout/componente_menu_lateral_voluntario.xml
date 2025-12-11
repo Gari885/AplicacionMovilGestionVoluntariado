@@ -9,5 +9,5 @@
     android:background="#1A3B85"
     app:itemTextColor="#FFFFFF"
     app:itemIconTint="#FFFFFF"
-    app:menu="@menu/drawer_menu_organizador"
+    app:menu="@menu/drawer_menu_voluntario"
     />
