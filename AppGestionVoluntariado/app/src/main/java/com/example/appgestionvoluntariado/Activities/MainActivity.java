@@ -11,7 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.EscaparateFragment;
+import com.example.appgestionvoluntariado.Fragments.DashboardFragment;
+import com.example.appgestionvoluntariado.Fragments.LogInFragment;
+import com.example.appgestionvoluntariado.Fragments.VoluntariosFragment;
 import com.example.appgestionvoluntariado.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,19 +33,21 @@ public class MainActivity extends AppCompatActivity {
         botonlogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, LogInActivity.class);
-                startActivity(intent);
+                Fragment fragmentSeleccionado = null;
+                fragmentSeleccionado = new LogInFragment();
+                if (fragmentSeleccionado != null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.containerFragments, fragmentSeleccionado)
+                            .commit();
+                }
             }
         });
 
-        logoImagen = findViewById(R.id.ivLogo);
-        logoImagen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.containerFragments, new EscaparateFragment()) // <--- Aquí cargas el Dashboard
+                    .commit();
+        }
 
     }
 }

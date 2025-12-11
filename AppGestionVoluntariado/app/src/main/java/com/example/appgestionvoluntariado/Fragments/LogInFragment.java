@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Activities;
+package com.example.appgestionvoluntariado.Fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -6,23 +6,28 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-
+import com.example.appgestionvoluntariado.Activities.OrganizadorActivity;
+import com.example.appgestionvoluntariado.Activities.VoluntarioActivity;
 import com.example.appgestionvoluntariado.R;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class LogInActivity extends AppCompatActivity {
+public class LogInFragment extends Fragment {
+
+
     private ImageView logoImagen;
     private TextView txtRegistrar;
 
@@ -33,45 +38,41 @@ public class LogInActivity extends AppCompatActivity {
 
     private Map<String,String> credenciales ;
 
-
-
     private String regex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_log_in);
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_log_in, container, false);
         credenciales = new HashMap<>();
         credenciales.put("admin@gmail.com", "admin");
         credenciales.put("usuario@gmail.com","usuario");
         credenciales.put("org","org");
 
-        correo = findViewById(R.id.editTextTextEmailAddress);
-        contraseña = findViewById(R.id.editTextTextPassword);
+        correo = view.findViewById(R.id.editTextTextEmailAddress);
+        contraseña = view.findViewById(R.id.editTextTextPassword);
 
-        logoImagen = findViewById(R.id.ivLogo);
-        logoImagen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LogInActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
 
-        txtRegistrar = findViewById(R.id.registar);
+        txtRegistrar = view.findViewById(R.id.registar);
         txtRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LogInActivity.this, RegistrarseActivity.class);
-                startActivity(intent);
-            }
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.containerFragments, new MenuRegistrarseFragment())
+                        .addToBackStack(null) // <--- IMPORTANTE: Para que el botón 'Atrás' del móvil te devuelva al menú
+                        .commit();
+                }
         });
 
 
-        login = findViewById(R.id.btnLogin);
+        login = view.findViewById(R.id.btnLogin);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,7 +85,7 @@ public class LogInActivity extends AppCompatActivity {
                 }
 
                 if (error.equals("")){
-                    logearUsuario(correo.getText().toString(),contraseña.getText().toString());
+                    logearUsuario(correo.getText().toString(),contraseña.getText().toString(),v);
                 }else {
                     invocarError(context,error);
                 }
@@ -92,9 +93,8 @@ public class LogInActivity extends AppCompatActivity {
             }
         });
 
-
+        return view;
     }
-
     private void invocarError(Context context, String error){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View popupView = LayoutInflater.from(context).inflate(R.layout.dialog_mensaje_error,null);
@@ -109,14 +109,15 @@ public class LogInActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void logearUsuario(String email, String contraseña){
+    private void logearUsuario(String email, String contraseña,View view){
+        Context context = view.getContext();
         if (credenciales.containsKey(email)) {
             if (email.equals("admin@gmail.com") && credenciales.containsValue(contraseña)) {
-                Intent intent = new Intent(LogInActivity.this, OrganizadorActivity.class);
+                Intent intent = new Intent(context, OrganizadorActivity.class);
                 startActivity(intent);
             }
             if (email.equals("usuario@gmail.com") && credenciales.containsValue(contraseña)){
-                Intent intent = new Intent(LogInActivity.this, VoluntarioActivity.class);
+                Intent intent = new Intent(context, VoluntarioActivity.class);
                 startActivity(intent);
             }
         }

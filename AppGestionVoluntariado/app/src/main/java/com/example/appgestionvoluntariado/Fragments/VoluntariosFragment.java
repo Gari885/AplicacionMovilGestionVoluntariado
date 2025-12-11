@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.appgestionvoluntariado.Activities.OrgRegistroActivity;
 import com.example.appgestionvoluntariado.R;
 
 
@@ -34,7 +33,7 @@ public class VoluntariosFragment extends Fragment {
 
         crearOrganizacion = view.findViewById(R.id.btnAnadirVoluntario);
 
-        crearOrganizacion.setOnClickListener(new View.OnClickListener() {
+        /*crearOrganizacion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
@@ -43,7 +42,7 @@ public class VoluntariosFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
+        */
         return view;
     }
 }

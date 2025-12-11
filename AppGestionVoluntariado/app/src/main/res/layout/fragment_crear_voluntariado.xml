@@ -37,7 +37,7 @@
             android:id="@+id/etNombre"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/background_input_border"
+            android:background="@drawable/input_rounded_bg"
             android:hint="Ayuda en casas"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
@@ -56,7 +56,7 @@
             android:id="@+id/etSector"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/background_input_border"
+            android:background="@drawable/input_rounded_bg"
             android:hint="Educación"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
@@ -75,7 +75,7 @@
             android:id="@+id/etZona"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/background_input_border"
+            android:background="@drawable/input_rounded_bg"
             android:hint="Pamplona"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
@@ -100,7 +100,7 @@
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:background="@drawable/background_input_border"
+                android:background="@drawable/input_rounded_bg"
                 android:layout_marginEnd="8dp">
 
                 <Spinner
@@ -113,7 +113,7 @@
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:background="@drawable/background_input_border"
+                android:background="@drawable/input_rounded_bg"
                 android:layout_marginStart="8dp">
 
                 <Spinner
@@ -135,7 +135,7 @@
             android:id="@+id/etDescripcion"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:background="@drawable/background_input_border"
+            android:background="@drawable/input_rounded_bg"
             android:gravity="top|start"
             android:inputType="textMultiLine"
             android:padding="16dp"

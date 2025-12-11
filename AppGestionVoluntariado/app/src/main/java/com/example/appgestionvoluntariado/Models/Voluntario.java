@@ -11,6 +11,7 @@ public class Voluntario {
     private ArrayList<String> habilidades;
     private ArrayList<String> intereses;
 
+
     public Voluntario(){
 
     }
