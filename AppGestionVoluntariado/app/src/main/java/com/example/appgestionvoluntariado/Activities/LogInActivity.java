@@ -111,9 +111,14 @@ public class LogInActivity extends AppCompatActivity {
 
     private void logearUsuario(String email, String contraseña){
         if (credenciales.containsKey(email)) {
-            if (email == "")
-            Intent intent = new Intent(LogInActivity.this, OrganizadorActivity.class);
-            startActivity(intent);
+            if (email.equals("admin@gmail.com") && credenciales.containsValue(contraseña)) {
+                Intent intent = new Intent(LogInActivity.this, OrganizadorActivity.class);
+                startActivity(intent);
+            }
+            if (email.equals("usuario@gmail.com") && credenciales.containsValue(contraseña)){
+                Intent intent = new Intent(LogInActivity.this, VoluntarioActivity.class);
+                startActivity(intent);
+            }
         }
 
     }
