@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments;
+package com.example.appgestionvoluntariado.Fragments.VistaOrganizacion;
 
 import android.os.Bundle;
 
@@ -11,8 +11,8 @@ import android.widget.Button;
 
 import com.example.appgestionvoluntariado.R;
 
-public class MatchesPendientesFragment extends Fragment {
 
+public class MatchesAceptadosFragment extends Fragment {
 
     private Button volver;
     @Override
@@ -25,7 +25,7 @@ public class MatchesPendientesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_matches_pendientes, container, false);
+        View view = inflater.inflate(R.layout.fragment_matches_aceptados, container, false);
 
         volver = view.findViewById(R.id.btnVolver);
         volver.setOnClickListener(v -> {

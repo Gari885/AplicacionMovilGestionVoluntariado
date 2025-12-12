@@ -1,6 +1,5 @@
 package com.example.appgestionvoluntariado.Activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,15 +7,10 @@ import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.EscaparateFragment;
-import com.example.appgestionvoluntariado.Fragments.DashboardFragment;
-import com.example.appgestionvoluntariado.Fragments.LogInFragment;
-import com.example.appgestionvoluntariado.Fragments.VoluntariosFragment;
+import com.example.appgestionvoluntariado.Fragments.EscaparateFragment;
+import com.example.appgestionvoluntariado.Fragments.RegistroYFormularios.LogInFragment;
 import com.example.appgestionvoluntariado.R;
 
 public class MainActivity extends AppCompatActivity {

@@ -1,7 +1,5 @@
-package com.example.appgestionvoluntariado.Fragments;
+package com.example.appgestionvoluntariado.Fragments.VistaOrganizacion;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,24 +12,23 @@ import android.widget.Button;
 import com.example.appgestionvoluntariado.R;
 
 
-public class VoluntariosFragment extends Fragment {
-
+public class OrganizacionesFragment extends Fragment {
 
     private Button crearOrganizacion;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_voluntarios, container, false);
+        View view =  inflater.inflate(R.layout.fragment_organizaciones, container, false);
 
-        crearOrganizacion = view.findViewById(R.id.btnAnadirVoluntario);
+        crearOrganizacion = view.findViewById(R.id.btnAnadirOrg);
 
         /*crearOrganizacion.setOnClickListener(new View.OnClickListener() {
             @Override

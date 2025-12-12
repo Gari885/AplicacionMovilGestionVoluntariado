@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments;
+package com.example.appgestionvoluntariado.Fragments.RegistroYFormularios;
 
 import android.os.Bundle;
 
@@ -11,9 +11,14 @@ import android.widget.Button;
 
 import com.example.appgestionvoluntariado.R;
 
-public class OrganizacionRegistrarseFragment extends Fragment {
+
+public class VoluntarioRegistrarseFragment extends Fragment {
 
     private Button registrado;
+
+
+    private Button volver;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,7 +28,7 @@ public class OrganizacionRegistrarseFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_registrarse_organizacion, container, false);
+        View view = inflater.inflate(R.layout.fragment_registrarse_voluntario, container, false);
 
         registrado = view.findViewById(R.id.btnRegistrar);
 
@@ -39,6 +44,18 @@ public class OrganizacionRegistrarseFragment extends Fragment {
 
             }
         });
+
+        volver = view.findViewById(R.id.btnVolver);
+        volver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.containerFragments, new MenuRegistrarseFragment())
+                        .addToBackStack(null) // <--- IMPORTANTE: Para que el botón 'Atrás' del móvil te devuelva al menú
+                        .commit();
+            }
+        });
+
         return view;
     }
 

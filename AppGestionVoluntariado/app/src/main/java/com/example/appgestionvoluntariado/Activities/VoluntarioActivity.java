@@ -10,13 +10,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Fragments.DashboardFragment;
-import com.example.appgestionvoluntariado.Fragments.MatchesMenuFragment;
-import com.example.appgestionvoluntariado.Fragments.MisVoluntariadosVolFragment;
-import com.example.appgestionvoluntariado.Fragments.OrgVoluntariadosFragment;
-import com.example.appgestionvoluntariado.Fragments.OrganizacionesFragment;
-import com.example.appgestionvoluntariado.Fragments.VoluntariadosVolFragment;
-import com.example.appgestionvoluntariado.Fragments.VoluntariosFragment;
+import com.example.appgestionvoluntariado.Fragments.VistaVoluntario.MisVoluntariadosVolFragment;
+import com.example.appgestionvoluntariado.Fragments.VistaVoluntario.VoluntariadosVolFragment;
 import com.example.appgestionvoluntariado.R;
 import com.google.android.material.navigation.NavigationView;
 

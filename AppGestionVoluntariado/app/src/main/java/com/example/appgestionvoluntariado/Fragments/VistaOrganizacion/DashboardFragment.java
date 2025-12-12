@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments;
+package com.example.appgestionvoluntariado.Fragments.VistaOrganizacion;
 
 import android.os.Bundle;
 
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import com.example.appgestionvoluntariado.R;
 
-public class MisVoluntariadosVolFragment extends Fragment {
+public class DashboardFragment extends Fragment {
 
 
     @Override
@@ -23,6 +23,6 @@ public class MisVoluntariadosVolFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_mis_voluntariados_vol, container, false);
+        return inflater.inflate(R.layout.fragment_dashboard_organizador, container, false);
     }
 }

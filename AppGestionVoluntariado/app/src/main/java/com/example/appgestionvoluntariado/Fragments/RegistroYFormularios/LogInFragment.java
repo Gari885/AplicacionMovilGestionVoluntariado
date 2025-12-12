@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments;
+package com.example.appgestionvoluntariado.Fragments.RegistroYFormularios;
 
 import android.app.AlertDialog;
 import android.content.Context;
