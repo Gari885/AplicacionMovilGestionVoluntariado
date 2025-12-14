@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments.VistaOrganizador;
+package com.example.appgestionvoluntariado.Fragments.VistaOrganizacion;
 
 import android.os.Bundle;
 
@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.example.appgestionvoluntariado.R;
 
 public class OrgMisVoluntariadosFragment extends Fragment {
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

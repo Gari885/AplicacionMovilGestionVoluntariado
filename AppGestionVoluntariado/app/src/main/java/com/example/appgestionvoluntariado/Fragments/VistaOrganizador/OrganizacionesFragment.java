@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments.VistaOrganizacion;
+package com.example.appgestionvoluntariado.Fragments.VistaOrganizador;
 
 import android.graphics.Color;
 import android.os.Bundle;

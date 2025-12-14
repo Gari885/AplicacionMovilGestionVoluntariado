@@ -10,11 +10,11 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Fragments.VistaOrganizacion.DashboardFragment;
-import com.example.appgestionvoluntariado.Fragments.VistaOrganizacion.MatchesMenuFragment;
-import com.example.appgestionvoluntariado.Fragments.VistaOrganizacion.OrgVoluntariadosFragment;
-import com.example.appgestionvoluntariado.Fragments.VistaOrganizacion.OrganizacionesFragment;
-import com.example.appgestionvoluntariado.Fragments.VistaOrganizacion.VoluntariosFragment;
+import com.example.appgestionvoluntariado.Fragments.VistaOrganizador.DashboardFragment;
+import com.example.appgestionvoluntariado.Fragments.VistaOrganizador.MatchesMenuFragment;
+import com.example.appgestionvoluntariado.Fragments.VistaOrganizador.OrgVoluntariadosFragment;
+import com.example.appgestionvoluntariado.Fragments.VistaOrganizador.OrganizacionesFragment;
+import com.example.appgestionvoluntariado.Fragments.VistaOrganizador.VoluntariosFragment;
 import com.example.appgestionvoluntariado.R;
 import com.google.android.material.navigation.NavigationView;
 

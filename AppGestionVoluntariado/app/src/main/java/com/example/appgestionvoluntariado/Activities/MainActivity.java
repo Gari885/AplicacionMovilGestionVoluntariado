@@ -40,6 +40,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        logoImagen = findViewById(R.id.ivLogo);
+        logoImagen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.containerFragments, new EscaparateFragment()) // <--- Aquí cargas el Dashboard
+                        .commit();
+            }
+        });
+
 
 
 

@@ -191,7 +191,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    app:trackTint="#1A3B85" />
+                    app:trackTint="#1A3B85"/>
             </LinearLayout>
 
             <LinearLayout
