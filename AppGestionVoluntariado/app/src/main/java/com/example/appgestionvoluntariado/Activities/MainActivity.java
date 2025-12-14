@@ -16,6 +16,9 @@ import com.example.appgestionvoluntariado.R;
 public class MainActivity extends AppCompatActivity {
     private Button botonlogIn;
     private ImageView logoImagen;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

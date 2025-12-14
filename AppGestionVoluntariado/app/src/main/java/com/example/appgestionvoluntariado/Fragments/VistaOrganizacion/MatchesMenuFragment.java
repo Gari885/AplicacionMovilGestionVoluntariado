@@ -50,16 +50,31 @@ public class MatchesMenuFragment extends Fragment {
 
         // --- IR A EN CURSO ---
         enCurso.setOnClickListener(v -> {
+            Fragment fragment = new MatchesAceptadosFragment();
+
+            Bundle args = new Bundle();
+            args.putString("TIPO_MATCH", "EN CURSO");
+
+            fragment.setArguments(args);
+
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new MatchesAceptadosFragment())
+                    .replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commit();
         });
 
         // --- IR A COMPLETADOS ---
         completados.setOnClickListener(v -> {
+
+            Fragment fragment = new MatchesAceptadosFragment();
+
+            Bundle args = new Bundle();
+            args.putString("TIPO_MATCH", "COMPLETADOS");
+
+            fragment.setArguments(args);
+
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new MatchesAceptadosFragment())
+                    .replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commit();
         });
