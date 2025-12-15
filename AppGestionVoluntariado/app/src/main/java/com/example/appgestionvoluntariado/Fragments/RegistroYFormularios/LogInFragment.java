@@ -18,8 +18,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.appgestionvoluntariado.Activities.OrganizacionActivity;
 import com.example.appgestionvoluntariado.Activities.OrganizadorActivity;
 import com.example.appgestionvoluntariado.Activities.VoluntarioActivity;
+import com.example.appgestionvoluntariado.Fragments.SesionGlobal;
 import com.example.appgestionvoluntariado.R;
 
 import java.util.HashMap;
@@ -54,7 +56,7 @@ public class LogInFragment extends Fragment {
         credenciales = new HashMap<>();
         credenciales.put("admin@gmail.com", "admin");
         credenciales.put("usuario@gmail.com","usuario");
-        credenciales.put("org","org");
+        credenciales.put("organizacion@gmail.com","org");
 
         correo = view.findViewById(R.id.editTextTextEmailAddress);
         contraseña = view.findViewById(R.id.editTextTextPassword);
@@ -113,12 +115,24 @@ public class LogInFragment extends Fragment {
         Context context = view.getContext();
         if (credenciales.containsKey(email)) {
             if (email.equals("admin@gmail.com") && credenciales.containsValue(contraseña)) {
+                SesionGlobal.setContrasena(contraseña);
                 Intent intent = new Intent(context, OrganizadorActivity.class);
                 startActivity(intent);
             }
             if (email.equals("usuario@gmail.com") && credenciales.containsValue(contraseña)){
+                SesionGlobal.setContrasena(contraseña);
+                SesionGlobal.iniciarSesionVol();
                 Intent intent = new Intent(context, VoluntarioActivity.class);
                 startActivity(intent);
+
+            }
+
+            if (email.equals("organizacion@gmail.com") && credenciales.containsValue(contraseña)){
+                SesionGlobal.setContrasena(contraseña);
+                SesionGlobal.iniciarSesionOrg();
+                Intent intent = new Intent(context, OrganizacionActivity.class);
+                startActivity(intent);
+
             }
         }
 

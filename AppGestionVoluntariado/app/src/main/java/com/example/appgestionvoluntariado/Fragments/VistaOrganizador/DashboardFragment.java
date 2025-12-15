@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments.VistaOrganizacion;
+package com.example.appgestionvoluntariado.Fragments.VistaOrganizador;
 
 import android.os.Bundle;
 
@@ -10,12 +10,7 @@ import android.view.ViewGroup;
 
 import com.example.appgestionvoluntariado.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link OrgVoluntariadosFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class OrgVoluntariadosFragment extends Fragment {
+public class DashboardFragment extends Fragment {
 
 
     @Override
@@ -28,6 +23,6 @@ public class OrgVoluntariadosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_org_voluntariados, container, false);
+        return inflater.inflate(R.layout.fragment_dashboard_organizador, container, false);
     }
 }

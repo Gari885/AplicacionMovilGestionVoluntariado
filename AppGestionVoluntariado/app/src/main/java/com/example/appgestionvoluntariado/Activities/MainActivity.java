@@ -16,6 +16,9 @@ import com.example.appgestionvoluntariado.R;
 public class MainActivity extends AppCompatActivity {
     private Button botonlogIn;
     private ImageView logoImagen;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +39,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        logoImagen = findViewById(R.id.ivLogo);
+        logoImagen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.containerFragments, new EscaparateFragment()) // <--- Aquí cargas el Dashboard
+                        .commit();
+            }
+        });
+
+
+
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

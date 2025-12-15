@@ -7,14 +7,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.example.appgestionvoluntariado.R;
 
-public class MatchesPendientesFragment extends Fragment {
+public class OrgMisVoluntariadosFragment extends Fragment {
 
 
-    private Button volver;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,16 +23,6 @@ public class MatchesPendientesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_matches_pendientes, container, false);
-
-        volver = view.findViewById(R.id.btnVolver);
-        volver.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new MatchesMenuFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        return view;
+        return inflater.inflate(R.layout.fragment_org_mis_voluntariados, container, false);
     }
 }

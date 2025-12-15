@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments.VistaOrganizacion;
+package com.example.appgestionvoluntariado.Fragments.Ajustes;
 
 import android.os.Bundle;
 
@@ -10,19 +10,20 @@ import android.view.ViewGroup;
 
 import com.example.appgestionvoluntariado.R;
 
-public class DashboardFragment extends Fragment {
+
+public class PerfilDatosOrganizacionFragment extends Fragment {
+
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dashboard_organizador, container, false);
+        return inflater.inflate(R.layout.fragment_perfil_datos_organizacion, container, false);
     }
 }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragments.VistaOrganizacion.MatchesAceptadosFragment">
+    tools:context=".Fragments.VistaOrganizador.MatchesAceptadosFragment">
 
     <LinearLayout
     android:layout_width="match_parent"
@@ -83,24 +83,24 @@
         android:weightSum="2">
 
         <TextView
-            android:id="@+id/tabOrgPendientes"
+            android:id="@+id/tabOrgEnCurso"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/background_tab_selected"
-            android:text="Pendientes"
+            android:text="En Curso"
             android:textColor="#FFFFFF"
             android:gravity="center"
             android:textStyle="bold"
             android:layout_marginEnd="8dp"/>
 
         <TextView
-            android:id="@+id/tabOrgAceptados"
+            android:id="@+id/tabOrgCompletados"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/background_tab_unselected"
-            android:text="Aceptados"
+            android:text="Completados"
             android:textColor="#1A3B85"
             android:gravity="center"
             android:textStyle="bold"

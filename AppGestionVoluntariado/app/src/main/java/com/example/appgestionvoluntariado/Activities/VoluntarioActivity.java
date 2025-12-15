@@ -10,6 +10,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.Fragments.Ajustes.PerfilUsuarioFragment;
 import com.example.appgestionvoluntariado.Fragments.VistaVoluntario.MisVoluntariadosVolFragment;
 import com.example.appgestionvoluntariado.Fragments.VistaVoluntario.VoluntariadosVolFragment;
 import com.example.appgestionvoluntariado.R;
@@ -18,7 +19,7 @@ import com.google.android.material.navigation.NavigationView;
 public class VoluntarioActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
-    private ImageView btnMenuHamburguesa;
+    private ImageView btnMenuHamburguesa, ajustesUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,15 @@ public class VoluntarioActivity extends AppCompatActivity {
             }
         });
 
+        ajustesUsuario = findViewById(R.id.opcUsuario);
+        ajustesUsuario.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new PerfilUsuarioFragment()) // <--- Aquí cargas el Dashboard
+                        .commit();
+            }
+        });
 
         // 2. Lógica de navegación del Menú
         navigationView.setNavigationItemSelectedListener(item -> {

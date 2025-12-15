@@ -10,7 +10,13 @@ import android.view.ViewGroup;
 
 import com.example.appgestionvoluntariado.R;
 
-public class OrgMisVoluntariadosFragment extends Fragment {
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link OrgVoluntariadosFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class OrgVoluntariadosFragment extends Fragment {
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -22,6 +28,6 @@ public class OrgMisVoluntariadosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_org_mis_voluntariados, container, false);
+        return inflater.inflate(R.layout.fragment_org_voluntariados, container, false);
     }
 }
