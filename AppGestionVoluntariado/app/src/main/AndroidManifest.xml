@@ -20,42 +20,10 @@
             android:exported="false" />
         <activity
             android:name=".Activities.OrganizadorActivity"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="DuplicateActivity" />
         <activity
             android:name=".Activities.VoluntarioActivity"
-            android:exported="false" />
-        <activity
-            android:name=".OrgVoluntariadosActivity2"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.OrgVoluntariadosActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.OrgMatchesAceptadosActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.OrgMatchesPendientesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.OrgMatchesMenuActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.OrgOrganizacionesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.OrgVoluntariosActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.VolRegistroActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.OrgRegistroActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.RegistrarseActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activities.LogInActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.MainActivity"

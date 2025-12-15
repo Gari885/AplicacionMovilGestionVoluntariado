@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.containerFragments, new EscaparateFragment()) // <--- Aquí cargas el Dashboard
+                    .replace(R.id.containerFragments, new LogInFragment()) // <--- Aquí cargas el Dashboard
                     .commit();
         }
 
