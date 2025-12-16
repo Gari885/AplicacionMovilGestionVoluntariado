@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.appgestionvoluntariado.Fragments.SesionGlobal;
+import com.example.appgestionvoluntariado.SesionGlobal;
 import com.example.appgestionvoluntariado.R;
 
 

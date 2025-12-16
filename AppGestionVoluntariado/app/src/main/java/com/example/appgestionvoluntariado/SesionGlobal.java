@@ -1,7 +1,4 @@
-package com.example.appgestionvoluntariado.Fragments;
-
-import com.example.appgestionvoluntariado.Models.Organizacion;
-import com.example.appgestionvoluntariado.Models.Voluntario;
+package com.example.appgestionvoluntariado;
 
 public class SesionGlobal {
 

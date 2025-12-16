@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.example.appgestionvoluntariado.Fragments.SesionGlobal;
+import com.example.appgestionvoluntariado.SesionGlobal;
 import com.example.appgestionvoluntariado.R;
 
 public class PerfilDatosVoluntarioFragment extends Fragment {

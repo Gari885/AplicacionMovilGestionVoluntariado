@@ -93,6 +93,32 @@
             app:layout_constraintTop_toBottomOf="@+id/lblCorreo" />
 
         <TextView
+            android:id="@+id/lblPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="Contraseña"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etCorreo" />
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/input_rounded_bg"
+            android:hint="********"
+            android:inputType="textPassword"
+            android:paddingStart="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/lblPassword" />
+
+
+        <TextView
             android:id="@+id/lblZona"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,7 +128,7 @@
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etCorreo" />
+            app:layout_constraintTop_toBottomOf="@+id/etPassword" />
 
         <EditText
             android:id="@+id/etZona"
@@ -158,66 +184,60 @@
                 android:paddingStart="10dp" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnAddHabilidades"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:backgroundTint="@color/azul"
-            android:drawableStart="@android:drawable/ic_input_add"
-            android:drawableTint="#FFFFFF"
-            android:paddingStart="20dp"
-            android:text="  Añadir Habilidades"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            app:layout_constraintTop_toBottomOf="@+id/layoutSpinners" />
-
-        <Button
-            android:id="@+id/btnAddIntereses"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:backgroundTint="@color/azul"
-            android:drawableStart="@android:drawable/ic_input_add"
-            android:drawableTint="#FFFFFF"
-            android:paddingStart="20dp"
-            android:text="  Añadir Intereses"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            app:layout_constraintTop_toBottomOf="@+id/btnAddHabilidades" />
-
         <TextView
-            android:id="@+id/lblDatos"
+            android:id="@+id/lblHabilidades"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:text="Datos Añadidos"
+            android:text="Habilidades (Selecciona)"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnAddIntereses" />
+            app:layout_constraintTop_toBottomOf="@+id/layoutSpinners" />
 
-        <EditText
-            android:id="@+id/etDatosAñadidos"
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupHabilidades"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="20dp"
-            android:background="@drawable/input_rounded_bg"
-            android:focusable="false"
-            android:gravity="top|start"
-            android:hint="Aquí aparecerán tus habilidades e intereses seleccionados..."
-            android:inputType="none"
-            android:padding="16dp"
-            android:textColorHint="#757575"
+            app:singleSelection="false"
+            app:layout_constraintTop_toBottomOf="@+id/lblHabilidades">
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cargando..."
+                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+        </com.google.android.material.chip.ChipGroup>
+
+
+        <TextView
+            android:id="@+id/lblIntereses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="Intereses (Selecciona)"
             android:textColor="#000000"
-            app:layout_constraintTop_toBottomOf="@+id/lblDatos" />
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chipGroupHabilidades" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupIntereses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="20dp"
+            app:singleSelection="false"
+            app:layout_constraintTop_toBottomOf="@+id/lblIntereses">
+
+        </com.google.android.material.chip.ChipGroup>
+
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnRegistrar"
@@ -231,7 +251,7 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etDatosAñadidos" />
+            app:layout_constraintTop_toBottomOf="@+id/chipGroupIntereses" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

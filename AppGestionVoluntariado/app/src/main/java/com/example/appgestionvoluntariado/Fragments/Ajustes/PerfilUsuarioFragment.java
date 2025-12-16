@@ -17,9 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.appgestionvoluntariado.Activities.MainActivity;
-import com.example.appgestionvoluntariado.Activities.VoluntarioActivity;
-import com.example.appgestionvoluntariado.Fragments.EscaparateFragment;
-import com.example.appgestionvoluntariado.Fragments.SesionGlobal;
+import com.example.appgestionvoluntariado.SesionGlobal;
 import com.example.appgestionvoluntariado.Fragments.VistaOrganizacion.OrgMisVoluntariadosFragment;
 import com.example.appgestionvoluntariado.Fragments.VistaVoluntario.VoluntariadosVolFragment;
 import com.example.appgestionvoluntariado.R;

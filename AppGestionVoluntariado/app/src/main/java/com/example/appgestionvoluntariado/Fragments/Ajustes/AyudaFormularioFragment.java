@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.appgestionvoluntariado.Fragments.SesionGlobal;
+import com.example.appgestionvoluntariado.SesionGlobal;
 import com.example.appgestionvoluntariado.R;
 
 

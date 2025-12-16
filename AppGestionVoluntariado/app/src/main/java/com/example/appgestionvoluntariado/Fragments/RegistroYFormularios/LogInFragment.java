@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -17,12 +18,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.appgestionvoluntariado.Activities.OrganizacionActivity;
 import com.example.appgestionvoluntariado.Activities.OrganizadorActivity;
 import com.example.appgestionvoluntariado.Activities.VoluntarioActivity;
-import com.example.appgestionvoluntariado.Fragments.SesionGlobal;
+import com.example.appgestionvoluntariado.SesionGlobal;
 import com.example.appgestionvoluntariado.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +46,8 @@ public class LogInFragment extends Fragment {
     private Button login;
 
     private Map<String,String> credenciales ;
+
+    private FirebaseAuth mAuth;
 
     private String regex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
@@ -60,6 +69,7 @@ public class LogInFragment extends Fragment {
 
         correo = view.findViewById(R.id.editTextTextEmailAddress);
         contraseña = view.findViewById(R.id.editTextTextPassword);
+        mAuth = FirebaseAuth.getInstance();
 
 
         txtRegistrar = view.findViewById(R.id.registar);
@@ -136,5 +146,47 @@ public class LogInFragment extends Fragment {
             }
         }
 
+    }
+
+    private void iniciarSesion(String email, String password) {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Login correcto, ahora verificamos qué rol tiene
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            verificarRol(user.getUid());
+                    }
+                });
+        }
+    }
+                
+    }
+
+    private void verificarRol(String uid) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Buscamos el documento del usuario por su ID
+        db.collection("usuarios").document(uid).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Obtenemos el campo "rol"
+                        String rol = documentSnapshot.getString("rol");
+
+                        // Redirigimos según el rol
+                        redirigirUsuario(rol);
+                    }
+                });
+    }
+
+    private void redirigirUsuario(String rol) {
+        Intent intent;
+        if ("admin".equals(rol)) {
+            intent = new Intent(MainActivity.this, AdminActivity.class);
+        } else {
+            intent = new Intent(MainActivity.this, VoluntarioActivity.class);
+        }
+        startActivity(intent);
+        finish();
     }
 }
