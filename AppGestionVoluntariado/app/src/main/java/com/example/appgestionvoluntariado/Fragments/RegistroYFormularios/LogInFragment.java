@@ -26,6 +26,7 @@ import com.example.appgestionvoluntariado.R;
 // pero con Firebase Auth suele ser innecesario guardar la pass en local.
 // import com.example.appgestionvoluntariado.SesionGlobal;
 
+import com.example.appgestionvoluntariado.SesionGlobal;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -140,7 +141,6 @@ public class LogInFragment extends Fragment {
                     if (documentSnapshot.exists()) {
                         // Obtenemos el campo "rol"
                         String rol = documentSnapshot.getString("rol");
-
                         // IMPORTANTE: Manejar el caso de que el rol sea null
                         if (rol != null) {
                             redirigirUsuario(context, rol);
@@ -158,31 +158,27 @@ public class LogInFragment extends Fragment {
 
     private void redirigirUsuario(Context context, String rol) {
         Intent intent = null;
-
-        // Normalizamos el string (quitamos espacios y ponemos minúsculas para comparar mejor)
         String rolNormalizado = rol.trim().toLowerCase();
 
         switch (rolNormalizado) {
             case "voluntario":
-                // Si usabas SesionGlobal aquí, puedes ponerlo antes del intent
+                SesionGlobal.iniciarSesionVol();
                 intent = new Intent(context, VoluntarioActivity.class);
                 break;
             case "organizador":
+                SesionGlobal.iniciarSesionOrg();
                 intent = new Intent(context, OrganizadorActivity.class);
                 break;
             case "organizacion":
                 intent = new Intent(context, OrganizacionActivity.class);
                 break;
             default:
-                // Rol desconocido o "admin"
-                // Puedes redirigir a una por defecto o mostrar error
                 invocarError(context, "Rol de usuario desconocido: " + rol);
                 return;
         }
 
         if (intent != null) {
             startActivity(intent);
-            // IMPORTANTE: En fragmentos se usa requireActivity().finish()
             if (getActivity() != null) {
                 getActivity().finish();
             }
