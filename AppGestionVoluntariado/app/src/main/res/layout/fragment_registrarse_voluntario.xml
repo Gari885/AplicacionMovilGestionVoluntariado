@@ -25,7 +25,7 @@
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="12sp"
-            app:backgroundTint="@null"
+            app:backgroundTint="#1A3B85"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,124 +36,116 @@
             android:layout_marginTop="10dp"
             android:text="Registrarse"
             android:textColor="#1A3B85"
-            android:textSize="38dp"
+            android:textSize="38sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnVolver" />
 
-        <TextView
-            android:id="@+id/lblNombre"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNombre"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:text="Nombre Completo"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitulo" />
-
-        <EditText
-            android:id="@+id/etNombre"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="20dp"
-            android:background="@drawable/input_rounded_bg"
-            android:hint="Juan Pérez"
-            android:inputType="textPersonName"
-            android:paddingStart="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/lblNombre" />
+            android:hint="Nombre Completo"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:errorEnabled="true"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitulo">
 
-        <TextView
-            android:id="@+id/lblCorreo"
-            android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilCorreo"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:text="Correo Electrónico"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etNombre" />
-
-        <EditText
-            android:id="@+id/etCorreo"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
-            android:background="@drawable/input_rounded_bg"
-            android:hint="juan@gmail.com"
-            android:inputType="textEmailAddress"
-            android:paddingStart="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/lblCorreo" />
+            android:hint="Correo Electrónico"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:errorEnabled="true"
+            app:layout_constraintTop_toBottomOf="@+id/tilNombre">
 
-        <TextView
-            android:id="@+id/lblPassword"
-            android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCorreo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPassword"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:text="Contraseña"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etCorreo" />
-
-        <EditText
-            android:id="@+id/etPassword"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
-            android:background="@drawable/input_rounded_bg"
-            android:hint="********"
-            android:inputType="textPassword"
-            android:paddingStart="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/lblPassword" />
+            android:hint="Contraseña"
+            app:endIconMode="password_toggle"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:errorEnabled="true"
+            app:layout_constraintTop_toBottomOf="@+id/tilCorreo">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/lblZona"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilZona"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:text="Zona"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etPassword" />
-
-        <EditText
-            android:id="@+id/etZona"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
-            android:background="@drawable/input_rounded_bg"
-            android:hint="Pamplona"
-            android:inputType="text"
-            android:paddingStart="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/lblZona" />
+            android:hint="Zona / Ciudad"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:errorEnabled="true"
+            app:layout_constraintTop_toBottomOf="@+id/tilPassword">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etZona"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/lblDisponibilidad"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="20dp"
             android:text="Disponibilidad"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etZona" />
+            app:layout_constraintTop_toBottomOf="@+id/tilZona" />
 
         <LinearLayout
             android:id="@+id/layoutSpinners"
@@ -188,7 +180,7 @@
             android:id="@+id/lblHabilidades"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="20dp"
             android:text="Habilidades (Selecciona)"
             android:textColor="#000000"
@@ -218,7 +210,7 @@
             android:id="@+id/lblIntereses"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="20dp"
             android:text="Intereses (Selecciona)"
             android:textColor="#000000"
@@ -244,7 +236,7 @@
             android:layout_width="200dp"
             android:layout_height="50dp"
             android:layout_marginTop="40dp"
-            android:backgroundTint="@color/azul"
+            android:backgroundTint="#1A3B85"
             android:text="Registrarme"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"

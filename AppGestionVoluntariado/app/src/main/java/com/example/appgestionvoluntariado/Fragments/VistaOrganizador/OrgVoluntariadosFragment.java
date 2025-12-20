@@ -7,17 +7,14 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.example.appgestionvoluntariado.Fragments.RegistroYFormularios.VoluntariadoCrearFragment;
 import com.example.appgestionvoluntariado.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link OrgVoluntariadosFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class OrgVoluntariadosFragment extends Fragment {
 
-
+    private Button anadirVol;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +25,19 @@ public class OrgVoluntariadosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_org_voluntariados, container, false);
+        View view = inflater.inflate(R.layout.fragment_org_voluntariados, container, false);
+
+        anadirVol = view.findViewById(R.id.btnAnadirVoluntariado);
+
+        anadirVol.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new VoluntariadoCrearFragment())
+                        .commit();
+            }
+        });
+
+        return view;
     }
 }

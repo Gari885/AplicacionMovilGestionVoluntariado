@@ -70,6 +70,7 @@ public class OrganizacionRegistrarseFragment extends Fragment {
     }
 
     private boolean verificarFormulario() {
+        Boolean validado = true;
         String error = "";
         String nombreVerificar = nombre.getText().toString();
         String emailVerificar = email.getText().toString();
@@ -77,9 +78,10 @@ public class OrganizacionRegistrarseFragment extends Fragment {
         String zonaVerificar = zona.getText().toString();
         String descripcionVerificar = descripcion.getText().toString();
 
-        if ((nombreVerificar.isEmpty() || nombreVerificar.isBlank()) || (emailVerificar.isBlank()|| emailVerificar.isEmpty()) || (sectorVerificar.isEmpty() || sectorVerificar.isBlank())
-        || (zonaVerificar.isBlank() || zonaVerificar.isEmpty()) || (descripcionVerificar.isEmpty() || descripcionVerificar.isBlank())){
-            error = "No puedes dejar ningun campo vacio";
+        if (nombreVerificar.isEmpty() || emailVerificar.isEmpty() || sectorVerificar.isEmpty()
+        || zonaVerificar.isEmpty() || descripcionVerificar.isEmpty()){
+            nombre.setError("No puedes dejar ningun campo vacio");
+            validado = false;
         }else {
             for (char c : nombreVerificar.toCharArray()){
                 if ((!Character.isUpperCase(c)) || (!Character.isUpperCase(c))){
@@ -90,6 +92,8 @@ public class OrganizacionRegistrarseFragment extends Fragment {
 
             if (!emailVerificar.matches(regex)){
                 error = "Debes introducir un email valido";
+                validado = false;
+
             }
 
             for (char c : sectorVerificar.toCharArray()){
@@ -102,7 +106,7 @@ public class OrganizacionRegistrarseFragment extends Fragment {
 
 
 
-        if (error == ""){
+        if (validado){
             registrarOrganizacion();
             return true;
         }else {
