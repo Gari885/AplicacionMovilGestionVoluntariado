@@ -119,8 +119,14 @@ public class LogInFragment extends Fragment {
                             // 1. Auth correcto. Obtenemos usuario
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
-                                // 2. Verificamos su rol en Firestore
-                                verificarRol(context, user.getUid());
+                                if (user.isEmailVerified()) {
+                                    // Está verificado -> Puede pasar
+                                    verificarRol(context, user.getUid());
+                                } else {
+                                    // No está verificado -> Fuera
+                                    invocarError(context, "Debes verificar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada (y Spam).");
+                                    mAuth.signOut(); // Le cerramos la puerta
+                                }
                             }
                         } else {
                             // Error en Firebase (contraseña mal, usuario no existe, etc)
