@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +43,9 @@ public class VoluntarioRegistrarseFragment extends Fragment {
 
     private Button volver;
 
-    private EditText email, contraseña;
+    private TextInputEditText nombreInput, emailInput, contraseñaInput, zonaInput;
+
+    private TextInputLayout nombreLayout, emailLayout, contraseñaLayout, zonaLayout;
 
     private ArrayList<String> dias, horario;
 
@@ -60,8 +64,14 @@ public class VoluntarioRegistrarseFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_registrarse_voluntario, container, false);
 
         registrado = view.findViewById(R.id.btnRegistrar);
-        email = view.findViewById(R.id.etCorreo);
-        contraseña = view.findViewById(R.id.etPassword);
+        nombreInput = view.findViewById(R.id.etNombre);
+        zonaInput = view.findViewById(R.id.etZona);
+        emailInput = view.findViewById(R.id.etCorreo);
+        contraseñaInput = view.findViewById(R.id.etPassword);
+        nombreLayout = view.findViewById(R.id.tilNombre);
+        emailLayout = view.findViewById(R.id.tilCorreo);
+        contraseñaLayout = view.findViewById(R.id.tilPassword);
+        zonaLayout = view.findViewById(R.id.tilZona);
         mAuth = FirebaseAuth.getInstance();
         dia = view.findViewById(R.id.spinnerDia);
         hora = view.findViewById(R.id.spinnerHorario);
@@ -92,12 +102,8 @@ public class VoluntarioRegistrarseFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (esFormularioValido()){
-                    registrarVoluntario(v,email.getText().toString(),contraseña.getText().toString(), "voluntario");
+                    registrarVoluntario(v,emailInput.getText().toString(),contraseñaInput.getText().toString(), "voluntario");
 
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.containerFragments, new LogInFragment())
-                            .addToBackStack(null) // <--- IMPORTANTE: Para que el botón 'Atrás' del móvil te devuelva al menú
-                            .commit();
                 }
 
             }
@@ -187,70 +193,79 @@ public class VoluntarioRegistrarseFragment extends Fragment {
         boolean esValido = true;
 
         // --- 1. VALIDAR NOMBRE ---
-        String nombre = this.nombre.getText().toString().trim();
+        String nombre = this.nombreInput.getText().toString().trim();
         if (nombre.isEmpty()) {
-            tilNombre.setError("No puedes dejar el campo vacío");
+            nombreLayout.setError("No puedes dejar el campo vacío");
             esValido = false;
         } else if (!nombre.matches("^[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+$")) {
-            tilNombre.setError("El nombre solo puede contener letras");
+            nombreLayout.setError("El nombre solo puede contener letras");
             esValido = false;
         } else {
-            tilNombre.setError(null); // Borra el error si ya lo arregló
+            nombreLayout.setError(null); // Borra el error si ya lo arregló
         }
 
         // --- 2. VALIDAR EMAIL ---
-        String email = this.email.getText().toString().trim();
+        String email = this.emailInput.getText().toString().trim();
         if (email.isEmpty()) {
-            tilCorreo.setError("No puedes dejar el campo vacío");
+            emailLayout.setError("No puedes dejar el campo vacío");
             esValido = false;
         } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilCorreo.setError("Introduce un correo válido");
+            emailLayout.setError("Introduce un correo válido");
             esValido = false;
         } else {
-            tilCorreo.setError(null);
+            emailLayout.setError(null);
         }
 
         // --- 3. VALIDAR CONTRASEÑA ---
-        String contraseña = this.contraseña.getText().toString().trim();
+        String contraseña = this.contraseñaInput.getText().toString().trim();
         if (contraseña.isEmpty()) {
-            tilContraseña.setError("No puedes dejar el campo vacío");
+            contraseñaLayout.setError("No puedes dejar el campo vacío");
             esValido = false;
         } else if (!comprobarContra(contraseña)) {
-            tilContraseña.setError("La contraseña debe tener minimo 10 caracteres, una mayuscula, una minuscula, un numero y un caracter especial");
+            contraseñaLayout.setError("La contraseña debe tener minimo 10 caracteres, una mayuscula, una minuscula, un numero y un caracter especial");
             esValido = false;
         } else {
-            tilCorreo.setError(null);
-        }
-
-        // --- 4. VALIDAR SECTOR ---
-        String sector = this.sector.getText().toString().trim();
-        if (sector.isEmpty()) {
-            tilSector.setError("No puedes dejar el campo vacío");
-            esValido = false;
-        } else if (!sector.matches("^[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+$")) {
-            tilSector.setError("Solo letras permitidas");
-            esValido = false;
-        } else {
-            tilSector.setError(null);
+            contraseñaLayout.setError(null);
         }
 
         // --- 5. VALIDAR ZONA ---
-        if (this.zona.getText().toString().trim().isEmpty()) {
-            tilZona.setError("No puedes dejar el campo vacío");
+        if (this.zonaInput.getText().toString().trim().isEmpty()) {
+            zonaLayout.setError("No puedes dejar el campo vacío");
             esValido = false;
         } else {
-            tilZona.setError(null);
+            zonaLayout.setError(null);
         }
 
-        // --- 6. VALIDAR DESCRIPCIÓN ---
-        if (this.descripcion.getText().toString().trim().isEmpty()) {
-            tilDescripcion.setError("Cuéntanos algo sobre la organización");
-            esValido = false;
-        } else {
-            tilDescripcion.setError(null);
-        }
+        //TO DO:
+        //AÑADIR VALIDACIONES QUE FALTAN, NECESITAMOS CONECTAR CON API PARA SACAR DATOS
 
         return esValido;
+    }
+
+    private boolean comprobarContra(String contra) {
+        Boolean minuscula = false;
+        Boolean mayuscula = false;
+        Boolean caractererEspecial = false;
+        Boolean numero = false;
+        Boolean longMinima = false;
+        int longitud = 0;
+
+        for (char c : contra.toCharArray()) {
+            if (Character.isLowerCase(c)) {
+                minuscula = true;
+            } else if (Character.isUpperCase(c)) {
+                mayuscula = true;
+            } else if (Character.isDigit(c)) {
+                numero = true;
+            } else {
+                caractererEspecial = true;
+            }
+            longitud++;
+
+        }
+        if (longitud >= 10) longMinima = true;
+
+        return minuscula && mayuscula && caractererEspecial && numero && longMinima;
     }
 
 }
