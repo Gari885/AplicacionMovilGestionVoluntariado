@@ -14,6 +14,8 @@ public class Voluntariado {
 
     private ArrayList<String> necesidades;
 
+
+
     private ArrayList<String> ods;
 
     public Voluntariado(){}

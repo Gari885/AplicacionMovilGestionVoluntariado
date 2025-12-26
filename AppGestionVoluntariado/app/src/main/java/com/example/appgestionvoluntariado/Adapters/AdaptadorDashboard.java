@@ -41,7 +41,7 @@ public class AdaptadorDashboard extends RecyclerView.Adapter<AdaptadorDashboard.
     }
 
     public class GridHolder extends RecyclerView.ViewHolder {
-        TextView textoIcono;
+        //TextView textoIcono;
         TextView textoTitulo;
         TextView numStat1;
         TextView textoStat2;
@@ -49,7 +49,7 @@ public class AdaptadorDashboard extends RecyclerView.Adapter<AdaptadorDashboard.
 
         public GridHolder(@NonNull View itemView) {
             super(itemView);
-            textoIcono = itemView.findViewById(R.id.icono);
+            //textoIcono = itemView.findViewById(R.id.iconoImg);
             textoTitulo = itemView.findViewById(R.id.titulo);
             numStat1 = itemView.findViewById(R.id.stats1);
             textoStat2 = itemView.findViewById(R.id.stats2);
@@ -60,10 +60,10 @@ public class AdaptadorDashboard extends RecyclerView.Adapter<AdaptadorDashboard.
             numStat1.setText(stat1);
             textoStat2.setText(stat.getStat2());
             icon = stat.getIcon2();
-            setIcon(icon);
+            //setIcon(icon);
         }
 
-        private void setIcon(String icon) {
+        /*private void setIcon(String icon) {
             switch (icon) {
                 case "voluntarios":
                     textoIcono.setText("👥");
@@ -81,7 +81,9 @@ public class AdaptadorDashboard extends RecyclerView.Adapter<AdaptadorDashboard.
                     textoIcono.setText("?");
                     break;
             }
+
         }
+        */
     }
 
 }

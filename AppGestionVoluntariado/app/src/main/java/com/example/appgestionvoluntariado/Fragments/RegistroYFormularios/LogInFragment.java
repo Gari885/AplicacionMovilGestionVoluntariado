@@ -123,6 +123,7 @@ public class LogInFragment extends Fragment {
                                     // Está verificado -> Puede pasar
                                     verificarRol(context, user.getUid());
                                 } else {
+                                    user.sendEmailVerification();
                                     // No está verificado -> Fuera
                                     invocarError(context, "Debes verificar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada (y Spam).");
                                     mAuth.signOut(); // Le cerramos la puerta
@@ -171,7 +172,7 @@ public class LogInFragment extends Fragment {
                 SesionGlobal.iniciarSesionVol();
                 intent = new Intent(context, VoluntarioActivity.class);
                 break;
-            case "organizador":
+            case "admin":
                 SesionGlobal.iniciarSesionOrg();
                 intent = new Intent(context, OrganizadorActivity.class);
                 break;
