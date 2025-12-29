@@ -28,7 +28,7 @@ public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntari
 
 
     public AdaptadorVoluntario(List<Voluntario> voluntarios) {
-        this.voluntarios  = voluntarios;
+        this.voluntarios  = new ArrayList<>(voluntarios);
 
     }
     @NonNull
@@ -47,6 +47,15 @@ public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntari
     @Override
     public int getItemCount() {
         return voluntarios.size();
+    }
+
+    public void actualizarDatos(List<Voluntario> voluntariosFiltrados) {
+
+        this.voluntarios.clear();
+
+        this.voluntarios.addAll(voluntariosFiltrados);
+
+        notifyDataSetChanged();
     }
 
     public class GridHolder extends RecyclerView.ViewHolder {
@@ -79,11 +88,13 @@ public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntari
                     LinearLayout intereses = popupView.findViewById(R.id.containerIntereses);
                     LinearLayout cerrar = popupView.findViewById(R.id.btnCerrarPopup);
 
-                    disponibilidad.setText(voluntario.getDisponibilidad());
+                    /*disponibilidad.setText(voluntario.getDisponibilidad());
 
                     rellenarTags(context,habilidades,voluntario.getHabilidades());
                     rellenarTags(context,intereses,voluntario.getIntereses());
 
+
+                     */
                     // 4. Mostrar
                     builder.setView(popupView);
                     AlertDialog dialog = builder.create();

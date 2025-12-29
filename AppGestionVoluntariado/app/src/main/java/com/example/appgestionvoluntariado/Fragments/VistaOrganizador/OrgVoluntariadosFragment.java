@@ -68,13 +68,13 @@ public class OrgVoluntariadosFragment extends Fragment {
 
 
                 } else {
-                    Log.e("DogApi", "Error en la respuesta: " + response.code());
+                    Log.e("Voluntariados", "Error en la respuesta: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Voluntariado>> call, Throwable t) {
-                Log.e("DogApi", "Error en la llamada", t);
+                Log.e("Voluntariados", "Error en la llamada", t);
 
             }
         });

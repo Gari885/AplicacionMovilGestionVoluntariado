@@ -2,36 +2,73 @@ package com.example.appgestionvoluntariado.Models;
 
 import java.util.ArrayList;
 
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+
 public class Organizacion {
 
+    @SerializedName("cif")
+    private String cif;
+
+    @SerializedName("nombre")
     private String nombre;
 
+    @SerializedName("email")
     private String email;
 
+    // --- NUEVOS CAMPOS DETECTADOS EN EL JSON ---
+    @SerializedName("sector")
+    private String sector; // Puede ser null, String lo aguanta bien
+
+    @SerializedName("direccion")
+    private String direccion;
+
+    @SerializedName("localidad")
+    private String localidad;
+
+    @SerializedName("cp")
+    private String cp; // Código postal (Mejor String para no perder ceros iniciales)
+
+    @SerializedName("descripcion")
     private String descripcion;
 
-    private String horarioHabitual;
+    @SerializedName("contacto")
+    private String contacto;
 
-    private ArrayList<String> necesidades;
+    @SerializedName("estado")
+    private String estado; // "aprobado", "pendiente"...
 
-    public Organizacion(){}
+    // --- CAMBIO IMPORTANTE: Lista de Actividades ---
+    // En el JSON, la organización tiene una lista de "actividades".
+    // Reutilizamos la clase Voluntariado que creamos antes.
+    @SerializedName("actividades")
+    private List<Voluntariado> actividades;
 
-    public Organizacion(String nombre, String email){
-        this.nombre = nombre;
-        this.email = email;
+    // --- CONSTRUCTOR VACÍO (Obligatorio para Gson/Retrofit) ---
+    public Organizacion() {
     }
 
-    public Organizacion(String nombre, String email,String horarioHabitual, String descripcion, ArrayList<String> necesidades){
-        this.nombre = nombre;
-        this.email = email;
-        this.descripcion = descripcion;
-        this.horarioHabitual = horarioHabitual;
-        this.necesidades = necesidades;
-    }
+    // --- GETTERS ---
+    public String getCif() { return cif; }
+    public String getNombre() { return nombre; }
+    public String getEmail() { return email; }
+    public String getSector() { return sector; }
+    public String getDireccion() { return direccion; }
+    public String getLocalidad() { return localidad; }
+    public String getCp() { return cp; }
+    public String getDescripcion() { return descripcion; }
+    public String getContacto() { return contacto; }
+    public String getEstado() { return estado; }
 
-    public String getNombre(){return this.nombre;}
-    public String getHorarioHabitual(){return this.horarioHabitual;}
-    public String getEmail(){return this.email;}
-    public String getDescripcion(){return this.descripcion;}
-    public ArrayList<String> getNecesidades(){return this.necesidades;}
+    // Este getter te devolverá la lista de voluntariados de esa ONG
+    public List<Voluntariado> getActividades() { return actividades; }
+
+    // --- SETTERS (Opcionales) ---
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setEmail(String email) { this.email = email; }
+
+    public void setEstado(String nuevoEstado) {
+        this.estado = nuevoEstado;
+    }
+    // ... genera el resto si los necesitas
 }

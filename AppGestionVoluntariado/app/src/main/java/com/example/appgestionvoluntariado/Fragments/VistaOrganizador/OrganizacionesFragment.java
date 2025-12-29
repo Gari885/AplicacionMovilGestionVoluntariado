@@ -3,81 +3,151 @@ package com.example.appgestionvoluntariado.Fragments.VistaOrganizador;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull; // Importante para buenas prácticas
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager; // Falta importar esto
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast; // Para avisar al usuario si falla
 
+import com.example.appgestionvoluntariado.Adapters.AdaptadorOrganizador;
+import com.example.appgestionvoluntariado.Models.Organizacion;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Services.OrganizationAPIService;
 
+import java.util.ArrayList; // Importante
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class OrganizacionesFragment extends Fragment {
 
     private Button crearOrganizacion;
-
     private TextView tabPendientes, tabAceptados;
     private RecyclerView recyclerView;
 
+    // Inicializamos las listas aquí para evitar NullPointerException
+    private List<Organizacion> organizaciones = new ArrayList<>();
+    private List<Organizacion> organizacionsFiltradas = new ArrayList<>();
 
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private OrganizationAPIService apiService;
+    private AdaptadorOrganizador adaptadorOrganizador;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_organizaciones, container, false);
+        View view = inflater.inflate(R.layout.fragment_organizaciones, container, false);
 
+        // 1. Vincular Vistas
         crearOrganizacion = view.findViewById(R.id.btnAnadirOrg);
         recyclerView = view.findViewById(R.id.rvOrganizaciones);
         tabPendientes = view.findViewById(R.id.tabOrgPendientes);
         tabAceptados = view.findViewById(R.id.tabOrgAceptados);
 
-        tabPendientes.setOnClickListener(v -> mostrarPendientes());
-        tabAceptados.setOnClickListener(v -> mostrarAceptados());
+        // 2. Configurar RecyclerView (¡OBLIGATORIO!)
+        // Si no pones el LayoutManager, no se verá nada aunque tengas datos
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mostrarPendientes();
-
-        /*crearOrganizacion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, OrgRegistroActivity.class);
-                intent.putExtra("tipo", "Añadir");
-                startActivity(intent);
-            }
+        // 3. Listeners de las Tabs
+        tabPendientes.setOnClickListener(v -> {
+            cambiarTabsVisualmente(true); // true = pendientes seleccionado
+            filtrarYMostrar("Pendiente");
         });
-        */
+
+        tabAceptados.setOnClickListener(v -> {
+            cambiarTabsVisualmente(false); // false = aceptados seleccionado
+            filtrarYMostrar("Aprobado"); // O el estado que uses para aceptados
+        });
+
+        // 4. Cargar Datos
+        cargarDatosDeAPI();
+
         return view;
     }
 
-    private void mostrarAceptados() {
-        tabAceptados.setBackgroundResource(R.drawable.background_tab_selected);
-        tabAceptados.setTextColor(Color.WHITE);
+    private void cargarDatosDeAPI() {
 
-        tabPendientes.setBackgroundResource(R.drawable.background_tab_unselected);
-        tabPendientes.setTextColor(Color.parseColor("#1A3B85"));
+        apiService = APIClient.getOrganizationAPIService();
+        Call<List<Organizacion>> call = apiService.getOrganizations();
 
+        call.enqueue(new Callback<List<Organizacion>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Organizacion>> call, @NonNull Response<List<Organizacion>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Guardamos la lista maestra
+                    organizaciones = response.body();
+
+                    // CORRECCIÓN CRÍTICA:
+                    // Mostramos los datos AHORA que ya han llegado, no antes.
+                    // Por defecto mostramos pendientes al iniciar
+                    cambiarTabsVisualmente(true);
+                    filtrarYMostrar("Pendiente");
+                } else {
+                    Log.e("API", "Error: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Organizacion>> call, @NonNull Throwable t) {
+                Log.e("API", "Error de conexión", t);
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
+    // He unificado tu lógica de filtrado en un solo método más limpio
+    private void filtrarYMostrar(String estadoBuscado) {
+        // 1. Limpiar la lista anterior para no duplicar
+        organizacionsFiltradas.clear();
 
-    private void mostrarPendientes() {
-        tabAceptados.setBackgroundResource(R.drawable.background_tab_unselected);
-        tabAceptados.setTextColor(Color.parseColor("#1A3B85"));
+        // 2. Filtrar
+        if (organizaciones != null) {
+            for (Organizacion org : organizaciones) {
+                if (org.getEstado() == null) continue;
 
-        tabPendientes.setBackgroundResource(R.drawable.background_tab_selected);
-        tabPendientes.setTextColor(Color.WHITE);
+                if (estadoBuscado.equals("Pendiente")) {
+                    if (org.getEstado().equalsIgnoreCase("Pendiente")) {
+                        organizacionsFiltradas.add(org);
+                    }
+                } else if (estadoBuscado.equals("Aprobado")) {
+                    if (org.getEstado().equalsIgnoreCase("Aprobado")) {
+                        organizacionsFiltradas.add(org);
+                    }
+                }
+            }
+        }
 
-
+        // 3. Actualizar el adaptador
+        if (adaptadorOrganizador == null) {
+            adaptadorOrganizador = new AdaptadorOrganizador(organizacionsFiltradas);
+            recyclerView.setAdapter(adaptadorOrganizador);
+        } else {
+            adaptadorOrganizador.actualizarDatos(organizacionsFiltradas);
+        }
     }
 
-
+    private void cambiarTabsVisualmente(boolean esPendientes) {
+        if (esPendientes) {
+            tabPendientes.setBackgroundResource(R.drawable.background_tab_selected);
+            tabPendientes.setTextColor(Color.WHITE);
+            tabAceptados.setBackgroundResource(R.drawable.background_tab_unselected);
+            tabAceptados.setTextColor(Color.parseColor("#1A3B85"));
+        } else {
+            tabAceptados.setBackgroundResource(R.drawable.background_tab_selected);
+            tabAceptados.setTextColor(Color.WHITE);
+            tabPendientes.setBackgroundResource(R.drawable.background_tab_unselected);
+            tabPendientes.setTextColor(Color.parseColor("#1A3B85"));
+        }
+    }
 }

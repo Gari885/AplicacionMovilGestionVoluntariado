@@ -69,7 +69,7 @@ public class AdaptadorMatches extends RecyclerView.Adapter<AdaptadorMatches.Grid
             nombreVol.setText(match.getVoluntario().getNombre());
             emailVol.setText(match.getVoluntario().getEmail());
             tituloAct.setText(match.getActividad().getTitulo());
-            zonaAct.setText(match.getActividad().getZona());
+            zonaAct.setText(match.getActividad().getDireccion());
 
         }
 

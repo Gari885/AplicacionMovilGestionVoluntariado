@@ -1,4 +1,14 @@
 package com.example.appgestionvoluntariado.Services;
 
-public class VolunteerAPIService {
+import com.example.appgestionvoluntariado.Models.Organizacion;
+import com.example.appgestionvoluntariado.Models.Voluntario;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.http.GET;
+
+public interface VolunteerAPIService {
+    @GET("voluntarios")
+    Call<List<Voluntario>> getVoluntarios();
 }

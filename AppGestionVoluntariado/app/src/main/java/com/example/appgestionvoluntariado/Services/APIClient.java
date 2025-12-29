@@ -17,4 +17,28 @@ public class APIClient {
         return retrofit.create(ActivitiesAPIService.class);
     }
 
+    public static OrganizationAPIService getOrganizationAPIService(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        return retrofit.create(OrganizationAPIService.class);
+    }
+
+    public static VolunteerAPIService getVolunteerAPIService(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        return retrofit.create(VolunteerAPIService.class);
+    }
+
+
+
+
+
 }

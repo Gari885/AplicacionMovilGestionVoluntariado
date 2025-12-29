@@ -64,8 +64,8 @@ public class AdaptadorVoluntariado extends RecyclerView.Adapter<AdaptadorVolunta
         }
         public void assingData(Voluntariado voluntariado) {
             titulo.setText(voluntariado.getTitulo());
-            zona.setText(voluntariado.getZona());
-            fecha.setText(voluntariado.getFecha());
+            zona.setText(voluntariado.getDireccion());
+            fecha.setText(voluntariado.getFechaInicio());
             info.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -80,8 +80,7 @@ public class AdaptadorVoluntariado extends RecyclerView.Adapter<AdaptadorVolunta
                     LinearLayout ods = popupView.findViewById(R.id.containerODS);
                     LinearLayout cerrar = popupView.findViewById(R.id.btnCerrarPopup);
 
-                    descripcion.setText(voluntariado.getDescripcion());
-                    fecha.setText(voluntariado.getFecha());
+                    fecha.setText(voluntariado.getFechaFin());
 
                     rellenarTags(context,necesidades,voluntariado.getNecesidades());
                     rellenarTags(context,ods,voluntariado.getOds());
@@ -98,7 +97,7 @@ public class AdaptadorVoluntariado extends RecyclerView.Adapter<AdaptadorVolunta
 
         }
 
-        private void rellenarTags(Context context, LinearLayout container, ArrayList<String> lista) {
+        private void rellenarTags(Context context, LinearLayout container, List<String> lista) {
             container.removeAllViews();
 
             if (lista == null) return;
