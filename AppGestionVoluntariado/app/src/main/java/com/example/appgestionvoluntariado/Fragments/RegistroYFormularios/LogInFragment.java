@@ -21,11 +21,14 @@ import android.widget.TextView;
 import com.example.appgestionvoluntariado.Activities.OrganizacionActivity;
 import com.example.appgestionvoluntariado.Activities.OrganizadorActivity;
 import com.example.appgestionvoluntariado.Activities.VoluntarioActivity;
+import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.R;
 // Si necesitas SesionGlobal para algo específico, descoméntalo,
 // pero con Firebase Auth suele ser innecesario guardar la pass en local.
 // import com.example.appgestionvoluntariado.SesionGlobal;
 
+import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Services.FindVolunteerAPIService;
 import com.example.appgestionvoluntariado.SesionGlobal;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,6 +36,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LogInFragment extends Fragment {
 
@@ -166,16 +173,30 @@ public class LogInFragment extends Fragment {
     private void redirigirUsuario(Context context, String rol) {
         Intent intent = null;
         String rolNormalizado = rol.trim().toLowerCase();
-
+        String email = correo.getText().toString();
         switch (rolNormalizado) {
             case "voluntario":
-                SesionGlobal.iniciarSesionVol();
+                FindVolunteerAPIService findVolunteerAPIService;
+                findVolunteerAPIService = APIClient.getfindVolunteerAPIService();
+                Call<Voluntario> call = findVolunteerAPIService.getVoluntario(email);
+                call.enqueue(new Callback<Voluntario>() {
+                    @Override
+                    public void onResponse(Call<Voluntario> call, Response<Voluntario> response) {
+                        SesionGlobal.iniciarSesionVol(response.body());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Voluntario> call, Throwable t) {
+
+                    }
+                });
                 intent = new Intent(context, VoluntarioActivity.class);
                 break;
+
             case "admin":
-                SesionGlobal.iniciarSesionOrg();
+                /*SesionGlobal.iniciarSesionOrg();
                 intent = new Intent(context, OrganizadorActivity.class);
-                break;
+                break;*/
             case "organizacion":
                 intent = new Intent(context, OrganizacionActivity.class);
                 break;

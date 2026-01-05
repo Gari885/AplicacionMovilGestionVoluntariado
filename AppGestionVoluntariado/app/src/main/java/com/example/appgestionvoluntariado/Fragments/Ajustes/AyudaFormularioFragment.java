@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.SesionGlobal;
 import com.example.appgestionvoluntariado.R;
 
@@ -22,6 +23,8 @@ public class AyudaFormularioFragment extends Fragment {
     private TextView emailUsuario;
 
     private EditText mensaje;
+
+    private Voluntario vol;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,8 +41,9 @@ public class AyudaFormularioFragment extends Fragment {
         enviar = view.findViewById(R.id.btnEnviar);
         emailUsuario = view.findViewById(R.id.tvDeUsuario);
         mensaje = view.findViewById(R.id.etMensaje);
+        vol = SesionGlobal.getVoluntario();
 
-        emailUsuario.setText(SesionGlobal.getEmail());
+        emailUsuario.setText(vol.getEmail());
 
         volver.setOnClickListener(new View.OnClickListener() {
             @Override

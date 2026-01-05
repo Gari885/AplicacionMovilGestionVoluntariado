@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.appgestionvoluntariado.Activities.MainActivity;
+import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.SesionGlobal;
 import com.example.appgestionvoluntariado.Fragments.VistaOrganizacion.OrgMisVoluntariadosFragment;
 import com.example.appgestionvoluntariado.Fragments.VistaVoluntario.VoluntariadosVolFragment;
@@ -31,6 +32,8 @@ public class PerfilUsuarioFragment extends Fragment {
     private TextView usuarioNombre,usuarioEmail;
 
     private SwitchCompat switchNotis;
+
+    private Voluntario vol;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class PerfilUsuarioFragment extends Fragment {
         usuarioNombre = view.findViewById(R.id.tvNombreUsuario);
         volver = view.findViewById(R.id.btnVolver);
         switchNotis = view.findViewById(R.id.switchNotificaciones);
+        vol = SesionGlobal.getVoluntario();
 
         switchNotis.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -65,8 +69,8 @@ public class PerfilUsuarioFragment extends Fragment {
         });
 
 
-        usuarioNombre.setText(SesionGlobal.getNombre());
-        usuarioEmail.setText(SesionGlobal.getEmail());
+        usuarioNombre.setText(vol.getNombre());
+        usuarioEmail.setText(vol.getEmail());
 
         volver.setOnClickListener(new View.OnClickListener() {
             @Override

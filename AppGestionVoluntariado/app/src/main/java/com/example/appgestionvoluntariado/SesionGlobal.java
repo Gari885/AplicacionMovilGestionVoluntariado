@@ -18,7 +18,8 @@ public class SesionGlobal {
 
     private enum tipoUsuario {
         VOLUNTARIO,
-        ORGANIZACION
+        ORGANIZACION,
+        ADMINISTRADOR
     }
 
     private static tipoUsuario tipoActual = tipoUsuario.VOLUNTARIO;
@@ -40,16 +41,13 @@ public class SesionGlobal {
         sesionOrg = organizacion;
     }
 
-    public static void iniciarSesionVol(){
+    public static void iniciarSesionVol(Voluntario vol){
+        sesionVol = vol;
         tipoActual = tipoUsuario.VOLUNTARIO;
-        nombre = "Juan Perez";
-        email = "juanperez@gmail.com";
     }
 
-    public static void iniciarSesionOrg(){
+    public static void iniciarSesionOrg(Organizacion org){
         tipoActual = tipoUsuario.ORGANIZACION;
-        nombre = "ONG Ayuda Global";
-        email = "contacto@ong.org";
     }
 
     public static void invocarError(Context context, String error) {
@@ -83,9 +81,14 @@ public class SesionGlobal {
         email = null;
     }
 
-    public static String getNombre() { return nombre; }
-    public static String getEmail() { return email; }
-    public static String getContraseña() { return contraseña; }
+
+    public static Voluntario getVoluntario() {
+        return sesionVol;
+    }
+
+    public static Organizacion getOrganizacion(){
+        return sesionOrg;
+    }
 
 
 }

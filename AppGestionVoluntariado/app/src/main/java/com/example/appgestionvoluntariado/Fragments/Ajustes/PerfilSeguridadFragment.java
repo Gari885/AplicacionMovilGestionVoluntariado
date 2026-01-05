@@ -56,6 +56,8 @@ public class PerfilSeguridadFragment extends Fragment {
         return view;
     }
 
+    //Los usuarios tienen que tener contraseñas o mirar alguna otra forma para hacer lo de las contraseñas
+    //Por ahora desactivado temporalmente no entrar en este fragment
     private void verificarCampos() {
         String error = "";
         String contraActual, nueva, verificacion;
@@ -72,9 +74,11 @@ public class PerfilSeguridadFragment extends Fragment {
             error = "No puedes dejar ningun campo vacio";
         }
         if (error.equals("")){
-            if (!contraActual.equals(SesionGlobal.getContraseña())){
+            /*if (!contraActual.equals(SesionGlobal.getContraseña())){
                 error = "Has introducido la contraseña acutal incorrecta";
             }
+            */
+
 
             if (comprobarContra(nueva)){
                 if (!nueva.equals(verificacion)){

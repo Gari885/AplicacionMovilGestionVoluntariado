@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.SesionGlobal;
 import com.example.appgestionvoluntariado.R;
 
@@ -18,6 +19,8 @@ public class PerfilDatosVoluntarioFragment extends Fragment {
     private EditText nombre,email,zona;
 
     private ImageButton editar;
+
+    private Voluntario vol;
 
 
     @Override
@@ -33,11 +36,11 @@ public class PerfilDatosVoluntarioFragment extends Fragment {
         nombre = view.findViewById(R.id.etNombre);
         email = view.findViewById(R.id.etEmail);
         editar = view.findViewById(R.id.btnActivarEdicion);
+        vol = SesionGlobal.getVoluntario();
 
 
-
-        nombre.setText(SesionGlobal.getNombre());
-        email.setText(SesionGlobal.getEmail());
+        nombre.setText(vol.getNombre());
+        email.setText(vol.getEmail());
 
 
         editar.setOnClickListener(new View.OnClickListener() {

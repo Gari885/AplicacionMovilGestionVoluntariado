@@ -12,15 +12,23 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.appgestionvoluntariado.EstadoRequest;
 import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Services.VolunteerAPIService;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntario.GridHolder> {
 
@@ -62,7 +70,14 @@ public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntari
         TextView nombre;
         TextView email;
 
-        ImageView info;
+        ImageView info,darBaja;
+
+        LinearLayout pendientesLayout;
+
+        Button aceptar,rechazar;
+
+
+
 
 
         public GridHolder(@NonNull View itemView) {
@@ -70,11 +85,39 @@ public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntari
             nombre = itemView.findViewById(R.id.tvNombre);
             email = itemView.findViewById(R.id.tvCorreo);
             info = itemView.findViewById(R.id.btnInfo);
+            darBaja = itemView.findViewById(R.id.btnDarBaja);
+            pendientesLayout = itemView.findViewById(R.id.layoutPendientes);
+            aceptar = itemView.findViewById(R.id.btnAceptar);
+            rechazar = itemView.findViewById(R.id.btnRechazar);
 
         }
-        public void assingData(Voluntario voluntario) {
-            nombre.setText(voluntario.getNombre());
-            email.setText(voluntario.getEmail());
+        public void assingData(Voluntario vol) {
+            nombre.setText(vol.getNombre());
+            email.setText(vol.getEmail());
+
+            if (vol.getEstadoVoluntario().equals("RECHAZADO")) {
+                pendientesLayout.setVisibility(View.VISIBLE);
+                darBaja.setVisibility(View.GONE);
+
+                aceptar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cambiarEstadoVoluntario(vol,"ACEPTADO",itemView.getContext());
+
+                    }
+                });
+
+                rechazar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cambiarEstadoVoluntario(vol,"RECHAZADO",itemView.getContext());
+                    }
+                });
+            }else {
+                pendientesLayout.setVisibility(View.GONE);
+                darBaja.setVisibility(View.VISIBLE);
+            }
+
             info.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -105,6 +148,34 @@ public class AdaptadorVoluntario extends RecyclerView.Adapter<AdaptadorVoluntari
                 }
             });
 
+        }
+
+        private void cambiarEstadoVoluntario(Voluntario vol, String nuevoEstado, Context context) {
+            VolunteerAPIService apiService = APIClient.getVolunteerAPIService();
+            EstadoRequest body = new EstadoRequest(nuevoEstado);
+
+            Call<Voluntario> call = apiService.actualizarEstado(vol.getDni(),body);
+            call.enqueue(new Callback<Voluntario>() {
+                @Override
+                public void onResponse(Call<Voluntario> call, Response<Voluntario> response) {
+                        if (response.isSuccessful()){
+                            vol.setEstado(nuevoEstado);
+                            voluntarios.remove(vol);
+                            notifyDataSetChanged();
+
+                            Toast.makeText(context, "Voluntario " + nuevoEstado, Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            Toast.makeText(context, "Error: " + response.code(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+
+                @Override
+                public void onFailure(Call<Voluntario> call, Throwable t) {
+                    Toast.makeText(context, "Fallo de conexión", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         private void rellenarTags(Context context, LinearLayout container, ArrayList<String> lista) {

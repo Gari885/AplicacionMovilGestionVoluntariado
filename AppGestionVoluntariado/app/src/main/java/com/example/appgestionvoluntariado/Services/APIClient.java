@@ -37,6 +37,26 @@ public class APIClient {
         return retrofit.create(VolunteerAPIService.class);
     }
 
+    public static MatchesAPIService getMAtchesAPIService(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        return retrofit.create(MatchesAPIService.class);
+    }
+
+    public static FindVolunteerAPIService getfindVolunteerAPIService(){
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        return retrofit.create(FindVolunteerAPIService.class);
+    }
+
 
 
 

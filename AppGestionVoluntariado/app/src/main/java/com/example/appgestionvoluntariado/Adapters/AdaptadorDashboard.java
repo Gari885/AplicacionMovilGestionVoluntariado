@@ -41,11 +41,13 @@ public class AdaptadorDashboard extends RecyclerView.Adapter<AdaptadorDashboard.
     }
 
     public class GridHolder extends RecyclerView.ViewHolder {
+
+        //Mirar como sacar el icono bien
         //TextView textoIcono;
         TextView textoTitulo;
         TextView numStat1;
         TextView textoStat2;
-        String icon;
+        int icon;
 
         public GridHolder(@NonNull View itemView) {
             super(itemView);

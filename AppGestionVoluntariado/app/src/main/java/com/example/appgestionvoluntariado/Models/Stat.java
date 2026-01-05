@@ -4,12 +4,12 @@ public class Stat {
     private String titulo;
     private int stat1;
     private String stat2;
-    private String icon;
+    private int icon;
 
     public Stat(){
 
     }
-    public Stat(String titulo,int stat1,String stat2,String icon){
+    public Stat(String titulo,int stat1,String stat2,int icon){
         this.titulo = titulo;
         this.stat1 = stat1;
         this.stat2 = stat2;
@@ -27,7 +27,7 @@ public class Stat {
         return  stat2;
     }
 
-    public String getIcon2(){
+    public int getIcon2(){
         return icon;
     }
 

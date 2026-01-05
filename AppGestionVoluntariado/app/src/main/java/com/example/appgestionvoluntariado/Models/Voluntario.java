@@ -77,6 +77,10 @@ public class Voluntario {
     public String getEstadoVoluntario() { return estadoVoluntario; }
     public List<Inscripcion> getInscripciones() { return inscripciones; }
 
+    public void setEstado(String nuevoEstado) {
+        this.estadoVoluntario = nuevoEstado;
+    }
+
 
     // --- CLASE INTERNA PARA LAS INSCRIPCIONES ---
     public static class Inscripcion {
