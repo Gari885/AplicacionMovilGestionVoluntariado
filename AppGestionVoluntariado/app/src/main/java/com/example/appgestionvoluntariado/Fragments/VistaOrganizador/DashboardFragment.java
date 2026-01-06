@@ -6,9 +6,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.appgestionvoluntariado.Adapters.AdaptadorDashboard;
 import com.example.appgestionvoluntariado.DatosGlobales;
@@ -24,6 +26,7 @@ import com.example.appgestionvoluntariado.Services.MatchesAPIService;
 import com.example.appgestionvoluntariado.Services.OrganizationAPIService;
 import com.example.appgestionvoluntariado.Services.VolunteerAPIService;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +48,22 @@ public class DashboardFragment extends Fragment {
 
     // CONTADOR PARA SINCRONIZAR
     private int llamadasCompletadas = 0;
+
+    private int indiceMensaje = 0;
     private final int TOTAL_LLAMADAS = 4; // Voluntariados, Org, Voluntarios
+
+    private final String[] FRASES_CARGA = {
+            "Obteniendo lista de voluntarios...",
+            "Conectando con organizaciones...",
+            "Cargando voluntariados disponibles...",
+            "Calculando estadísticas...",
+            "Sincronizando datos..."
+    };
+
+    private Handler handlerAnimacion = new Handler();
+    private Runnable runnableAnimacion;
+
+    private TextView textoCarga;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,17 +80,16 @@ public class DashboardFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         layoutCarga = view.findViewById(R.id.layoutCarga);
         layoutCarga.setVisibility(View.VISIBLE);
-
+        textoCarga = view.findViewById(R.id.textoCarga);
         stats = new ArrayList<Stat>();
 
         //TODO mostrar progress bar
-
+        iniciarAnimacionConTextos();
         cargarDatosEnParalelo();
 
 
         return view;
     }
-
     private void cargarDatosEnParalelo() {
         llamadasCompletadas = 0;
         //Cargar actividades
@@ -157,32 +174,28 @@ public class DashboardFragment extends Fragment {
         });
     }
 
-    private void verificarSiHemosTerminado() {
-        llamadasCompletadas++;
-        if (llamadasCompletadas == TOTAL_LLAMADAS) {
-            //Quitar barra de progreso
-            calcularEstadisticas();
-            layoutCarga.setVisibility(View.GONE);
-        }
-    }
-
-    private void calcularEstadisticas() {
-        stats.clear();
-        crearTarjetaVoluntario();
-        crearTarjetaOrganizaciones();
-        mostrarStats();
-    }
-
-    private void mostrarStats() {
-        if (adaptadorDashboard == null) {
-            adaptadorDashboard = new AdaptadorDashboard(stats);
-            recyclerView.setAdapter(adaptadorDashboard);
-        } else {
-            //Dejar esto por ahora por si añadimos algo que haga cambiar el adaptador
-            adaptadorDashboard.notifyDataSetChanged();
+    private void crearTarjetaVoluntario() {
+        int aceptados = 0;
+        int pendientes = 0;
+        List<Voluntario> voluntarios = DatosGlobales.getInstance().voluntarios;
+        if (voluntarios != null) {
+            for (Voluntario vol : voluntarios) {
+                String estado = vol.getEstadoVoluntario();
+                if (estado.equalsIgnoreCase("Activo")) {
+                    aceptados++;
+                }
+                if (estado.equalsIgnoreCase("Pendiente")) {
+                    pendientes++;
+                }
+            }
         }
 
+        String pendientesStr = (pendientes > 0) ? "+" + pendientes + " Pendientes" : "Ningun pendiente";
+
+
+        stats.add(new Stat("VOLUNTARIOS",aceptados,pendientesStr,R.drawable.voluntarios));
     }
+
 
     private void crearTarjetaOrganizaciones() {
         int aceptados = 0;
@@ -208,25 +221,63 @@ public class DashboardFragment extends Fragment {
         stats.add(new Stat("ORGANIACIONES",aceptados,pendientesStr,R.drawable.voluntarios));
     }
 
-    private void crearTarjetaVoluntario() {
-        int aceptados = 0;
-        int pendientes = 0;
-        List<Voluntario> voluntarios = DatosGlobales.getInstance().voluntarios;
-        if (voluntarios != null) {
-            for (Voluntario vol : voluntarios) {
-                String estado = vol.getEstadoVoluntario();
-                if (estado.equalsIgnoreCase("Activo")) {
-                    aceptados++;
-                }
-                if (estado.equalsIgnoreCase("Pendiente")) {
-                    pendientes++;
-                }
+
+    private void iniciarAnimacionConTextos() {
+        runnableAnimacion = new Runnable() {
+            @Override
+            public void run() {
+                textoCarga.setText(FRASES_CARGA[indiceMensaje]);
+
+                indiceMensaje = (indiceMensaje + 1) & FRASES_CARGA.length;
+
+                handlerAnimacion.postDelayed(this,800);
             }
+        };
+        handlerAnimacion.post(runnableAnimacion);
+    }
+
+    private void detenerAnimacionTextos() {
+        if (runnableAnimacion != null) {
+            handlerAnimacion.removeCallbacks(runnableAnimacion);
+        }
+    }
+
+    private void verificarSiHemosTerminado() {
+        llamadasCompletadas++;
+        if (llamadasCompletadas == TOTAL_LLAMADAS) {
+            //Quitar barra de progreso
+            detenerAnimacionTextos();
+            calcularEstadisticas();
+            layoutCarga.setVisibility(View.GONE);
+        }
+    }
+
+    private void mostrarStats() {
+        if (adaptadorDashboard == null) {
+            adaptadorDashboard = new AdaptadorDashboard(stats);
+            recyclerView.setAdapter(adaptadorDashboard);
+        } else {
+            //Dejar esto por ahora por si añadimos algo que haga cambiar el adaptador
+            adaptadorDashboard.notifyDataSetChanged();
         }
 
-        String pendientesStr = (pendientes > 0) ? "+" + pendientes + " Pendientes" : "Ningun pendiente";
-
-
-        stats.add(new Stat("VOLUNTARIOS",aceptados,pendientesStr,R.drawable.voluntarios));
     }
+
+    private void calcularEstadisticas() {
+        stats.clear();
+        crearTarjetaVoluntario();
+        crearTarjetaOrganizaciones();
+        mostrarStats();
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        detenerAnimacionTextos();
+    }
+
+
+
+
+
+
 }

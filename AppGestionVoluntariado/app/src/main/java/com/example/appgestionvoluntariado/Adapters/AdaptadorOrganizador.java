@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appgestionvoluntariado.EstadoRequest;
+import com.example.appgestionvoluntariado.Models.EstadoRequest;
 import com.example.appgestionvoluntariado.Models.Organizacion;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;

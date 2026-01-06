@@ -17,7 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appgestionvoluntariado.EstadoRequest;
+import com.example.appgestionvoluntariado.Models.EstadoRequest;
 import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;

@@ -1,8 +1,7 @@
 package com.example.appgestionvoluntariado.Services;
 
-import com.example.appgestionvoluntariado.EstadoRequest;
+import com.example.appgestionvoluntariado.Models.EstadoRequest;
 import com.example.appgestionvoluntariado.Models.Organizacion;
-import com.example.appgestionvoluntariado.Models.Voluntariado;
 
 import java.util.List;
 

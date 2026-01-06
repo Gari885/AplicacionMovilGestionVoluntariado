@@ -116,7 +116,7 @@ public class MatchesMenuFragment extends Fragment {
     private void filtrarPendientes() {
         if (matches != null) {
             for (Match mat : matches) {
-                String estadoMatch = mat.getEs();
+                String estadoMatch = mat.getEstado();
                 if (estadoMatch.equalsIgnoreCase("Pendiente")) {
                     matchesFiltradas.add(mat);
                 }

@@ -13,8 +13,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.appgestionvoluntariado.Adapters.AdaptadorVoluntariado;
+import com.example.appgestionvoluntariado.DatosGlobales;
 import com.example.appgestionvoluntariado.Fragments.RegistroYFormularios.VoluntariadoCrearFragment;
 import com.example.appgestionvoluntariado.Models.Voluntariado;
+import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.ActivitiesAPIService;
@@ -33,6 +35,8 @@ public class OrgVoluntariadosFragment extends Fragment {
 
     private AdaptadorVoluntariado adaptadorVoluntariado;
 
+    private List<Voluntariado>  voluntariados;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,35 +53,9 @@ public class OrgVoluntariadosFragment extends Fragment {
         anadirVol = view.findViewById(R.id.btnAnadirVoluntariado);
         recyclerView = view.findViewById(R.id.rvVoluntariados);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        voluntariados = DatosGlobales.getInstance().voluntariados;
 
-
-        ActivitiesAPIService apiService = APIClient.getActivitiesAPIService();
-
-        Call<List<Voluntariado>> call = apiService.getActivities();
-
-
-        call.enqueue(new Callback<List<Voluntariado>>() {
-            @Override
-            public void onResponse(Call<List<Voluntariado>> call, Response<List<Voluntariado>> response) {
-                if (response.isSuccessful()) {
-                    List<Voluntariado> voluntariados = response.body();
-                    if (voluntariados != null && !voluntariados.isEmpty()){
-                        adaptadorVoluntariado = new AdaptadorVoluntariado(voluntariados);
-                        recyclerView.setAdapter(adaptadorVoluntariado);
-                    }
-
-
-                } else {
-                    Log.e("Voluntariados", "Error en la respuesta: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Voluntariado>> call, Throwable t) {
-                Log.e("Voluntariados", "Error en la llamada", t);
-
-            }
-        });
+        sacarVoluntariados();
 
 
 
@@ -91,5 +69,14 @@ public class OrgVoluntariadosFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void sacarVoluntariados() {
+        if (adaptadorVoluntariado == null) {
+            adaptadorVoluntariado = new AdaptadorVoluntariado(voluntariados);
+            recyclerView.setAdapter(adaptadorVoluntariado);
+        }else {
+            adaptadorVoluntariado.notifyDataSetChanged();
+        }
     }
 }

@@ -79,6 +79,19 @@ public class SesionGlobal {
         tipoActual = null;
     }
 
+    public static String devolverRol() {
+        String tipo = "";
+        switch(tipoActual) {
+            case VOLUNTARIO:
+                tipo = "Voluntario";
+            case ORGANIZACION:
+                tipo = "Organizacion";
+            case ADMINISTRADOR:
+                tipo = "Administrador";
+        }
+        return tipo;
+    }
+
 
     public static Voluntario getVoluntario() {
         return sesionVol;
