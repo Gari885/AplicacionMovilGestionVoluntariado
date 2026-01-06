@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.appgestionvoluntariado.Adapters.AdaptadorDashboard;
 import com.example.appgestionvoluntariado.DatosGlobales;
+import com.example.appgestionvoluntariado.Models.Match;
 import com.example.appgestionvoluntariado.Models.Organizacion;
 import com.example.appgestionvoluntariado.Models.Stat;
 import com.example.appgestionvoluntariado.Models.Voluntariado;
@@ -19,6 +20,7 @@ import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.ActivitiesAPIService;
+import com.example.appgestionvoluntariado.Services.MatchesAPIService;
 import com.example.appgestionvoluntariado.Services.OrganizationAPIService;
 import com.example.appgestionvoluntariado.Services.VolunteerAPIService;
 
@@ -39,9 +41,11 @@ public class DashboardFragment extends Fragment {
     private RecyclerView recyclerView;
     private AdaptadorDashboard adaptadorDashboard;
 
+    private View layoutCarga;
+
     // CONTADOR PARA SINCRONIZAR
     private int llamadasCompletadas = 0;
-    private final int TOTAL_LLAMADAS = 3; // Voluntariados, Org, Voluntarios
+    private final int TOTAL_LLAMADAS = 4; // Voluntariados, Org, Voluntarios
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,8 @@ public class DashboardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_dashboard_organizador, container, false);
         recyclerView = view.findViewById(R.id.recyclerViewDashboard);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        layoutCarga = view.findViewById(R.id.layoutCarga);
+        layoutCarga.setVisibility(View.VISIBLE);
 
         stats = new ArrayList<Stat>();
 
@@ -84,6 +90,7 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Voluntariado>> call, Throwable t) {
+                verificarSiHemosTerminado();
 
             }
         });
@@ -95,13 +102,15 @@ public class DashboardFragment extends Fragment {
         callOrg.enqueue(new Callback<List<Organizacion>>() {
             @Override
             public void onResponse(Call<List<Organizacion>> call, Response<List<Organizacion>> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     DatosGlobales.getInstance().organizaciones = response.body();
                 }
+                verificarSiHemosTerminado();
             }
 
             @Override
             public void onFailure(Call<List<Organizacion>> call, Throwable t) {
+                verificarSiHemosTerminado();
 
             }
         });
@@ -113,13 +122,36 @@ public class DashboardFragment extends Fragment {
         callVol.enqueue(new Callback<List<Voluntario>>() {
             @Override
             public void onResponse(Call<List<Voluntario>> call, Response<List<Voluntario>> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     DatosGlobales.getInstance().voluntarios = response.body();
                 }
+                verificarSiHemosTerminado();
             }
+
 
             @Override
             public void onFailure(Call<List<Voluntario>> call, Throwable t) {
+                verificarSiHemosTerminado();
+
+            }
+        });
+
+        MatchesAPIService matchesAPIService;
+        matchesAPIService = APIClient.getMAtchesAPIService();
+        Call<List<Match>> callMatch = matchesAPIService.getMatches();
+        callMatch.enqueue(new Callback<List<Match>>() {
+            @Override
+            public void onResponse(Call<List<Match>> call, Response<List<Match>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    DatosGlobales.getInstance().matches = response.body();
+                }
+                verificarSiHemosTerminado();
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Match>> call, Throwable t) {
+                verificarSiHemosTerminado();
 
             }
         });
@@ -130,6 +162,7 @@ public class DashboardFragment extends Fragment {
         if (llamadasCompletadas == TOTAL_LLAMADAS) {
             //Quitar barra de progreso
             calcularEstadisticas();
+            layoutCarga.setVisibility(View.GONE);
         }
     }
 
@@ -160,7 +193,7 @@ public class DashboardFragment extends Fragment {
         if (organizaciones != null) {
             for (Organizacion org : organizaciones) {
                 String estadoOrg = org.getEstado().toString();
-                if (estadoOrg.equalsIgnoreCase("Aceptado")) {
+                if (estadoOrg.equalsIgnoreCase("Activo")) {
                     aceptados++;
                 }
                 if (org.getEstado().equals("Pendiente")) {
@@ -182,7 +215,7 @@ public class DashboardFragment extends Fragment {
         if (voluntarios != null) {
             for (Voluntario vol : voluntarios) {
                 String estado = vol.getEstadoVoluntario();
-                if (estado.equalsIgnoreCase("Aceptado")) {
+                if (estado.equalsIgnoreCase("Activo")) {
                     aceptados++;
                 }
                 if (estado.equalsIgnoreCase("Pendiente")) {

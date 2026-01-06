@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.appgestionvoluntariado.Adapters.AdaptadorOrganizador;
 import com.example.appgestionvoluntariado.Adapters.AdaptadorVoluntario;
+import com.example.appgestionvoluntariado.DatosGlobales;
 import com.example.appgestionvoluntariado.Models.Organizacion;
 import com.example.appgestionvoluntariado.Models.Voluntario;
 import com.example.appgestionvoluntariado.R;
@@ -75,7 +76,7 @@ public class VoluntariosFragment extends Fragment {
             filtrarYMostrar("Aprobado"); // O el estado que uses para aceptados
         });
 
-        cargarDatosDeAPI();
+        cargarDatosGlobales();
 
         /*crearOrganizacion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,35 +93,11 @@ public class VoluntariosFragment extends Fragment {
         return view;
     }
 
-    private void cargarDatosDeAPI() {
-        apiService = APIClient.getVolunteerAPIService();
-        Call<List<Voluntario>> call = apiService.getVoluntarios();
+    private void cargarDatosGlobales() {
+        voluntarios = DatosGlobales.getInstance().voluntarios;
+        cambiarTabsVisualmente(true);
+        filtrarYMostrar("Pendiente");
 
-        call.enqueue(new Callback<List<Voluntario>>() {
-            @Override
-            public void onResponse(Call<List<Voluntario>> call, Response<List<Voluntario>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    // Guardamos la lista maestra
-                    voluntarios = response.body();
-
-                    // CORRECCIÓN CRÍTICA:
-                    // Mostramos los datos AHORA que ya han llegado, no antes.
-                    // Por defecto mostramos pendientes al iniciar
-                    cambiarTabsVisualmente(true);
-                    filtrarYMostrar("Rechazado");
-                } else {
-                    Log.e("API", "Error: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Voluntario>> call, Throwable t) {
-                Log.e("API", "Error de conexión", t);
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     private void filtrarYMostrar(String estadoBuscado) {
@@ -131,14 +108,14 @@ public class VoluntariosFragment extends Fragment {
             for (Voluntario vol : voluntarios) {
                 if (vol.getEstadoVoluntario() == null) continue;
 
-                if (estadoBuscado.equals("Rechazado")) {
+                if (estadoBuscado.equals("Pendiente")) {
                     // Muestra solo los pendientes
-                    if (vol.getEstadoVoluntario().equalsIgnoreCase("Rechazado")) {
+                    if (vol.getEstadoVoluntario().equalsIgnoreCase("Pendiente")) {
                         voluntariosFiltrados.add(vol);
                     }
                 } else {
                     // Muestra todo lo que NO sea pendiente (Aceptados, rechazados, etc)
-                    if (!vol.getEstadoVoluntario().equalsIgnoreCase("Rechazado")) {
+                    if (!vol.getEstadoVoluntario().equalsIgnoreCase("Pendiente")) {
                         voluntariosFiltrados.add(vol);
                     }
                 }

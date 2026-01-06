@@ -23,9 +23,6 @@ public class SesionGlobal {
     }
 
     private static tipoUsuario tipoActual = tipoUsuario.VOLUNTARIO;
-    private static String nombre;
-    private static String email;
-
     private static Voluntario sesionVol;
 
     private static Organizacion sesionOrg;
@@ -46,7 +43,10 @@ public class SesionGlobal {
         tipoActual = tipoUsuario.VOLUNTARIO;
     }
 
-    public static void iniciarSesionOrg(Organizacion org){
+    public static void iniciarSesionAdministrador(){
+        tipoActual = tipoUsuario.ADMINISTRADOR;
+    }
+    public static void iniciarSesionOrganizacion(Organizacion org){
         tipoActual = tipoUsuario.ORGANIZACION;
     }
 
@@ -77,8 +77,6 @@ public class SesionGlobal {
 
     public static void destruirSesion() {
         tipoActual = null;
-        nombre = null;
-        email = null;
     }
 
 

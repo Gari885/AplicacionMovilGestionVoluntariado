@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast; // Para avisar al usuario si falla
 
 import com.example.appgestionvoluntariado.Adapters.AdaptadorOrganizador;
+import com.example.appgestionvoluntariado.DatosGlobales;
 import com.example.appgestionvoluntariado.Models.Organizacion;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
@@ -65,45 +66,20 @@ public class OrganizacionesFragment extends Fragment {
 
         tabAceptados.setOnClickListener(v -> {
             cambiarTabsVisualmente(false); // false = aceptados seleccionado
-            filtrarYMostrar("Aprobado"); // O el estado que uses para aceptados
+            filtrarYMostrar("Activo"); // O el estado que uses para aceptados
         });
 
         // 4. Cargar Datos
-        cargarDatosDeAPI();
+        cargarDatosGlobales();
 
         return view;
     }
 
-    private void cargarDatosDeAPI() {
+    private void cargarDatosGlobales() {
 
-        apiService = APIClient.getOrganizationAPIService();
-        Call<List<Organizacion>> call = apiService.getOrganizations();
-
-        call.enqueue(new Callback<List<Organizacion>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Organizacion>> call, @NonNull Response<List<Organizacion>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    // Guardamos la lista maestra
-                    organizaciones = response.body();
-
-                    // CORRECCIÓN CRÍTICA:
-                    // Mostramos los datos AHORA que ya han llegado, no antes.
-                    // Por defecto mostramos pendientes al iniciar
-                    cambiarTabsVisualmente(true);
-                    filtrarYMostrar("Pendiente");
-                } else {
-                    Log.e("API", "Error: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Organizacion>> call, @NonNull Throwable t) {
-                Log.e("API", "Error de conexión", t);
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        organizaciones = DatosGlobales.getInstance().organizaciones;
+        cambiarTabsVisualmente(true);
+        filtrarYMostrar("Pendiente");
     }
 
     // He unificado tu lógica de filtrado en un solo método más limpio
@@ -120,8 +96,8 @@ public class OrganizacionesFragment extends Fragment {
                     if (org.getEstado().equalsIgnoreCase("Pendiente")) {
                         organizacionsFiltradas.add(org);
                     }
-                } else if (estadoBuscado.equals("Aprobado")) {
-                    if (org.getEstado().equalsIgnoreCase("Aprobado")) {
+                } else if (estadoBuscado.equals("Activo")) {
+                    if (org.getEstado().equalsIgnoreCase("Activo")) {
                         organizacionsFiltradas.add(org);
                     }
                 }

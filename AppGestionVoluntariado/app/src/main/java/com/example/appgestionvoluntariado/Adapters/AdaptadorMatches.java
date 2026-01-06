@@ -66,10 +66,8 @@ public class AdaptadorMatches extends RecyclerView.Adapter<AdaptadorMatches.Grid
         }
         public void assingData(Match match) {
 
-            nombreVol.setText(match.getVoluntario().getNombre());
-            emailVol.setText(match.getVoluntario().getEmail());
-            tituloAct.setText(match.getActividad().getTitulo());
-            zonaAct.setText(match.getActividad().getDireccion());
+            nombreVol.setText(match.getNombreVoluntario());
+            tituloAct.setText(match.getNombreActividad());
 
         }
 

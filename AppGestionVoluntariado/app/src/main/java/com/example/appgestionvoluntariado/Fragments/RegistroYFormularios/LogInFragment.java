@@ -194,9 +194,9 @@ public class LogInFragment extends Fragment {
                 break;
 
             case "admin":
-                /*SesionGlobal.iniciarSesionOrg();
+                SesionGlobal.iniciarSesionAdministrador();
                 intent = new Intent(context, OrganizadorActivity.class);
-                break;*/
+                break;
             case "organizacion":
                 intent = new Intent(context, OrganizacionActivity.class);
                 break;
