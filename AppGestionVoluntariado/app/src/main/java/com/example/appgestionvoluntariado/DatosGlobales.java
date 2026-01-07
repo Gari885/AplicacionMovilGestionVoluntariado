@@ -79,6 +79,59 @@ public class DatosGlobales {
             "Tafalla"
     };
 
+    //Por ahora no igual luego interesa meterlo
+    //private final String[] LISTA_ZONAS = {"Pamplona", "Tudela", "Estella", "Burlada", "Tafalla"};
+    public final String[] LISTA_IDIOMAS = {
+            "Castellano",
+            "Euskera",
+            "Inglés",
+            "Francés",
+            "Alemán"
+    };
+    public final String[] LISTA_EXPERIENCIA = {
+            "Sin experiencia",
+            "Menos de 1 año",
+            "1-3 años",
+            "Más de 3 años"
+    };
+    public final String[] LISTA_COCHE = {
+            "Sí",
+            "No"
+    };
+    public final String[] LISTA_CICLOS = {
+            "DAM",
+            "ASIR",
+            "TL",
+            "GVEC",
+            "CID",
+            "AF"
+    };
+
+    // Datos para Chips
+    public final String[] CHIPS_HABILIDADES = {
+            "Programación",
+            "Diseño Gráfico",
+            "Redes Sociales",
+            "Gestión de Eventos",
+            "Docencia",
+            "Primeros Auxilios",
+            "Cocina",
+            "Conducción",
+            "Idiomas",
+            "Música",
+    };
+    public final String[] CHIPS_INTERESES = {
+            "Medio Ambiente",
+            "Educación",
+            "Salud",
+            "Animales",
+            "Cultura",
+            "Deporte",
+            "Tecnología",
+            "Derechos Humanos",
+            "Mayores",
+            "Infancia",
+    };
 
 
 

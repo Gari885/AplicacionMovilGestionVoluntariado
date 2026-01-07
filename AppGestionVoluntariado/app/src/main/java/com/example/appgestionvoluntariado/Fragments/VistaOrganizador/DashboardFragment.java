@@ -154,7 +154,7 @@ public class DashboardFragment extends Fragment {
         });
 
         MatchesAPIService matchesAPIService;
-        matchesAPIService = APIClient.getMAtchesAPIService();
+        matchesAPIService = APIClient.getMatchesAPIService();
         Call<List<Match>> callMatch = matchesAPIService.getMatches();
         callMatch.enqueue(new Callback<List<Match>>() {
             @Override

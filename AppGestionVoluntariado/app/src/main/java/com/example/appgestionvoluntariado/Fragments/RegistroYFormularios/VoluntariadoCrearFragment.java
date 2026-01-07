@@ -51,14 +51,15 @@ public class VoluntariadoCrearFragment extends Fragment {
 
     // Inputs de Texto
     private TextInputEditText etNombre, etDescripcion, etFechaInicio, etFechaFin;
-    private TextInputEditText etNuevaHabilidad, etNuevoODS, etMaxParticipantes;
+    private TextInputEditText etNuevaHabilidad, etNuevoODS, etMaxParticipantes, etZona;
 
     // Layouts (Para mostrar errores)
     private TextInputLayout tilNombre, tilOrganizacion, tilDescripcion, tilFechaInicio, tilFechaFin;
     private TextInputLayout tilSector, tilZona, tilNuevaHabilidad, tilNuevoODS, tilMaxParticipantes;
 
+
     // Desplegables
-    private AutoCompleteTextView actvSector, actvZona, actvOrganizacion;
+    private AutoCompleteTextView actvSector, actvOrganizacion;
 
     // Chips (Etiquetas)
     private ChipGroup chipGroupDatosAnadidos;
@@ -108,6 +109,7 @@ public class VoluntariadoCrearFragment extends Fragment {
         etNuevaHabilidad = view.findViewById(R.id.etNuevaHabilidad);
         etNuevoODS = view.findViewById(R.id.etNuevoODS);
         etMaxParticipantes = view.findViewById(R.id.etMaxParticipantes);
+        etZona = view.findViewById(R.id.etZona);
 
         // Layouts
         tilNombre = view.findViewById(R.id.tilNombre);
@@ -123,7 +125,6 @@ public class VoluntariadoCrearFragment extends Fragment {
 
         // Desplegables
         actvSector = view.findViewById(R.id.actvSector);
-        actvZona = view.findViewById(R.id.actvZona);
         actvOrganizacion = view.findViewById(R.id.actvOrganizacion);
 
         // Chips Container
@@ -163,9 +164,6 @@ public class VoluntariadoCrearFragment extends Fragment {
         ArrayAdapter<String> adapterSector = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, DatosGlobales.getInstance().LISTA_SECTORES);
         actvSector.setAdapter(adapterSector);
 
-        // Zona
-        ArrayAdapter<String> adapterZona = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, DatosGlobales.getInstance().LISTA_ZONAS);
-        actvZona.setAdapter(adapterZona);
     }
 
     private void configurarLogicaSegunRol() {
@@ -289,7 +287,6 @@ public class VoluntariadoCrearFragment extends Fragment {
     private void agregarEtiqueta(TextInputEditText input, TextInputLayout layout, String tipo) {
         String texto = input.getText() != null ? input.getText().toString().trim() : "";
 
-
         if (!texto.isEmpty()) {
             anadirChipVisual(texto, tipo);
             input.setText("");
@@ -366,7 +363,7 @@ public class VoluntariadoCrearFragment extends Fragment {
 
         if (validarCampoVacio(etNombre, tilNombre)) esValido = false;
         if (validarCampoVacio(actvSector, tilSector)) esValido = false;
-        if (validarCampoVacio(actvZona, tilZona)) esValido = false;
+        if (validarCampoVacio(etZona, tilZona)) esValido = false;
         if (validarCampoVacio(etFechaInicio, tilFechaInicio)) esValido = false;
         if (validarCampoVacio(etFechaFin, tilFechaFin)) esValido = false;
         if (validarCampoVacio(etDescripcion, tilDescripcion)) esValido = false;
