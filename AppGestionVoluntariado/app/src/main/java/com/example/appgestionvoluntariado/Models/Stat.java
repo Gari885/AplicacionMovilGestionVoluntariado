@@ -1,34 +1,33 @@
 package com.example.appgestionvoluntariado.Models;
 
 public class Stat {
-    private String titulo;
-    private int stat1;
-    private String stat2;
-    private int icon;
+    private String title;
+    private int count;
+    private String description;
+    private int iconResId;
 
     public Stat(){
-
     }
-    public Stat(String titulo,int stat1,String stat2,int icon){
-        this.titulo = titulo;
-        this.stat1 = stat1;
-        this.stat2 = stat2;
-        this.icon = icon;
-    }
-
-    public String getTitulo(){
-        return this.titulo;
-    }
-    public int getStat1(){
-        return  stat1;
+    
+    public Stat(String title, int count, String description, int iconResId){
+        this.title = title;
+        this.count = count;
+        this.description = description;
+        this.iconResId = iconResId;
     }
 
-    public String getStat2(){
-        return  stat2;
+    public String getTitle(){
+        return this.title;
+    }
+    public int getCount(){
+        return count;
     }
 
-    public int getIcon2(){
-        return icon;
+    public String getDescription(){
+        return description;
     }
 
+    public int getIconResId(){
+        return iconResId;
+    }
 }

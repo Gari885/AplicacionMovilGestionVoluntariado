@@ -1,49 +1,34 @@
 package com.example.appgestionvoluntariado.Activities;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Fragments.RegistroYFormularios.LogInFragment;
+import com.example.appgestionvoluntariado.Fragments.Auth.LoginFragment;
 import com.example.appgestionvoluntariado.R;
 
 public class MainActivity extends AppCompatActivity {
-    private Button botonlogIn;
-
-
+    private Button btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_welcome);
 
-
-        botonlogIn = findViewById(R.id.logIn);
-        botonlogIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Fragment fragmentSeleccionado = null;
-                fragmentSeleccionado = new LogInFragment();
-                if (fragmentSeleccionado != null) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.containerFragments, fragmentSeleccionado)
-                            .commit();
-                }
-            }
+        btnLogin = findViewById(R.id.btnLogin);
+        btnLogin.setOnClickListener(v -> {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, new LoginFragment())
+                    .commit();
         });
-
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.containerFragments, new LogInFragment()) // <--- Aquí cargas el Dashboard
+                    .replace(R.id.fragmentContainer, new LoginFragment())
                     .commit();
         }
-
     }
 }

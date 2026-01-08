@@ -15,18 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppGestionVoluntariado">
         <activity
-            android:name=".Activities.OrganizacionActivity"
+            android:name=".Activities.OrganizationActivity"
             android:exported="false"
             android:theme="@style/Theme.AppGestionVoluntariado" />
         <activity
-            android:name=".Activities.OrganizadorActivity"
+            android:name=".Activities.AdminActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.OrganizadorActivity"
-            android:exported="false"
-            tools:ignore="DuplicateActivity" />
-        <activity
-            android:name=".Activities.VoluntarioActivity"
+            android:name=".Activities.VolunteerActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.MainActivity"

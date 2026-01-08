@@ -1,7 +1,7 @@
 package com.example.appgestionvoluntariado.Services;
 
-import com.example.appgestionvoluntariado.Models.EstadoRequest;
-import com.example.appgestionvoluntariado.Models.Voluntario;
+import com.example.appgestionvoluntariado.Models.StatusRequest;
+import com.example.appgestionvoluntariado.Models.Volunteer;
 
 import java.util.List;
 
@@ -13,11 +13,11 @@ import retrofit2.http.Path;
 
 public interface VolunteerAPIService {
     @GET("voluntarios")
-    Call<List<Voluntario>> getVoluntarios();
+    Call<List<Volunteer>> getVolunteers();
 
     @PATCH("voluntarios/{dni}/estado")
-    Call<Voluntario> actualizarEstado(
-            @Path("dni") String dni,       // Rellena la parte {cif} de la URL
-            @Body EstadoRequest request    // Envía el JSON { "estado": "..." }
+    Call<Volunteer> updateStatus(
+            @Path("dni") String dni,       
+            @Body StatusRequest request    
     );
 }

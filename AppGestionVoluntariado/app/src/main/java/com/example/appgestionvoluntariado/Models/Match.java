@@ -1,91 +1,55 @@
 package com.example.appgestionvoluntariado.Models;
 
-import java.util.ArrayList;
-
 import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Match implements Serializable {
 
     @SerializedName("id_inscripcion")
-    private int idInscripcion;
+    private int enrollmentId;
 
     @SerializedName("dni_voluntario")
-    private String dniVoluntario;
+    private String volunteerDni;
 
     @SerializedName("nombre_voluntario")
-    private String nombreVoluntario;
+    private String volunteerName;
 
-    // Fíjate que en tu JSON este campo viene en camelCase, así que el name debe coincidir
     @SerializedName("codActividad")
-    private int codActividad;
+    private int activityCode;
 
     @SerializedName("nombre_actividad")
-    private String nombreActividad;
+    private String activityTitle;
 
     @SerializedName("estado")
-    private String estado;
+    private String status;
 
-    // Constructor vacío (necesario para muchas librerías de JSON)
     public Match() {
     }
 
-    // Constructor completo
-    public Match(int idInscripcion, String dniVoluntario, String nombreVoluntario, int codActividad, String nombreActividad, String estado) {
-        this.idInscripcion = idInscripcion;
-        this.dniVoluntario = dniVoluntario;
-        this.nombreVoluntario = nombreVoluntario;
-        this.codActividad = codActividad;
-        this.nombreActividad = nombreActividad;
-        this.estado = estado;
+    public Match(int enrollmentId, String volunteerDni, String volunteerName, int activityCode, String activityTitle, String status) {
+        this.enrollmentId = enrollmentId;
+        this.volunteerDni = volunteerDni;
+        this.volunteerName = volunteerName;
+        this.activityCode = activityCode;
+        this.activityTitle = activityTitle;
+        this.status = status;
     }
 
-    // Getters y Setters
-    public int getIdInscripcion() {
-        return idInscripcion;
-    }
+    public int getEnrollmentId() { return enrollmentId; }
+    public void setEnrollmentId(int enrollmentId) { this.enrollmentId = enrollmentId; }
 
-    public void setIdInscripcion(int idInscripcion) {
-        this.idInscripcion = idInscripcion;
-    }
+    public String getVolunteerDni() { return volunteerDni; }
+    public void setVolunteerDni(String volunteerDni) { this.volunteerDni = volunteerDni; }
 
-    public String getDniVoluntario() {
-        return dniVoluntario;
-    }
+    public String getVolunteerName() { return volunteerName; }
+    public void setVolunteerName(String volunteerName) { this.volunteerName = volunteerName; }
 
-    public void setDniVoluntario(String dniVoluntario) {
-        this.dniVoluntario = dniVoluntario;
-    }
+    public int getActivityCode() { return activityCode; }
+    public void setActivityCode(int activityCode) { this.activityCode = activityCode; }
 
-    public String getNombreVoluntario() {
-        return nombreVoluntario;
-    }
+    public String getActivityTitle() { return activityTitle; }
+    public void setActivityTitle(String activityTitle) { this.activityTitle = activityTitle; }
 
-    public void setNombreVoluntario(String nombreVoluntario) {
-        this.nombreVoluntario = nombreVoluntario;
-    }
-
-    public int getCodActividad() {
-        return codActividad;
-    }
-
-    public void setCodActividad(int codActividad) {
-        this.codActividad = codActividad;
-    }
-
-    public String getNombreActividad() {
-        return nombreActividad;
-    }
-
-    public void setNombreActividad(String nombreActividad) {
-        this.nombreActividad = nombreActividad;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
