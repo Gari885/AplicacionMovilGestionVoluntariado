@@ -275,9 +275,4 @@ public class DashboardFragment extends Fragment {
         detenerAnimacionTextos();
     }
 
-
-
-
-
-
 }

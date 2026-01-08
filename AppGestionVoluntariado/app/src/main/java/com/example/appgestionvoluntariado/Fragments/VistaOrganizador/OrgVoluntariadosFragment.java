@@ -72,11 +72,13 @@ public class OrgVoluntariadosFragment extends Fragment {
     }
 
     private void sacarVoluntariados() {
-        if (adaptadorVoluntariado == null) {
+        /*if (adaptadorVoluntariado == null) {
             adaptadorVoluntariado = new AdaptadorVoluntariado(voluntariados);
             recyclerView.setAdapter(adaptadorVoluntariado);
         }else {
             adaptadorVoluntariado.notifyDataSetChanged();
         }
+
+         */
     }
 }

@@ -200,7 +200,6 @@ public class VoluntarioRegistrarseFragment extends Fragment {
     }
 
     // PASO 2: Backend API (Retrofit)
-// PASO 2: Backend API (Retrofit)
     private void guardarEnBackendSQL(String uid, String email, FirebaseUser firebaseUser) {
         // Recogemos datos obligatorios
         String nombre = getTextSafe(etNombre);
