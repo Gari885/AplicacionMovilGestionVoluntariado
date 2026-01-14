@@ -8,7 +8,6 @@ import android.widget.Button;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.GlobalData;
 import com.example.appgestionvoluntariado.Models.Match;
 import com.example.appgestionvoluntariado.R;
 

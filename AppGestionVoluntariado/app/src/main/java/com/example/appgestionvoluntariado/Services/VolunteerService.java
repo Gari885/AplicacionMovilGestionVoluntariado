@@ -9,9 +9,10 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
-public interface VolunteerAPIService {
+public interface VolunteerService {
     @GET("voluntarios")
     Call<List<Volunteer>> getVolunteers();
 
@@ -20,4 +21,11 @@ public interface VolunteerAPIService {
             @Path("dni") String dni,       
             @Body StatusRequest request    
     );
+
+    @GET("volunteer/profile")
+    Call<Volunteer> getProfile();
+
+    @PUT("volunteer/profile")
+    Call<Void> updateProfile(@Body Volunteer volunteer);
+
 }

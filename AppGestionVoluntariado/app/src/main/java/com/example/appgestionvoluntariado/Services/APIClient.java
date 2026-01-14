@@ -1,7 +1,8 @@
 package com.example.appgestionvoluntariado.Services;
 
+import com.example.appgestionvoluntariado.Utils.AuthInterceptor;
+
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -10,19 +11,17 @@ public class APIClient {
     private static final String BASE_URL = "http://10.0.2.2:8000/api/";
     private static Retrofit retrofit = null;
 
-    private static Retrofit getClient() {
+    public static Retrofit getClient() {
         if (retrofit == null) {
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-
+            // Configuramos OkHttpClient con el nuevo Interceptor
             OkHttpClient client = new OkHttpClient.Builder()
-                    .addInterceptor(logging)
+                    .addInterceptor(new AuthInterceptor())
                     .build();
 
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(client) 
+                    .client(client) // Vinculamos el cliente seguro
                     .build();
         }
         return retrofit;
@@ -38,8 +37,8 @@ public class APIClient {
         return getClient().create(OrganizationAPIService.class);
     }
 
-    public static VolunteerAPIService getVolunteerAPIService(){
-        return getClient().create(VolunteerAPIService.class);
+    public static VolunteerService getVolunteerAPIService(){
+        return getClient().create(VolunteerService.class);
     }
 
     public static MatchesAPIService getMatchesAPIService(){

@@ -9,7 +9,6 @@ import android.widget.ImageButton;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.GlobalSession;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 
@@ -26,7 +25,7 @@ public class ProfileVolunteerDataFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_volunteer_profile_edit, container, false);
+        View view = inflater.inflate(R.layout.fragment_volunteer_profile_hub, container, false);
         etName = view.findViewById(R.id.etNombre);
         etEmail = view.findViewById(R.id.etEmail);
         btnEdit = view.findViewById(R.id.btnActivarEdicion);

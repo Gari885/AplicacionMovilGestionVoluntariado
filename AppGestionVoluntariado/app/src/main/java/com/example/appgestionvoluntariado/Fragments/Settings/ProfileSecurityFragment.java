@@ -9,7 +9,6 @@ import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.GlobalSession;
 import com.example.appgestionvoluntariado.R;
 
 public class ProfileSecurityFragment extends Fragment {

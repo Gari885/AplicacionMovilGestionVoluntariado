@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.DashboardAdapter;
-import com.example.appgestionvoluntariado.GlobalData;
 import com.example.appgestionvoluntariado.Models.Match;
 import com.example.appgestionvoluntariado.Models.Organization;
 import com.example.appgestionvoluntariado.Models.Project;
@@ -23,7 +22,7 @@ import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.MatchesAPIService;
 import com.example.appgestionvoluntariado.Services.OrganizationAPIService;
 import com.example.appgestionvoluntariado.Services.ProjectsAPIService;
-import com.example.appgestionvoluntariado.Services.VolunteerAPIService;
+import com.example.appgestionvoluntariado.Services.VolunteerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +117,7 @@ public class AdminDashboardFragment extends Fragment {
         });
 
         // Load Volunteers
-        VolunteerAPIService volunteerAPIService = APIClient.getVolunteerAPIService();
+        VolunteerService volunteerAPIService = APIClient.getVolunteerAPIService();
         Call<List<Volunteer>> callVol = volunteerAPIService.getVolunteers();
         callVol.enqueue(new Callback<List<Volunteer>>() {
             @Override

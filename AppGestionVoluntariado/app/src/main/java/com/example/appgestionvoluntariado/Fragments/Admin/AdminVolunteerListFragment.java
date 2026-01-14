@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.VolunteerAdapter;
-import com.example.appgestionvoluntariado.GlobalData;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
-import com.example.appgestionvoluntariado.Services.VolunteerAPIService;
+import com.example.appgestionvoluntariado.Services.VolunteerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class AdminVolunteerListFragment extends Fragment {
     private List<Volunteer> volunteers = new ArrayList<>();
     private List<Volunteer> filteredVolunteers = new ArrayList<>();
 
-    private VolunteerAPIService apiService;
+    private VolunteerService apiService;
     private VolunteerAdapter volunteerAdapter;
 
     @Override

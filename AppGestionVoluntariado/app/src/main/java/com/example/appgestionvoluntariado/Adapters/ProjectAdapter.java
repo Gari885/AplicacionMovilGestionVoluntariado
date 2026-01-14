@@ -2,6 +2,7 @@ package com.example.appgestionvoluntariado.Adapters;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -28,9 +29,12 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.GridHold
     private ViewMode currentMode;
     private OnItemAction listener;
 
+    // Color corporativo Cuatrovientos
+    private final String COLOR_NAVY = "#1A3B85";
+
     public interface OnItemAction {
-        void onPrimaryAction(Project item);
-        void onSecondaryAction(Project item);
+        void onPrimaryAction(Project item);    // Acción principal (Apuntar, Aceptar, Borrar)
+        void onSecondaryAction(Project item);  // Acción secundaria (Rechazar)
     }
 
     public ProjectAdapter(Context context, List<Project> projects, ViewMode mode, OnItemAction listener) {
@@ -67,7 +71,6 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.GridHold
             title = itemView.findViewById(R.id.tvProjectTitle);
             zone = itemView.findViewById(R.id.tvProjectZone);
             date = itemView.findViewById(R.id.tvProjectDate);
-
             info = itemView.findViewById(R.id.btnProjectInfo);
             btnPrimary = itemView.findViewById(R.id.btnPrimaryAction);
             btnSecondary = itemView.findViewById(R.id.btnSecondaryAction);
@@ -78,23 +81,32 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.GridHold
             zone.setText("📍 " + project.getAddress());
             date.setText("📅 " + project.getStartDate());
 
+            // Reset de visibilidad
             btnPrimary.setVisibility(View.GONE);
             btnSecondary.setVisibility(View.GONE);
 
             if (currentMode != null) {
                 switch (currentMode) {
                     case ADMINISTRATOR:
-                        configureButton(btnPrimary, "Aceptar", android.R.color.holo_green_dark);
-                        configureButton(btnSecondary, "Rechazar", android.R.color.holo_red_dark);
+                        // El Admin acepta o rechaza propuestas
+                        configureButton(btnPrimary, "Aceptar", Color.parseColor("#2E7D32")); // Verde
+                        configureButton(btnSecondary, "Rechazar", Color.parseColor("#D32F2F")); // Rojo
                         break;
+
                     case ORGANIZATION:
-                        configureButton(btnPrimary, "Borrar", android.R.color.holo_red_dark);
+                        // El Organizador gestiona sus errores borrando/modificando
+                        configureButton(btnPrimary, "Borrar", Color.parseColor("#D32F2F"));
+                        // Podrías añadir btnSecondary para "Editar" si fuera necesario
                         break;
+
                     case VOLUNTEER_AVAILABLE:
-                        configureButton(btnPrimary, "Apuntarse", android.R.color.holo_green_dark);
+                        // Voluntario buscando: Color corporativo para destacar
+                        configureButton(btnPrimary, "Apuntarse", Color.parseColor(COLOR_NAVY));
                         break;
+
                     case VOLUNTEER_MY_PROJECTS:
-                        configureButton(btnPrimary, "Desapuntarse", android.R.color.holo_red_dark);
+                        // Voluntario inscrito: Opción de salida en rojo
+                        configureButton(btnPrimary, "Desapuntarse", Color.parseColor("#D32F2F"));
                         break;
                 }
             }
@@ -104,10 +116,10 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.GridHold
             info.setOnClickListener(v -> showInfoPopup(project));
         }
 
-        private void configureButton(Button btn, String text, int colorResId) {
+        private void configureButton(Button btn, String text, int color) {
             btn.setVisibility(View.VISIBLE);
             btn.setText(text);
-            btn.setBackgroundTintList(ContextCompat.getColorStateList(context, colorResId));
+            btn.setBackgroundTintList(ColorStateList.valueOf(color));
             btn.setTextColor(Color.WHITE);
         }
 
@@ -119,16 +131,18 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.GridHold
             TextView tvDate = popupView.findViewById(R.id.tvFechaVal);
             LinearLayout needsContainer = popupView.findViewById(R.id.containerNecesidadesVol);
             LinearLayout odsContainer = popupView.findViewById(R.id.containerODS);
-            LinearLayout closeBtn = popupView.findViewById(R.id.btnCerrarPopup);
+            View closeBtn = popupView.findViewById(R.id.btnCerrarPopup);
 
             description.setText(project.getDescription());
             tvDate.setText(project.getEndDate());
 
+            // Poblado dinámico de etiquetas (Skills y ODS)
             populateTags(context, needsContainer, project.getRequiredSkills());
             populateTags(context, odsContainer, project.getOds());
 
             builder.setView(popupView);
             AlertDialog dialog = builder.create();
+
             if (dialog.getWindow() != null)
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -138,14 +152,15 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.GridHold
 
         private void populateTags(Context context, LinearLayout container, List<String> list) {
             container.removeAllViews();
-            if (list == null) return;
+            if (list == null || list.isEmpty()) return;
+
             for (String text : list) {
                 TextView tag = new TextView(context);
                 tag.setText(text);
                 tag.setTextSize(12);
-                tag.setTextColor(Color.parseColor("#1A3B85"));
-                tag.setBackgroundResource(R.drawable.tag_bg_blue);
-                tag.setPadding(25, 10, 25, 10);
+                tag.setTextColor(Color.parseColor(COLOR_NAVY));
+                tag.setBackgroundResource(R.drawable.tag_bg_blue); // Asegúrate de tener este drawable
+                tag.setPadding(24, 12, 24, 12);
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);

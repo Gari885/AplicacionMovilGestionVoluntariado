@@ -10,11 +10,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appgestionvoluntariado.Adapters.ProjectAdapter;
-import com.example.appgestionvoluntariado.GlobalData;
 import com.example.appgestionvoluntariado.Fragments.Auth.ProjectCreateFragment;
 import com.example.appgestionvoluntariado.Models.Project;
-import com.example.appgestionvoluntariado.ViewMode; // Need this!
 import com.example.appgestionvoluntariado.R;
 
 import java.util.List;

@@ -20,7 +20,7 @@ import com.example.appgestionvoluntariado.Models.StatusRequest;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.VolunteerAPIService;
+import com.example.appgestionvoluntariado.Services.VolunteerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,7 +134,7 @@ public class VolunteerAdapter extends RecyclerView.Adapter<VolunteerAdapter.Volu
         }
 
         private void changeVolunteerStatus(Volunteer volunteer, String newStatus, Context context) {
-            VolunteerAPIService apiService = APIClient.getVolunteerAPIService();
+            VolunteerService apiService = APIClient.getVolunteerAPIService();
             StatusRequest body = new StatusRequest(newStatus);
 
             Call<Volunteer> call = apiService.updateStatus(volunteer.getDni(), body);

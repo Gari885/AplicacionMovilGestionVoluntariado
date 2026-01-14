@@ -10,14 +10,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Activities.MainActivity;
 import com.example.appgestionvoluntariado.Fragments.Organization.OrganizationMyProjectsFragment;
 import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerMyProjectsFragment;
-import com.example.appgestionvoluntariado.GlobalSession;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 

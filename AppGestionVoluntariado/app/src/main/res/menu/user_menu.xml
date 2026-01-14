@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_logout"
+        android:icon="@drawable/ic_log_out"
+        android:title="Cerrar Sesión"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_user"
+        android:icon="@drawable/ic_user_avatar"
+        android:title="Usuario"
+        app:showAsAction="always" />
+</menu>

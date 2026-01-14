@@ -1,70 +1,68 @@
-package com.example.appgestionvoluntariado.Activities;
+package com.example.appgestionvoluntariado.Activities.Volunteer;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageView;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Fragments.Settings.ProfileUserFragment;
+import com.example.appgestionvoluntariado.Activities.MainActivity;
 import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerExploreFragment;
 import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerMyProjectsFragment;
+import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerProfileHubFragment;
 import com.example.appgestionvoluntariado.R;
-import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class VolunteerActivity extends AppCompatActivity {
-
-    private DrawerLayout drawerLayout;
-    private ImageView btnHamburgerMenu, userSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_volunteer_main);
+        setContentView(R.layout.activity_volunteer);
 
-        btnHamburgerMenu = findViewById(R.id.ivMenu);
-        drawerLayout = findViewById(R.id.drawerLayout);
-        NavigationView navigationView = findViewById(R.id.navigationView);
-        userSettings = findViewById(R.id.ivUserProfile);
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
-        btnHamburgerMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.END));
-
-        userSettings.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new ProfileUserFragment())
-                    .addToBackStack(null)
-                    .commit();
+        // Logout en el menú superior
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_logout) {
+                performLogout();
+                return true;
+            }
+            return false;
         });
 
-        navigationView.setNavigationItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
+        // Navegación entre Fragmentos
+        bottomNav.setOnItemSelectedListener(item -> {
+            Fragment selected = null;
             int id = item.getItemId();
 
-            if (id == R.id.nav_voluntarios) {
-                // nav_voluntarios IS confusing in Spanish menucode, but implies "Voluntariados" (Projects) for Volunteer view
-                selectedFragment = new VolunteerExploreFragment(); 
-            } else if (id == R.id.nav_misVoluntariados) {
-                selectedFragment = new VolunteerMyProjectsFragment();
-            }
+            if (id == R.id.nav_search) selected = new VolunteerExploreFragment();
+            else if (id == R.id.nav_my_inscriptions) selected = new VolunteerMyProjectsFragment();
+            else if (id == R.id.nav_profile) selected = new VolunteerProfileHubFragment();
 
-            if (selectedFragment != null) {
+            if (selected != null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentContainer, selectedFragment)
-                        .commit();
+                        .replace(R.id.fragment_container, selected).commit();
+                return true;
             }
-            drawerLayout.closeDrawer(GravityCompat.END);
-            return true;
+            return false;
         });
 
+        // Inicio por defecto
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new VolunteerExploreFragment())
-                    .commit();
-            navigationView.setCheckedItem(R.id.nav_voluntarios);
+                    .replace(R.id.fragment_container, new VolunteerExploreFragment()).commit();
         }
+    }
+
+    private void performLogout() {
+        FirebaseAuth.getInstance().signOut();
+        SessionManager.getInstance(this).logout();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

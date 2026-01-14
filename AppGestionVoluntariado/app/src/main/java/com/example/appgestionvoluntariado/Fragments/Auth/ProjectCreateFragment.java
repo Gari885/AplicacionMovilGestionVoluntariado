@@ -16,8 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.GlobalData;
-import com.example.appgestionvoluntariado.GlobalSession;
 import com.example.appgestionvoluntariado.Models.Organization;
 import com.example.appgestionvoluntariado.Models.ProjectCreationRequest;
 import com.example.appgestionvoluntariado.R;

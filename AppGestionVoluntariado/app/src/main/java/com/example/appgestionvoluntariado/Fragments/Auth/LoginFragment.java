@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 import com.example.appgestionvoluntariado.Activities.OrganizationActivity;
 import com.example.appgestionvoluntariado.Activities.AdminActivity;
 import com.example.appgestionvoluntariado.Activities.VolunteerActivity;
-import com.example.appgestionvoluntariado.GlobalSession;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;

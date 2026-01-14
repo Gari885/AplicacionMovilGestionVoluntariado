@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragments.VistaOrganizador.OrgVoluntariadosFragment">
+    android:background="#FFFFFF"
+    tools:context=".Fragments.Volunteer.VolunteerInscriptionsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,35 +16,60 @@
             android:id="@+id/tvProjectsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
             android:text="Mis Voluntariados"
             android:textColor="#1A3B85"
-            android:textSize="38dp"
-            android:textStyle="bold"/>
+            android:textSize="32sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etSearchProject"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"
+            android:layout_marginEnd="20dp"
             android:background="@drawable/background_search_bar"
-            android:hint="Buscar voluntariado..."
-            android:inputType="text"
-            android:paddingStart="16dp"
             android:drawableStart="@android:drawable/ic_menu_search"
             android:drawablePadding="10dp"
-            android:drawableTint="#757575"/>
+            android:drawableTint="#757575"
+            android:hint="Buscar voluntariado..."
+            android:inputType="text"
+            android:paddingStart="16dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvProjects"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="20dp"
-            android:nestedScrollingEnabled="false"/>
+            android:clipToPadding="false"
+            android:paddingBottom="80dp" />
+    </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:indeterminateTint="#1A3B85" />
+
+        <TextView
+            android:id="@+id/tvLoadingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Cargando tus inscripciones"
+            android:textColor="#1A3B85"
+            android:textSize="16sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </FrameLayout>

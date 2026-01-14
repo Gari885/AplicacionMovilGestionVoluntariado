@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.GlobalData;
 import com.example.appgestionvoluntariado.Models.VolunteerRegisterRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;

@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.OrganizationAdapter;
-import com.example.appgestionvoluntariado.GlobalData;
 import com.example.appgestionvoluntariado.Models.Organization;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.OrganizationAPIService;
