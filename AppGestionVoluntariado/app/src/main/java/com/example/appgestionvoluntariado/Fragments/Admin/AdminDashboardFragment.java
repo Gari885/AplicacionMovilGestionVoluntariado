@@ -6,23 +6,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.DashboardAdapter;
-import com.example.appgestionvoluntariado.Models.Match;
-import com.example.appgestionvoluntariado.Models.Organization;
-import com.example.appgestionvoluntariado.Models.Project;
+import com.example.appgestionvoluntariado.Models.AdminStatsResponse;
 import com.example.appgestionvoluntariado.Models.Stat;
-import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.MatchesService;
-import com.example.appgestionvoluntariado.Services.OrganizationService;
-import com.example.appgestionvoluntariado.Services.ProjectsService;
-import com.example.appgestionvoluntariado.Services.VolunteerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,207 +29,118 @@ import retrofit2.Response;
 
 public class AdminDashboardFragment extends Fragment {
 
-    private List<Stat> stats;
     private RecyclerView recyclerView;
     private DashboardAdapter dashboardAdapter;
-
     private View loadingLayout;
-
-    private int completedCalls = 0;
-    private int messageIndex = 0;
-    private final int TOTAL_CALLS = 4;
-
-    private final String[] LOADING_PHRASES = {
-            "Obteniendo lista de voluntarios...",
-            "Conectando con organizaciones...",
-            "Cargando voluntariados disponibles...",
-            "Calculando estadísticas...",
-            "Sincronizando datos..."
-    };
+    private TextView loadingText;
+    private List<Stat> statsList = new ArrayList<>();
 
     private Handler animationHandler = new Handler();
     private Runnable animationRunnable;
-    private TextView loadingText;
+    private int messageIndex = 0;
+    private final String[] LOADING_PHRASES = {
+            "Sincronizando con el servidor...",
+            "Calculando métricas globales...",
+            "Obteniendo estado de la plataforma..."
+    };
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_dashboard, container, false);
-        recyclerView = view.findViewById(R.id.rvDashboard);
-        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        
-        loadingLayout = view.findViewById(R.id.layoutLoading);
-        loadingLayout.setVisibility(View.VISIBLE);
-        loadingText = view.findViewById(R.id.tvLoadingText);
-        stats = new ArrayList<>();
 
+        initViews(view);
         startLoadingAnimation();
-        loadDataInParallel();
+        fetchDashboardStats();
 
         return view;
     }
 
-    private void loadDataInParallel() {
-        completedCalls = 0;
+    private void initViews(View v) {
+        recyclerView = v.findViewById(R.id.rvDashboard);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Load Projects
-        ProjectsService projectsService = APIClient.getProjectsService();
-        Call<List<Project>> callProject = projectsService.getAvailableProjects();
-        callProject.enqueue(new Callback<List<Project>>() {
-            @Override
-            public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
-                if (response.isSuccessful() && response.body() != null){
-                    GlobalData.getInstance().projects = response.body();
-                }
-                checkIfFinished();
-            }
+        loadingLayout = v.findViewById(R.id.layoutLoading);
+        loadingText = v.findViewById(R.id.tvLoadingText);
+    }
 
-            @Override
-            public void onFailure(Call<List<Project>> call, Throwable t) {
-                checkIfFinished();
-            }
-        });
+    private void fetchDashboardStats() {
+        AdminService adminService = APIClient.getAdminService();
 
-        // Load Organizations
-        OrganizationService organizationService = APIClient.getOrganizationService();
-        Call<List<Organization>> callOrg = organizationService.getOrganizations();
-        callOrg.enqueue(new Callback<List<Organization>>() {
+        // Una única llamada para todas las estadísticas
+        adminService.getSummaryStats().enqueue(new Callback<AdminStatsResponse>() {
             @Override
-            public void onResponse(Call<List<Organization>> call, Response<List<Organization>> response) {
+            public void onResponse(Call<AdminStatsResponse> call, Response<AdminStatsResponse> response) {
+                stopLoadingAnimation();
+                loadingLayout.setVisibility(View.GONE);
+
                 if (response.isSuccessful() && response.body() != null) {
-                    GlobalData.getInstance().organizations = response.body();
+                    processStats(response.body());
+                } else {
+                    Toast.makeText(getContext(), "Error al obtener estadísticas", Toast.LENGTH_SHORT).show();
                 }
-                checkIfFinished();
             }
 
             @Override
-            public void onFailure(Call<List<Organization>> call, Throwable t) {
-                checkIfFinished();
-            }
-        });
-
-        // Load Volunteers
-        VolunteerService volunteerAPIService = APIClient.getVolunteerService();
-        Call<List<Volunteer>> callVol = volunteerAPIService.getVolunteers();
-        callVol.enqueue(new Callback<List<Volunteer>>() {
-            @Override
-            public void onResponse(Call<List<Volunteer>> call, Response<List<Volunteer>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    GlobalData.getInstance().volunteers = response.body();
-                }
-                checkIfFinished();
-            }
-
-            @Override
-            public void onFailure(Call<List<Volunteer>> call, Throwable t) {
-                checkIfFinished();
-            }
-        });
-
-        // Load Matches
-        MatchesService matchesService = APIClient.getMatchesService();
-        Call<List<Match>> callMatch = matchesService.getMatches();
-        callMatch.enqueue(new Callback<List<Match>>() {
-            @Override
-            public void onResponse(Call<List<Match>> call, Response<List<Match>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    GlobalData.getInstance().matches = response.body();
-                }
-                checkIfFinished();
-            }
-
-            @Override
-            public void onFailure(Call<List<Match>> call, Throwable t) {
-                checkIfFinished();
+            public void onFailure(Call<AdminStatsResponse> call, Throwable t) {
+                stopLoadingAnimation();
+                loadingLayout.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "Fallo de conexión", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void createVolunteerCard() {
-        int accepted = 0;
-        int pending = 0;
-        List<Volunteer> volunteers = GlobalData.getInstance().volunteers;
-        if (volunteers != null) {
-            for (Volunteer vol : volunteers) {
-                String status = vol.getStatus();
-                if ("Activo".equalsIgnoreCase(status) || "ACEPTADO".equalsIgnoreCase(status)) {
-                    accepted++;
-                }
-                if ("Pendiente".equalsIgnoreCase(status) || "PENDIENTE".equalsIgnoreCase(status)) {
-                    pending++;
-                }
-            }
-        }
+    private void processStats(AdminStatsResponse data) {
+        statsList.clear();
 
-        String pendingStr = (pending > 0) ? "+" + pending + " Pendientes" : "Ningún pendiente";
-        stats.add(new Stat("VOLUNTARIOS", accepted, pendingStr, R.drawable.ic_volunteers_group));
+        // Mapeamos los datos de la API a los objetos Stat para el RecyclerView
+        statsList.add(new Stat("VOLUNTARIOS",
+                data.getVolunteersActive(),
+                "+" + data.getVolunteersPending() + " Pendientes",
+                R.drawable.ic_volunteers));
+
+        statsList.add(new Stat("ORGANIZACIONES",
+                data.getOrgsActive(),
+                "+" + data.getOrgsPending() + " Pendientes",
+                R.drawable.ic_organizations));
+
+        statsList.add(new Stat("PROYECTOS",
+                data.getProjectsActive(),
+                "+" + data.getProjectsPending() + " por Validar",
+                R.drawable.ic_projects));
+
+        statsList.add(new Stat("MATCHES",
+                data.getTotalMatches(),
+                "Conexiones exitosas",
+                R.drawable.ic_matches));
+
+        updateUI();
     }
 
-    private void createOrganizationCard() {
-        int accepted = 0;
-        int pending = 0;
-        List<Organization> organizations = GlobalData.getInstance().organizations;
-        if (organizations != null) {
-            for (Organization org : organizations) {
-                String status = org.getStatus();
-                if ("Activo".equalsIgnoreCase(status) || "aprobado".equalsIgnoreCase(status)) {
-                    accepted++;
-                }
-                if ("Pendiente".equalsIgnoreCase(status)) {
-                    pending++;
-                }
-            }
-        }
-
-        String pendingStr = (pending > 0) ? "+" + pending + " Pendientes" : "Ningún pendiente";
-        stats.add(new Stat("ORGANIZACIONES", accepted, pendingStr, R.drawable.ic_volunteers_group));
-    }
-
-    private void startLoadingAnimation() {
-        animationRunnable = new Runnable() {
-            @Override
-            public void run() {
-                loadingText.setText(LOADING_PHRASES[messageIndex]);
-                messageIndex = (messageIndex + 1) % LOADING_PHRASES.length;
-                animationHandler.postDelayed(this, 800);
-            }
-        };
-        animationHandler.post(animationRunnable);
-    }
-
-    private void stopLoadingAnimation() {
-        if (animationRunnable != null) {
-            animationHandler.removeCallbacks(animationRunnable);
-        }
-    }
-
-    private void checkIfFinished() {
-        completedCalls++;
-        if (completedCalls == TOTAL_CALLS) {
-            stopLoadingAnimation();
-            calculateStats();
-            loadingLayout.setVisibility(View.GONE);
-        }
-    }
-
-    private void showStats() {
+    private void updateUI() {
         if (dashboardAdapter == null) {
-            dashboardAdapter = new DashboardAdapter(stats);
+            dashboardAdapter = new DashboardAdapter(statsList);
             recyclerView.setAdapter(dashboardAdapter);
         } else {
             dashboardAdapter.notifyDataSetChanged();
         }
     }
 
-    private void calculateStats() {
-        stats.clear();
-        createVolunteerCard();
-        createOrganizationCard();
-        showStats();
+    // --- Lógica de Animación ---
+    private void startLoadingAnimation() {
+        animationRunnable = new Runnable() {
+            @Override
+            public void run() {
+                loadingText.setText(LOADING_PHRASES[messageIndex]);
+                messageIndex = (messageIndex + 1) % LOADING_PHRASES.length;
+                animationHandler.postDelayed(this, 1000);
+            }
+        };
+        animationHandler.post(animationRunnable);
+    }
+
+    private void stopLoadingAnimation() {
+        if (animationRunnable != null) animationHandler.removeCallbacks(animationRunnable);
     }
 
     @Override

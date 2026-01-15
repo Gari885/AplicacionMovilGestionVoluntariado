@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_admin_dashboard"
+        android:icon="@drawable/ic_stats"
+        android:title="Dashboard" />
+    <item
+        android:id="@+id/nav_admin_vols"
+        android:icon="@drawable/ic_volunteers"
+        android:title="Voluntarios" />
 
+    <item
+        android:id="@+id/nav_admin_projects"
+        android:icon="@drawable/ic_projects"
+        android:title="Proyectos" />
+    <item
+        android:id="@+id/nav_admin_orgs"
+        android:icon="@drawable/ic_organization"
+        android:title="Orgs" />
+    <item
+        android:id="@+id/nav_admin_matches"
+        android:icon="@drawable/ic_person"
+        android:title="Matches" />
 </menu>

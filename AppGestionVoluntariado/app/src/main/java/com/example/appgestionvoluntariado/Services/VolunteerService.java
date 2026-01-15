@@ -11,15 +11,16 @@ import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface VolunteerService {
     @GET("voluntarios")
-    Call<List<Volunteer>> getVolunteers();
+    Call<List<Volunteer>> getVolunteers(@Query("estado") String estado);
 
     @PATCH("voluntarios/{dni}/estado")
-    Call<Volunteer> updateStatus(
-            @Path("dni") String dni,       
-            @Body StatusRequest request    
+    Call<Void> updateStatus(
+            @Path ("dni") String dni,
+            @Body StatusRequest request
     );
 
     @GET("volunteer/profile")

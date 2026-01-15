@@ -1,170 +1,225 @@
 package com.example.appgestionvoluntariado.Fragments.Admin;
 
+import android.app.AlertDialog;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.VolunteerAdapter;
+import com.example.appgestionvoluntariado.Models.StatusRequest;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
-import com.example.appgestionvoluntariado.Services.VolunteerService;
+import com.example.appgestionvoluntariado.Services.APIClient;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class AdminVolunteerListFragment extends Fragment {
 
-    private Button btnCreateOrganization; // Not used/implemented in original Fully?
+    private RecyclerView rvVolunteers;
+    private EditText etSearch;
     private TextView tabPending, tabAccepted;
-    private RecyclerView recyclerView;
+    private View loadingLayout;
 
-    private List<Volunteer> volunteers = new ArrayList<>();
-    private List<Volunteer> filteredVolunteers = new ArrayList<>();
-
-    private VolunteerService apiService;
-    private VolunteerAdapter volunteerAdapter;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private List<Volunteer> fullList = new ArrayList<>();
+    private VolunteerAdapter adapter;
+    private String currentStatus = "PENDIENTE";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_admin_volunteer_list, container, false);
+        // Asegúrate de que este sea el nombre de tu XML de fragmento
+        View v = inflater.inflate(R.layout.fragment_admin_volunteer_list, container, false);
 
-        btnCreateOrganization = view.findViewById(R.id.btnAddVolunteer);
-        recyclerView = view.findViewById(R.id.rvVolunteers);
-        tabPending = view.findViewById(R.id.tabStatusPending);
-        tabAccepted = view.findViewById(R.id.tabStatusAccepted);
-        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        // Inicialización
+        rvVolunteers = v.findViewById(R.id.rvVolunteers);
+        rvVolunteers.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        etSearch = v.findViewById(R.id.etSearchVolunteer);
+        tabPending = v.findViewById(R.id.tabStatusPending);
+        tabAccepted = v.findViewById(R.id.tabStatusAccepted);
+        loadingLayout = v.findViewById(R.id.layoutLoading);
+
+        setupTabs();
+        setupSearch();
+        fetchVolunteers();
+
+        return v;
+    }
+
+    private void setupTabs() {
         tabPending.setOnClickListener(v -> {
-            updateTabsVisuals(true);
-            filterAndShow("Rechazado"); // Logic from original: "Rechazado" passes to filter? Original logic was weird.
-            // Original code:
-            // if (estadoBuscado.equals("Pendiente")) -> match "Pendiente"
-            // else -> match ! "Pendiente"
-            // So passing "Rechazado" goes to else -> !Pendiente.
-            // Wait.
-            // tabPendientes click -> updateTabsVisuals(true) -> filterAndShow("Rechazado").
-            // "Rechazado" != "Pendiente", so else block: if (!vol.status.equals("Pendiente")).
-            // This displays NON-PENDING volunteers when clicking Pending tab? That seems WRONG in original code.
-            // Let's re-read original code carefully.
-
-            /*
-            tabPendientes.setOnClickListener(v -> {
-                cambiarTabsVisualmente(true);
-                filtrarYMostrar("Rechazado"); // <--- This string is passed
-            });
-            ...
-            filtrarYMostrar(String estadoBuscado) ...
-               if (estadoBuscado.equals("Pendiente")) ...
-               else {
-                   if (!vol.getEstadoVoluntario().equalsIgnoreCase("Pendiente")) ...
-               }
-             */
-             // So if I pass "Rechazado", it enters the ELSE block.
-             // It filters for volunteers where status is NOT "Pendiente".
-             // So clicking "Pendientes" tab shows "Non-Pending" volunteers?
-             // That logic seems inverted in the original file I read (lines 69-72).
-             // Wait:
-             /*
-             tabPendientes.setOnClickListener(v -> {
-                 cambiarTabsVisualmente(true); // true = pendientes seleccionado
-                 filtrarYMostrar("Rechazado");
-             });
-             */
-             // Maybe the tab IDs are swapped or I misunderstood the boolean logic?
-             // `cambiarTabsVisualmente(true)` highlights `tabPendientes`.
-             // But calls `filtrarYMostrar("Rechazado")`.
-             // And `filtrarYMostrar` with "Rechazado" (which is NOT "Pendiente") filters for NOT "Pendiente".
-             // So clicking Pending Tab shows Accepted/Rejected volunteers.
-             // And clicking Accepted Tab (lines 74-77):
-             /*
-             tabAceptados.setOnClickListener(v -> {
-                 cambiarTabsVisualmente(false); // false = aceptados seleccionado
-                 filtrarYMostrar("Aprobado");
-             });
-             */
-             // `Aprobado` is NOT "Pendiente", so filters for NOT "Pendiente".
-             // Both tabs do the SAME thing?
-             // Ah, `filtrarYMostrar("Pendiente")` is ONLY called in `cargarDatosGlobales`.
-             // This looks like a bug in the original code.
-
-             // However, I should probably FIX it to be logical or strictly follow it if I must.
-             // Given "Refactor" implies improving, I'll make it logical.
-             // Tab Pending -> Filter "Pendiente".
-             // Tab Accepted -> Filter "Activo"/"Aceptado"/"Rechazado" (Not Pending).
-
-             updateTabsVisuals(true);
-             filterAndShow("Pendiente");
+            currentStatus = "PENDIENTE";
+            updateTabUI(tabPending, tabAccepted);
+            fetchVolunteers();
         });
 
         tabAccepted.setOnClickListener(v -> {
-            updateTabsVisuals(false);
-            filterAndShow("Accepted"); // Anything not pending
+            currentStatus = "ACTIVO";
+            updateTabUI(tabAccepted, tabPending);
+            fetchVolunteers();
         });
-
-        loadGlobalData();
-
-        return view;
     }
 
-    private void loadGlobalData() {
-        volunteers = GlobalData.getInstance().volunteers;
-        updateTabsVisuals(true);
-        filterAndShow("Pendiente");
+    private void updateTabUI(TextView selected, TextView unselected) {
+        selected.setBackgroundResource(R.drawable.background_tab_selected);
+        selected.setTextColor(Color.WHITE);
+        unselected.setBackgroundResource(R.drawable.background_tab_unselected);
+        unselected.setTextColor(Color.parseColor("#1A3B85"));
     }
 
-    private void filterAndShow(String targetStatus) {
-        filteredVolunteers.clear();
-
-        if (volunteers != null) {
-            for (Volunteer vol : volunteers) {
-                if (vol.getStatus() == null) continue;
-
-                if ("Pendiente".equalsIgnoreCase(targetStatus)) {
-                    // Show only Pending
-                    if ("Pendiente".equalsIgnoreCase(vol.getStatus()) || "PENDIENTE".equalsIgnoreCase(vol.getStatus())) {
-                        filteredVolunteers.add(vol);
+    private void fetchVolunteers() {
+        loadingLayout.setVisibility(View.VISIBLE);
+        APIClient.getVolunteerService().getVolunteers(currentStatus)
+                .enqueue(new Callback<List<Volunteer>>() {
+                    @Override
+                    public void onResponse(Call<List<Volunteer>> call, Response<List<Volunteer>> response) {
+                        loadingLayout.setVisibility(View.GONE);
+                        if (response.isSuccessful() && response.body() != null) {
+                            fullList = response.body();
+                            updateAdapter(fullList);
+                        }
                     }
-                } else {
-                    // Show Non-Pending (Accepted, Rejected, Active)
-                    if (!"Pendiente".equalsIgnoreCase(vol.getStatus()) && !"PENDIENTE".equalsIgnoreCase(vol.getStatus())) {
-                        filteredVolunteers.add(vol);
+
+                    @Override
+                    public void onFailure(Call<List<Volunteer>> call, Throwable t) {
+                        loadingLayout.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Error al cargar voluntarios", Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    private void updateAdapter(List<Volunteer> list) {
+        if (adapter == null) {
+            adapter = new VolunteerAdapter(list, new VolunteerAdapter.OnVolunteerActionListener() {
+                @Override
+                public void onAccept(Volunteer volunteer) {
+                    processStatusChange(volunteer,new StatusRequest("aprobado"));
                 }
+
+                @Override
+                public void onReject(Volunteer volunteer) {
+                    processStatusChange(volunteer,new StatusRequest("rechazado"));
+                }
+
+                @Override
+                public void onDelete(Volunteer volunteer) {
+                    showConfirmDeleteDialog(volunteer);
+                }
+
+                @Override
+                public void onDetails(Volunteer volunteer) {
+                    showVolunteerDetails(volunteer);
+                }
+            });
+            rvVolunteers.setAdapter(adapter);
+        } else {
+            adapter.updateList(list);
+        }
+    }
+
+    private void processStatusChange(Volunteer vol, StatusRequest request) {
+        loadingLayout.setVisibility(View.VISIBLE);
+        // Usamos el token de Firebase, no enviamos identificadores en la URL/Body
+        APIClient.getVolunteerService().updateStatus(vol.getDni(),request)
+                .enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            fetchVolunteers(); // Refrescamos la lista completa
+                        } else {
+                            loadingLayout.setVisibility(View.GONE);
+                            Toast.makeText(getContext(), "Error en el cambio de estado", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        loadingLayout.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Fallo de conexión", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void showConfirmDeleteDialog(Volunteer volunteer) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("¿Dar de baja?")
+                .setMessage("¿Estás seguro de que quieres desactivar a " + volunteer.getFullName() + "?")
+                .setPositiveButton("Confirmar", (dialog, which) -> processStatusChange(volunteer,new StatusRequest("rechazado")))
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void showVolunteerDetails(Volunteer v) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        View view = getLayoutInflater().inflate(R.layout.dialog_volunteer_info, null);
+        bottomSheetDialog.setContentView(view);
+
+        // Referencias
+        ChipGroup cgHabilidades = view.findViewById(R.id.chipGroupHabilidades);
+        TextView tvDisp = view.findViewById(R.id.tvDisponibilidadVal);
+        Button btnCerrar = view.findViewById(R.id.btnCerrarPopup);
+
+
+        // TRUCO: Quitar el fondo por defecto del contenedor para que se vean las esquinas redondeadas
+        View parent = (View) view.getParent();
+        parent.setBackgroundResource(android.R.color.transparent);
+
+        // Crear chips dinámicamente para que no se corten
+        if (v.getSkills() != null) {
+            for (String skill : v.getSkills().split(",")) {
+                Chip chip = new Chip(getContext());
+                chip.setText(skill.trim());
+                chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue_light); // Define un azul claro en colors
+                cgHabilidades.addView(chip);
             }
         }
 
-        if (volunteerAdapter == null) {
-            volunteerAdapter = new VolunteerAdapter(filteredVolunteers);
-            recyclerView.setAdapter(volunteerAdapter);
-        } else {
-            volunteerAdapter.updateData(filteredVolunteers);
-        }
+        btnCerrar.setOnClickListener(view1 -> bottomSheetDialog.dismiss());
+        bottomSheetDialog.show();
     }
 
-    private void updateTabsVisuals(boolean isPendingSelected) {
-        if (isPendingSelected) {
-            tabPending.setBackgroundResource(R.drawable.background_tab_selected);
-            tabPending.setTextColor(Color.WHITE);
-            tabAccepted.setBackgroundResource(R.drawable.background_tab_unselected);
-            tabAccepted.setTextColor(Color.parseColor("#1A3B85"));
-        } else {
-            tabAccepted.setBackgroundResource(R.drawable.background_tab_selected);
-            tabAccepted.setTextColor(Color.WHITE);
-            tabPending.setBackgroundResource(R.drawable.background_tab_unselected);
-            tabPending.setTextColor(Color.parseColor("#1A3B85"));
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterList(s.toString());
+            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void filterList(String text) {
+        List<Volunteer> filtered = new ArrayList<>();
+        String query = text.toLowerCase().trim();
+        for (Volunteer v : fullList) {
+            // Buscamos por nombre o por DNI
+            if (v.getFullName().toLowerCase().contains(query) ||
+                    v.getDni().toLowerCase().contains(query)) {
+                filtered.add(v);
+            }
         }
+        updateAdapter(filtered);
     }
 }

@@ -44,7 +44,7 @@
         android:background="#FFFFFF"
         app:itemIconTint="#1A3B85"
         app:itemTextColor="#1A3B85"
-        app:menu="@menu/menu_bottom_admin"
+        app:menu="@menu/admin_bottom_nav"
         app:labelVisibilityMode="labeled" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

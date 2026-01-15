@@ -24,7 +24,7 @@ public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.Grid
     @NonNull
     @Override
     public GridHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_organization_dashboard_card, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_dashboard, parent, false);
         return new GridHolder(itemView);
     }
 

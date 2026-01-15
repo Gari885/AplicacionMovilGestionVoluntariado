@@ -15,20 +15,19 @@
         android:padding="24dp">
 
         <TextView
-            android:id="@+id/tvHubOrgName"
+            android:id="@+id/tvHubUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre de la Organización"
+            android:text="Cargando nombre..."
             android:textColor="#FFFFFF"
             android:textSize="26sp"
             android:textStyle="bold"
             android:textAlignment="center" />
 
         <TextView
-            android:id="@+id/tvHubOrgCif"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CIF: Cargando..."
+            android:text="Voluntario"
             android:textColor="#BBDEFB"
             android:textSize="14sp"
             android:layout_marginTop="4dp" />
@@ -49,7 +48,7 @@
             android:padding="8dp">
 
             <LinearLayout
-                android:id="@+id/btnNavEditOrgData"
+                android:id="@+id/btnNavEditData"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:background="?attr/selectableItemBackground"
@@ -69,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
-                    android:text="Datos de la organización"
+                    android:text="Mis datos personales"
                     android:textColor="#333333"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -88,7 +87,7 @@
                 android:background="#F0F0F0" />
 
             <LinearLayout
-                android:id="@+id/btnNavOrgSecurity"
+                android:id="@+id/btnNavSecurity"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:background="?attr/selectableItemBackground"
@@ -124,7 +123,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogoutOrg"
+        android:id="@+id/btnLogout"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="55dp"
@@ -134,7 +133,7 @@
         android:textColor="#D32F2F"
         android:textStyle="bold"
         android:letterSpacing="0.1"
-        app:icon="@drawable/ic_logout"
+        app:icon="@drawable/ic_log_out"
         app:iconGravity="textStart"
         app:iconTint="#D32F2F" />
 

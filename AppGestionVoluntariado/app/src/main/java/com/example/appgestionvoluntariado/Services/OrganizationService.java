@@ -10,14 +10,17 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface OrganizationService {
     @GET("organizations")
-    Call<List<Organization>> getOrganizations();
+    Call<List<Organization>> getOrganizations(@Query("estado")String estado);
+
+    //Se va a usar el authinterceptor para esto
     @PATCH("organizations/{cif}/state")
-    Call<Organization> updateStatus(
-            @Path("cif") String cif,       
-            @Body StatusRequest request    
+    Call<Void> updateStatus(
+            @Path("cif") String cif,
+            @Body StatusRequest request
     );
 
 }

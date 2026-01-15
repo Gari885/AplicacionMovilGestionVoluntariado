@@ -35,6 +35,7 @@ public class Match implements Serializable {
         this.status = status;
     }
 
+
     public int getEnrollmentId() { return enrollmentId; }
     public void setEnrollmentId(int enrollmentId) { this.enrollmentId = enrollmentId; }
 
