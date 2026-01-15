@@ -29,24 +29,24 @@ public class APIClient {
 
     // --- Public Services ---
 
-    public static ProjectsAPIService getProjectsAPIService(){
-        return getClient().create(ProjectsAPIService.class);
+    public static ProjectsService getProjectsService(){
+        return getClient().create(ProjectsService.class);
     }
 
-    public static OrganizationAPIService getOrganizationAPIService(){
-        return getClient().create(OrganizationAPIService.class);
+    public static OrganizationService getOrganizationService(){
+        return getClient().create(OrganizationService.class);
     }
 
-    public static VolunteerService getVolunteerAPIService(){
+    public static VolunteerService getVolunteerService(){
         return getClient().create(VolunteerService.class);
     }
 
-    public static MatchesAPIService getMatchesAPIService(){
-        return getClient().create(MatchesAPIService.class);
+    public static MatchesService getMatchesService(){
+        return getClient().create(MatchesService.class);
     }
 
-    public static FindVolunteerAPIService getFindVolunteerAPIService(){
-        return getClient().create(FindVolunteerAPIService.class);
+    public static FindVolunteerService getFindVolunteerService(){
+        return getClient().create(FindVolunteerService.class);
     }
 
     public static AuthAPIService getAuthAPIService(){

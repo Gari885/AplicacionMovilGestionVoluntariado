@@ -19,9 +19,9 @@ import com.example.appgestionvoluntariado.Models.Stat;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.MatchesAPIService;
-import com.example.appgestionvoluntariado.Services.OrganizationAPIService;
-import com.example.appgestionvoluntariado.Services.ProjectsAPIService;
+import com.example.appgestionvoluntariado.Services.MatchesService;
+import com.example.appgestionvoluntariado.Services.OrganizationService;
+import com.example.appgestionvoluntariado.Services.ProjectsService;
 import com.example.appgestionvoluntariado.Services.VolunteerService;
 
 import java.util.ArrayList;
@@ -81,8 +81,8 @@ public class AdminDashboardFragment extends Fragment {
         completedCalls = 0;
 
         // Load Projects
-        ProjectsAPIService projectsAPIService = APIClient.getProjectsAPIService();
-        Call<List<Project>> callProject = projectsAPIService.getProjects();
+        ProjectsService projectsService = APIClient.getProjectsService();
+        Call<List<Project>> callProject = projectsService.getAvailableProjects();
         callProject.enqueue(new Callback<List<Project>>() {
             @Override
             public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
@@ -99,8 +99,8 @@ public class AdminDashboardFragment extends Fragment {
         });
 
         // Load Organizations
-        OrganizationAPIService organizationAPIService = APIClient.getOrganizationAPIService();
-        Call<List<Organization>> callOrg = organizationAPIService.getOrganizations();
+        OrganizationService organizationService = APIClient.getOrganizationService();
+        Call<List<Organization>> callOrg = organizationService.getOrganizations();
         callOrg.enqueue(new Callback<List<Organization>>() {
             @Override
             public void onResponse(Call<List<Organization>> call, Response<List<Organization>> response) {
@@ -117,7 +117,7 @@ public class AdminDashboardFragment extends Fragment {
         });
 
         // Load Volunteers
-        VolunteerService volunteerAPIService = APIClient.getVolunteerAPIService();
+        VolunteerService volunteerAPIService = APIClient.getVolunteerService();
         Call<List<Volunteer>> callVol = volunteerAPIService.getVolunteers();
         callVol.enqueue(new Callback<List<Volunteer>>() {
             @Override
@@ -135,8 +135,8 @@ public class AdminDashboardFragment extends Fragment {
         });
 
         // Load Matches
-        MatchesAPIService matchesAPIService = APIClient.getMatchesAPIService();
-        Call<List<Match>> callMatch = matchesAPIService.getMatches();
+        MatchesService matchesService = APIClient.getMatchesService();
+        Call<List<Match>> callMatch = matchesService.getMatches();
         callMatch.enqueue(new Callback<List<Match>>() {
             @Override
             public void onResponse(Call<List<Match>> call, Response<List<Match>> response) {

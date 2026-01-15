@@ -32,6 +32,9 @@ public class Volunteer {
     @SerializedName("coche")
     private boolean hasCar;
 
+    @SerializedName("ciclo") // Añadido para coincidir con el registro
+    private String cycle;
+
     @SerializedName("habilidades")
     private String skills;
 
@@ -50,37 +53,47 @@ public class Volunteer {
     public Volunteer() {
     }
 
+    // --- GETTERS ---
     public String getDni() { return dni; }
     public String getFirstName() { return firstName; }
-    
-    public String getFullName() {
-        return firstName + " " + lastName1 + " " + (lastName2 != null ? lastName2 : "");
-    }
-
     public String getLastName1() { return lastName1; }
     public String getLastName2() { return lastName2; }
     public String getEmail() { return email; }
     public String getZone() { return zone; }
     public String getBirthDate() { return birthDate; }
     public String getExperience() { return experience; }
-    public boolean hasCar() { return hasCar; }
-
+    public boolean getHasCar() { return hasCar; }
+    public String getCycle() { return cycle; }
     public String getSkills() { return skills; }
     public String getInterests() { return interests; }
     public String getLanguages() { return languages; }
     public String getStatus() { return status; }
     public List<Enrollment> getEnrollments() { return enrollments; }
 
-    public void setStatus(String status) {
-        this.status = status;
+    // Método helper para la UI
+    public String getFullName() {
+        return firstName + " " + (lastName1 != null ? lastName1 : "") + " " + (lastName2 != null ? lastName2 : "");
     }
 
+    // --- SETTERS (Necesarios para la edición) ---
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName1(String lastName1) { this.lastName1 = lastName1; }
+    public void setLastName2(String lastName2) { this.lastName2 = lastName2; }
+    public void setZone(String zone) { this.zone = zone; }
+    public void setBirthDate(String birthDate) { this.birthDate = birthDate; }
+    public void setExperience(String experience) { this.experience = experience; }
+    public void setHasCar(boolean hasCar) { this.hasCar = hasCar; }
+    public void setCycle(String cycle) { this.cycle = cycle; }
+    public void setLanguages(String languages) { this.languages = languages; }
+    public void setStatus(String status) { this.status = status; }
+
+    // --- CLASE INTERNA ENROLLMENT ---
     public static class Enrollment {
         @SerializedName("id_inscripcion")
         private int enrollmentId;
 
         @SerializedName("actividad")
-        private String projectTitle; // 'actividad' in JSON usually refers to the project name here
+        private String projectTitle;
 
         @SerializedName("estado")
         private String status;

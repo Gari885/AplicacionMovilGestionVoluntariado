@@ -18,7 +18,7 @@ public class VolunteerProfileChangePasswordFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_volunteer_change_password, container, false);
+        View view = inflater.inflate(R.layout.fragment_volunteer_change_passwords, container, false);
 
         etCurrent = view.findViewById(R.id.etCurrentPassword);
         etNew = view.findViewById(R.id.etNewPassword);

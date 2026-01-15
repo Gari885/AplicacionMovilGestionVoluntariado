@@ -6,7 +6,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-public interface AuthentificationAPIService {
+public interface AuthentificationService {
     @POST("auth/register/voluntario")
     Call<Void> registrarVoluntario(@Body VoluntarioRegistroRequest request);
 

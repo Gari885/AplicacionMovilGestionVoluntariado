@@ -23,7 +23,7 @@ import com.example.appgestionvoluntariado.Activities.VolunteerActivity;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.FindVolunteerAPIService;
+import com.example.appgestionvoluntariado.Services.FindVolunteerService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -141,8 +141,8 @@ public class LoginFragment extends Fragment {
 
         switch (normalizedRole) {
             case "voluntario":
-                FindVolunteerAPIService findVolunteerAPIService = APIClient.getFindVolunteerAPIService();
-                findVolunteerAPIService.getVolunteer(email).enqueue(new Callback<Volunteer>() {
+                FindVolunteerService findVolunteerService = APIClient.getFindVolunteerService();
+                findVolunteerService.getVolunteer(email).enqueue(new Callback<Volunteer>() {
                     @Override
                     public void onResponse(Call<Volunteer> call, Response<Volunteer> response) {
                         if (response.isSuccessful() && response.body() != null) {

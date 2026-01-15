@@ -30,7 +30,7 @@ public class OrganizationExploreFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_organization_explore, container, false);
+        View view = inflater.inflate(R.layout.fragment_organization_my_projects, container, false);
 
         btnAddProject = view.findViewById(R.id.btnAddProject);
         recyclerView = view.findViewById(R.id.rvProjects);

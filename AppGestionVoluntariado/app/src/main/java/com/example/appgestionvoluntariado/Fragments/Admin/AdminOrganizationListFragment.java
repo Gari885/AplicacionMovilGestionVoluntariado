@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.appgestionvoluntariado.Adapters.OrganizationAdapter;
 import com.example.appgestionvoluntariado.Models.Organization;
 import com.example.appgestionvoluntariado.R;
-import com.example.appgestionvoluntariado.Services.OrganizationAPIService;
+import com.example.appgestionvoluntariado.Services.OrganizationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class AdminOrganizationListFragment extends Fragment {
     private List<Organization> organizations = new ArrayList<>();
     private List<Organization> filteredOrganizations = new ArrayList<>();
 
-    private OrganizationAPIService apiService;
+    private OrganizationService apiService;
     private OrganizationAdapter organizationAdapter;
 
     @Override

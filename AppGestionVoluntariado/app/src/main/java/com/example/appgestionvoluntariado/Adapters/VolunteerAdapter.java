@@ -134,7 +134,7 @@ public class VolunteerAdapter extends RecyclerView.Adapter<VolunteerAdapter.Volu
         }
 
         private void changeVolunteerStatus(Volunteer volunteer, String newStatus, Context context) {
-            VolunteerService apiService = APIClient.getVolunteerAPIService();
+            VolunteerService apiService = APIClient.getVolunteerService();
             StatusRequest body = new StatusRequest(newStatus);
 
             Call<Volunteer> call = apiService.updateStatus(volunteer.getDni(), body);

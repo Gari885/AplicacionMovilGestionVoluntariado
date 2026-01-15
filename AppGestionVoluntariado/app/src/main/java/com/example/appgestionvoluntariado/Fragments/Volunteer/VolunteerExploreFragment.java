@@ -18,7 +18,7 @@ import com.example.appgestionvoluntariado.Adapters.ProjectAdapter;
 import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.ProjectsAPIService;
+import com.example.appgestionvoluntariado.Services.ProjectsService;
 import com.example.appgestionvoluntariado.ViewMode;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import retrofit2.Response;
 public class VolunteerExploreFragment extends Fragment {
 
     private List<Project> availableProjects = new ArrayList<>();
-    private ProjectsAPIService projectsAPIService;
+    private ProjectsService projectsService;
     private RecyclerView recyclerView;
     private ProjectAdapter projectAdapter;
     private LinearLayout loadingLayout;
@@ -56,14 +56,14 @@ public class VolunteerExploreFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // APIClient ya inyecta automáticamente el Token de Firebase en la cabecera
-        projectsAPIService = APIClient.getProjectsAPIService();
+        projectsService = APIClient.getProjectsAPIService();
     }
 
     private void loadAvailableProjects() {
         showLoading("Buscando nuevas ofertas...");
 
         // Ya no enviamos el DNI; el backend lo extrae del token de autorización
-        projectsAPIService.getAvailableProjects().enqueue(new Callback<List<Project>>() {
+        projectsService.getAvailableProjects().enqueue(new Callback<List<Project>>() {
             @Override
             public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
                 hideLoading();
@@ -103,7 +103,7 @@ public class VolunteerExploreFragment extends Fragment {
         showLoading("Tramitando tu inscripción...");
 
         // Llamada simplificada: solo pasamos el ID del proyecto
-        projectsAPIService.enroll(item.getId()).enqueue(new Callback<Void>() {
+        projectsService.enroll(item.getId()).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 hideLoading();

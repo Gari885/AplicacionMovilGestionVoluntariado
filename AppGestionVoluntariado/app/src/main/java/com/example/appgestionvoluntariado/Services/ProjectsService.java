@@ -12,7 +12,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
-public interface ProjectsAPIService {
+public interface ProjectsService {
 
     // ==========================================
     // --- SECCIÓN VOLUNTARIO ---
@@ -67,4 +67,5 @@ public interface ProjectsAPIService {
 
     @DELETE("projects/{id}")
     Call<Void> deleteProject(@Path("id") int id);
+
 }

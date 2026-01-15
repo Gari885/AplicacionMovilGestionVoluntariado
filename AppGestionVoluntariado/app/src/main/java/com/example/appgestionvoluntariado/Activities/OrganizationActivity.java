@@ -1,40 +1,47 @@
 package com.example.appgestionvoluntariado.Activities;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.appgestionvoluntariado.Fragments.Settings.ProfileUserFragment;
-import com.example.appgestionvoluntariado.Fragments.Organization.OrganizationMyProjectsFragment;
+import androidx.fragment.app.Fragment;
+import com.example.appgestionvoluntariado.Fragments.Organization.OrgActivitiesFragment;
+import com.example.appgestionvoluntariado.Fragments.Organization.OrgCreateProjectFragment;
+import com.example.appgestionvoluntariado.Fragments.Organization.OrgProfileFragment;
 import com.example.appgestionvoluntariado.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class OrganizationActivity extends AppCompatActivity {
-
-    private ImageView userSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_organization_main);
+        setContentView(R.layout.activity_organization);
 
-        userSettings = findViewById(R.id.ivUserProfile);
-        userSettings.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new ProfileUserFragment())
-                    .addToBackStack(null) // Added backstack to allow return logic if needed
-                    .commit();
+        BottomNavigationView bottomNav = findViewById(R.id.organization_bottom_navigation);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int id = item.getItemId();
+
+            if (id == R.id.nav_org_activities) {
+                selectedFragment = new OrgActivitiesFragment();
+            } else if (id == R.id.nav_org_create) {
+                selectedFragment = new OrgCreateProjectFragment();
+            } else if (id == R.id.nav_org_profile) {
+                selectedFragment = new OrgProfileFragment();
+            }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.organization_fragment_container, selectedFragment)
+                        .commit();
+            }
+            return true;
         });
 
+        // Pantalla de inicio por defecto
         if (savedInstanceState == null) {
-            // Default fragment for Organization?? The original code had nothing.
-            // But usually we want to show their projects.
-            // I'll add OrganizationMyProjectsFragment as default to avoid empty screen.
-             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new OrganizationMyProjectsFragment())
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.organization_fragment_container, new OrgActivitiesFragment())
                     .commit();
         }
     }

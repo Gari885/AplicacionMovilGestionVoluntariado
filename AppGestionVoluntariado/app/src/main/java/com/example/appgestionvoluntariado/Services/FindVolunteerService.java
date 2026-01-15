@@ -6,7 +6,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
-public interface FindVolunteerAPIService {
+public interface FindVolunteerService {
     @GET("voluntarios/email/{email}")
     Call<Volunteer> getVolunteer(@Path("email") String email);
 

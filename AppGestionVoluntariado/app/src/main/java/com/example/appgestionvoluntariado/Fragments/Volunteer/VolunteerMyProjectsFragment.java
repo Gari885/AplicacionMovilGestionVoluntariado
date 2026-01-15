@@ -23,7 +23,7 @@ import com.example.appgestionvoluntariado.Adapters.ProjectAdapter;
 import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.ProjectsAPIService;
+import com.example.appgestionvoluntariado.Services.ProjectsService;
 import com.example.appgestionvoluntariado.ViewMode;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
     private TextView loadingText;
     private EditText etSearch;
 
-    private ProjectsAPIService projectsAPIService;
+    private ProjectsService projectsService;
 
     private Handler animationHandler;
     private Runnable animationRunnable;
@@ -74,7 +74,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
         etSearch = view.findViewById(R.id.etSearchProject);
 
         // APIClient ya debe incluir el AuthInterceptor para el Token
-        projectsAPIService = APIClient.getProjectsAPIService();
+        projectsService = APIClient.getProjectsAPIService();
         animationHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -82,7 +82,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
         startLoadingAnimation("Cargando tus voluntariados");
 
         // IMPORTANTE: Ya no pasamos el DNI. El backend lo obtiene del Token Firebase
-        projectsAPIService.getEnrolledProjects().enqueue(new Callback<List<Project>>() {
+        projectsService.getEnrolledProjects().enqueue(new Callback<List<Project>>() {
             @Override
             public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
                 stopLoadingAnimation();
@@ -122,7 +122,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
         startLoadingAnimation("Anulando inscripción");
 
         // Tampoco pasamos el DNI aquí; la seguridad la da el Token
-        projectsAPIService.unenroll(item.getId()).enqueue(new Callback<Void>() {
+        projectsService.unenroll(item.getId()).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 stopLoadingAnimation();

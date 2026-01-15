@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_org_activities"
+        android:icon="@drawable/ic_projects"
+        android:title="Actividades" />
+
+    <item
+        android:id="@+id/nav_org_create"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="Nueva" />
+
+    <item
+        android:id="@+id/nav_org_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Mi Perfil" />
+
+</menu>

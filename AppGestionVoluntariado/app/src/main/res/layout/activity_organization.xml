@@ -13,13 +13,13 @@
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBarAdmin"
+            android:id="@+id/topAppBarOrg"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:menu="@menu/user_menu">
 
             <ImageView
-                android:id="@+id/appLogoAdmin"
+                android:id="@+id/appLogoOrg"
                 android:layout_width="150dp"
                 android:layout_height="38dp"
                 android:src="@drawable/ic_logo_app"
@@ -31,20 +31,20 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/admin_fragment_container"
+        android:id="@+id/organization_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/admin_bottom_navigation"
+        android:id="@+id/organization_bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="#FFFFFF"
         app:itemIconTint="#1A3B85"
         app:itemTextColor="#1A3B85"
-        app:menu="@menu/menu_bottom_admin"
+        app:menu="@menu/organization_bottom_nav"
         app:labelVisibilityMode="labeled" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

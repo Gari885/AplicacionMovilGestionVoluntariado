@@ -6,33 +6,48 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.Activities.MainActivity;
+import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Services.VolunteerService;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class VolunteerProfileHubFragment extends Fragment {
+
+    private TextView tvName;
+    private VolunteerService volunteerService;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Inflamos el diseño corregido sin el icono blanco
         View view = inflater.inflate(R.layout.fragment_volunteer_profile_hub, container, false);
 
-        TextView tvName = view.findViewById(R.id.tvHubUserName);
-        if (GlobalSession.getVolunteer() != null) {
-            tvName.setText(GlobalSession.getVolunteer().getName());
-        }
+        tvName = view.findViewById(R.id.tvHubUserName);
+        volunteerService = APIClient.getVolunteerService();
 
-        // Navegación a Editar Datos
+        // Cargamos el nombre real desde la API usando el Token de Firebase
+        fetchProfileName();
+
+        // Navegación a Editar Datos Personales (ahora con el nombre de clase correcto)
         view.findViewById(R.id.btnNavEditData).setOnClickListener(v ->
-                replaceFragment(new VolunteerEditDataFragment()));
+                replaceFragment(new VolunteerProfileEditDataFragment()));
 
-        // Navegación a Seguridad
+        // Navegación a Seguridad y Contraseña
         view.findViewById(R.id.btnNavSecurity).setOnClickListener(v ->
-                replaceFragment(new VolunteerChangePasswordFragment()));
+                replaceFragment(new VolunteerProfileChangePasswordFragment()));
 
         // Logout
         view.findViewById(R.id.btnLogout).setOnClickListener(v -> performLogout());
@@ -40,19 +55,49 @@ public class VolunteerProfileHubFragment extends Fragment {
         return view;
     }
 
+    private void fetchProfileName() {
+        // La API sabe quién es el usuario gracias al AuthInterceptor
+        volunteerService.getProfile().enqueue(new Callback<Volunteer>() {
+            @Override
+            public void onResponse(Call<Volunteer> call, Response<Volunteer> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Usamos el helper getFullName() que definimos en el modelo
+                    tvName.setText(response.body().getFullName());
+                } else {
+                    tvName.setText("Usuario");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Volunteer> call, Throwable t) {
+                tvName.setText("Error al cargar");
+            }
+        });
+    }
+
     private void replaceFragment(Fragment fragment) {
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
+                .addToBackStack(null) // Permite volver al Hub con el botón atrás
                 .commit();
     }
 
     private void performLogout() {
+        // 1. Cerrar sesión en Firebase
         FirebaseAuth.getInstance().signOut();
+
+        // 2. Limpiar preferencias locales (token, etc.)
         SessionManager.getInstance(getContext()).logout();
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
+
+        // 3. Volver al Login limpiando el historial de actividades
+        Intent intent = new Intent(getActivity(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        if (getActivity() != null) getActivity().finish();
+
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
+
+        Toast.makeText(getContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
     }
 }

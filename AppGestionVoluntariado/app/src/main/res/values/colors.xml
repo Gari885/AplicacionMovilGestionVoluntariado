@@ -3,4 +3,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="azul">#1E3A8A</color>
+    <color name="cuatrovientos_blue">#1A3B85</color>
+    <color name="cuatrovientos_blue_light">#2A54B8</color>
 </resources>

@@ -20,7 +20,7 @@ import com.example.appgestionvoluntariado.Models.StatusRequest;
 import com.example.appgestionvoluntariado.Models.Organization;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.OrganizationAPIService;
+import com.example.appgestionvoluntariado.Services.OrganizationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,7 +145,7 @@ public class OrganizationAdapter extends RecyclerView.Adapter<OrganizationAdapte
         }
 
         private void changeOrganizationStatus(Organization org, String newStatus, Context context) {
-            OrganizationAPIService apiService = APIClient.getOrganizationAPIService();
+            OrganizationService apiService = APIClient.getOrganizationService();
             StatusRequest body = new StatusRequest(newStatus);
             Call<Organization> call = apiService.updateStatus(org.getCif(), body);
 

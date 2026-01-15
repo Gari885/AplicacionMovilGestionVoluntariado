@@ -11,6 +11,9 @@ public class Project {
     @SerializedName("nombre")
     private String title;
 
+    @SerializedName("descripcion") // Añadido para el popup de detalles
+    private String description;
+
     @SerializedName("estado")
     private String status;
 
@@ -43,6 +46,7 @@ public class Project {
     public Project() {
     }
 
+    // Getters
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getStatus() { return status; }
@@ -63,7 +67,20 @@ public class Project {
         isEnrolled = enrolled;
     }
 
+    // Método corregido para devolver la descripción real de la actividad
     public String getDescription() {
-        return "Organizado por: " + organizationName;
+        return description != null ? description : "Sin descripción disponible.";
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    // Método helper para mostrar el rango de fechas en la tarjeta
+    public String getDateRange() {
+        if (startDate != null && endDate != null) {
+            return startDate + " - " + endDate;
+        }
+        return startDate != null ? startDate : "Fecha no definida";
     }
 }

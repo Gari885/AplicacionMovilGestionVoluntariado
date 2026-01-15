@@ -29,29 +29,29 @@ import retrofit2.Response;
 
 public class VolunteerProfileEditDataFragment extends Fragment {
 
-    // Vistas del formulario
+    // Vistas del formulario basadas en el XML
     private TextInputEditText etName, etDni, etZone, etBirthday;
     private AutoCompleteTextView spinnerCycle, spinnerExp, spinnerLanguages, spinnerCar;
     private MaterialButton btnSave, btnBack;
 
-    // Lógica y datos
+    // Lógica y datos (Sin GlobalSession, todo vía API)
     private VolunteerService volunteerService;
     private Volunteer currentVolunteer;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflamos el diseño que no tiene foto de perfil
+        // Inflamos el diseño de edición completo
         View view = inflater.inflate(R.layout.fragment_volunteer_edit_data, container, false);
 
         initViews(view);
         setupSpinners();
         setupDatePicker();
 
-        // Cargamos los datos directamente desde la API
+        // Cargamos los datos frescos directamente desde la API
         fetchUserData();
 
-        // Configuración de botones
+        // Configuración de navegación
         btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         btnSave.setOnClickListener(v -> saveData());
 
@@ -76,7 +76,7 @@ public class VolunteerProfileEditDataFragment extends Fragment {
     }
 
     private void setupSpinners() {
-        // Opciones basadas en el formulario de registro
+        // Opciones alineadas con el formulario de registro
         String[] cycles = {"ASIR", "DAM", "DAW", "Marketing", "Administración", "Finanzas"};
         String[] expOptions = {"Sin experiencia", "Menos de 1 año", "1-3 años", "Más de 3 años"};
         String[] langOptions = {"Castellano", "Euskera", "Inglés", "Francés", "Alemán"};
@@ -97,6 +97,7 @@ public class VolunteerProfileEditDataFragment extends Fragment {
 
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
                     (view, year1, monthOfYear, dayOfMonth) -> {
+                        // Formato estándar DD/MM/YYYY
                         String date = String.format(Locale.getDefault(), "%02d/%02d/%d", dayOfMonth, (monthOfYear + 1), year1);
                         etBirthday.setText(date);
                     }, year, month, day);
@@ -105,7 +106,7 @@ public class VolunteerProfileEditDataFragment extends Fragment {
     }
 
     private void fetchUserData() {
-        // La API identifica al usuario mediante el Token de Firebase
+        // El interceptor añadirá el Token de Firebase automáticamente
         volunteerService.getProfile().enqueue(new Callback<Volunteer>() {
             @Override
             public void onResponse(Call<Volunteer> call, Response<Volunteer> response) {
@@ -113,24 +114,24 @@ public class VolunteerProfileEditDataFragment extends Fragment {
                     currentVolunteer = response.body();
                     fillFields(currentVolunteer);
                 } else {
-                    Toast.makeText(getContext(), "No se pudieron cargar tus datos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error al obtener perfil", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Volunteer> call, Throwable t) {
-                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error de red: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void fillFields(Volunteer v) {
-        etName.setText(v.getName());
+        etName.setText(v.getFullName()); // Usa el método helper del modelo
         etDni.setText(v.getDni());
-        etZone.setText(v.getAddress());
-        etBirthday.setText(v.getBirthday());
+        etZone.setText(v.getZone()); // Corregido v.get()
+        etBirthday.setText(v.getBirthDate()); // Corregido v.getBirthday()
 
-        // El parámetro 'false' evita que el filtro del AutoCompleteTextView se active al cargar
+        // 'false' evita que se despliegue el menú al asignar el texto
         spinnerCycle.setText(v.getCycle(), false);
         spinnerExp.setText(v.getExperience(), false);
         spinnerLanguages.setText(v.getLanguages(), false);
@@ -140,29 +141,31 @@ public class VolunteerProfileEditDataFragment extends Fragment {
     private void saveData() {
         if (currentVolunteer == null) return;
 
-        // Recogemos la información de los inputs
-        currentVolunteer.setName(etName.getText().toString());
-        currentVolunteer.setAddress(etZone.getText().toString());
-        currentVolunteer.setBirthday(etBirthday.getText().toString());
+        // Actualizamos el objeto local con los nuevos valores de los inputs
+        currentVolunteer.setFirstName(etName.getText().toString());
+        currentVolunteer.setZone(etZone.getText().toString());
+        currentVolunteer.setBirthDate(etBirthday.getText().toString());
         currentVolunteer.setCycle(spinnerCycle.getText().toString());
         currentVolunteer.setExperience(spinnerExp.getText().toString());
         currentVolunteer.setLanguages(spinnerLanguages.getText().toString());
         currentVolunteer.setHasCar(spinnerCar.getText().toString().equals("Sí"));
 
+        // Enviamos la actualización al servidor
         volunteerService.updateProfile(currentVolunteer).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Información actualizada correctamente", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
+                    // Volvemos al Hub de Perfil
                     getParentFragmentManager().popBackStack();
                 } else {
-                    Toast.makeText(getContext(), "Error al guardar los cambios", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "No se pudieron guardar los cambios", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(getContext(), "Fallo en la comunicación con el servidor", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Fallo en la comunicación", Toast.LENGTH_SHORT).show();
             }
         });
     }

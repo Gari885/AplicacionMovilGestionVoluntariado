@@ -1,7 +1,6 @@
 package com.example.appgestionvoluntariado.Services;
 
 import com.example.appgestionvoluntariado.Models.ActividadCreacionRequest;
-import com.example.appgestionvoluntariado.Models.Voluntariado;
 import com.example.appgestionvoluntariado.Models.VoluntarioInscribirseRequest;
 
 import java.util.List;

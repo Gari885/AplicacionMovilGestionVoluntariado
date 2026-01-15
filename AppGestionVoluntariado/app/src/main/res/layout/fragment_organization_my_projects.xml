@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragments.VistaOrganizador.OrgVoluntariadosFragment">
+    android:background="#F8F9FA"
+    tools:context=".Fragments.Organization.OrgActivitiesFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,51 +17,88 @@
             android:id="@+id/tvProjectsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:layout_gravity="center_horizontal"
             android:text="Mis Voluntariados"
             android:textColor="#1A3B85"
-            android:textSize="38dp"
-            android:textStyle="bold"/>
-
-        <Button
-            android:id="@+id/btnAddProject"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/background_button_pill"
-            app:backgroundTint="@null"
-            android:text="+ Añadir Voluntariado"
-            android:textColor="#FFFFFF"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"/>
+            android:textSize="32sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etSearchProject"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/background_search_bar"
-            android:hint="Buscar voluntariado..."
+            android:hint="Buscar mis proyectos..."
             android:inputType="text"
             android:paddingStart="16dp"
             android:drawableStart="@android:drawable/ic_menu_search"
-            android:drawablePadding="10dp"
-            android:drawableTint="#757575"/>
+            android:drawablePadding="12dp"
+            android:drawableTint="#757575"
+            android:elevation="2dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/tabStatusPending"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Pendientes"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/background_tab_selected"
+                android:elevation="2dp"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView
+                android:id="@+id/tabStatusAccepted"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Aceptados"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#1A3B85"
+                android:background="@drawable/background_tab_unselected"
+                android:elevation="2dp"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvProjects"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
-            android:nestedScrollingEnabled="false"/>
+            android:layout_marginTop="12dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:clipToPadding="false" />
 
     </LinearLayout>
 
-</FrameLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddProject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="#1A3B85"
+        app:tint="#FFFFFF"
+        app:elevation="6dp"
+        android:contentDescription="Añadir voluntariado" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

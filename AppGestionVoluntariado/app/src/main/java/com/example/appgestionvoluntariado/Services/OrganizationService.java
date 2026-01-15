@@ -11,7 +11,7 @@ import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.Path;
 
-public interface OrganizationAPIService {
+public interface OrganizationService {
     @GET("organizations")
     Call<List<Organization>> getOrganizations();
     @PATCH("organizations/{cif}/state")
