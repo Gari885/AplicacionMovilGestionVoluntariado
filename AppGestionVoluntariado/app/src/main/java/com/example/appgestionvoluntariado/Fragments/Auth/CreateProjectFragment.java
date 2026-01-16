@@ -2,6 +2,7 @@ package com.example.appgestionvoluntariado.Fragments.Auth;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import com.example.appgestionvoluntariado.Models.ProjectCreationRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.ProjectsService;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
@@ -42,7 +44,7 @@ public class CreateProjectFragment extends Fragment {
     private ImageButton btnClose;
     private Button btnCreate, btnAddSkill, btnAddODS;
     private TextInputEditText etName, etDescription, etStartDate, etEndDate, etMaxParticipants, etNewSkill, etNewODS;
-    private TextInputLayout tilName, tilDescription, tilStartDate, tilEndDate, tilMaxParticipants, tilNewSkill, tilNewODS;
+    private TextInputLayout tilName, tilDescription, tilStartDate, tilEndDate, tilMaxParticipants, tilNewSkill, tilNewODS, tilZone;
     private AutoCompleteTextView actvZone;
     private ChipGroup chipGroupData;
 
@@ -54,14 +56,13 @@ public class CreateProjectFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_organization_create_project, container, false);
-
         initViews(view);
         setupDropdowns();
         setupDateTimePickers();
         setupListeners();
+        setupToolbar();
 
         projectsAPIService = APIClient.getProjectsService();
-
         return view;
     }
 
@@ -86,9 +87,19 @@ public class CreateProjectFragment extends Fragment {
         tilMaxParticipants = v.findViewById(R.id.tilMaxParticipants);
         tilNewSkill = v.findViewById(R.id.tilNewSkill);
         tilNewODS = v.findViewById(R.id.tilNewODS);
+        tilZone = v.findViewById(R.id.tilZone); // Asegúrate de tener este ID en el XML
 
         actvZone = v.findViewById(R.id.actvZone);
         chipGroupData = v.findViewById(R.id.chipGroupAddedData);
+    }
+
+    private void setupToolbar() {
+        MaterialToolbar toolbar = getActivity().findViewById(R.id.topAppBarOrg);
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.ic_back_arrow);
+            toolbar.setNavigationIconTint(Color.parseColor("#1A3B85"));
+            toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        }
     }
 
     private void setupDropdowns() {
@@ -98,10 +109,8 @@ public class CreateProjectFragment extends Fragment {
 
     private void setupListeners() {
         btnClose.setOnClickListener(v -> getParentFragmentManager().popBackStack());
-
         btnAddSkill.setOnClickListener(v -> addChip(etNewSkill, skillsList, "SKILL"));
         btnAddODS.setOnClickListener(v -> addChip(etNewODS, odsList, "ODS"));
-
         btnCreate.setOnClickListener(v -> {
             if (validateForm()) {
                 sendProjectToBackend();
@@ -109,33 +118,68 @@ public class CreateProjectFragment extends Fragment {
         });
     }
 
+    private boolean validateForm() {
+        boolean isValid = true;
+
+        // Reset errors
+        tilName.setError(null);
+        tilDescription.setError(null);
+        tilStartDate.setError(null);
+        tilEndDate.setError(null);
+        tilMaxParticipants.setError(null);
+        tilZone.setError(null);
+
+        // Required Text Fields
+        if (TextUtils.isEmpty(etName.getText())) { tilName.setError("Project name required"); isValid = false; }
+        if (TextUtils.isEmpty(etDescription.getText())) { tilDescription.setError("Description required"); isValid = false; }
+        if (TextUtils.isEmpty(actvZone.getText())) { tilZone.setError("Zone selection required"); isValid = false; }
+        if (TextUtils.isEmpty(etStartDate.getText())) { tilStartDate.setError("Start date required"); isValid = false; }
+        if (TextUtils.isEmpty(etEndDate.getText())) { tilEndDate.setError("End date required"); isValid = false; }
+
+        if (TextUtils.isEmpty(etMaxParticipants.getText())) {
+            tilMaxParticipants.setError("Participant limit required");
+            isValid = false;
+        }
+
+        // Required Lists
+        if (odsList.isEmpty()) {
+            Toast.makeText(getContext(), "Add at least one ODS", Toast.LENGTH_SHORT).show();
+            isValid = false;
+        }
+        if (skillsList.isEmpty()) {
+            Toast.makeText(getContext(), "Add at least one required skill", Toast.LENGTH_SHORT).show();
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
     private void sendProjectToBackend() {
-        // Creamos el objeto Project con los datos del formulario
         ProjectCreationRequest request = new ProjectCreationRequest();
-        request.setTitle(etName.getText().toString());
-        request.setDescription(etDescription.getText().toString());
-        request.setAddress(actvZone.getText().toString());
+        request.setName(etName.getText().toString().trim());
+        request.setDescription(etDescription.getText().toString().trim());
+        request.setAddress(actvZone.getText().toString().trim());
         request.setStartDate(formatDateForBackend(etStartDate.getText().toString()));
         request.setEndDate(formatDateForBackend(etEndDate.getText().toString()));
         request.setMaxParticipants(Integer.parseInt(etMaxParticipants.getText().toString()));
-        // Suponiendo que tu modelo Project acepta List<String> para ODS y Habilidades
-        // newProject.setOds(odsList);
-        // newProject.setRequiredSkills(skillsList);
+        request.setOds(odsList);
+        request.setSkills(skillsList);
+        // Note: organizationCif is handled by the server via Firebase Token [cite: 2026-01-15]
 
-        projectsAPIService.createProject(newProject).enqueue(new Callback<Void>() {
+        projectsAPIService.createProject(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "¡Proyecto enviado para revisión!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Project sent for review!", Toast.LENGTH_LONG).show();
                     getParentFragmentManager().popBackStack();
                 } else {
-                    Toast.makeText(getContext(), "Error al crear el proyecto", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(getContext(), "Error de red: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -147,20 +191,12 @@ public class CreateProjectFragment extends Fragment {
             Chip chip = new Chip(requireContext());
             chip.setText(text);
             chip.setCloseIconVisible(true);
-
-            // Colores Cuatrovientos
-            if (type.equals("ODS")) {
-                chip.setChipBackgroundColorResource(android.R.color.holo_blue_dark);
-            } else {
-                chip.setChipBackgroundColorResource(android.R.color.darker_gray);
-            }
-            chip.setTextColor(getResources().getColor(android.R.color.white));
-
+            chip.setChipBackgroundColorResource(type.equals("ODS") ? R.color.cuatrovientos_blue_light : R.color.cuatrovientos_blue);
+            chip.setTextColor(Color.WHITE);
             chip.setOnCloseIconClickListener(v -> {
                 chipGroupData.removeView(chip);
                 list.remove(text);
             });
-
             chipGroupData.addView(chip);
             input.setText("");
         }
@@ -179,15 +215,6 @@ public class CreateProjectFragment extends Fragment {
                 input.setText(date);
             }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-    }
-
-    private boolean validateForm() {
-        boolean valid = true;
-        if (TextUtils.isEmpty(etName.getText())) { tilName.setError("Obligatorio"); valid = false; }
-        if (TextUtils.isEmpty(etStartDate.getText())) { tilStartDate.setError("Obligatorio"); valid = false; }
-        if (TextUtils.isEmpty(etEndDate.getText())) { tilEndDate.setError("Obligatorio"); valid = false; }
-        if (odsList.isEmpty()) { Toast.makeText(getContext(), "Añade al menos un ODS", Toast.LENGTH_SHORT).show(); valid = false; }
-        return valid;
     }
 
     private String formatDateForBackend(String dateStr) {

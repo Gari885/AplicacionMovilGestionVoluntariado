@@ -1,5 +1,7 @@
 package com.example.appgestionvoluntariado.Services;
 
+import androidx.credentials.CredentialManager;
+
 import com.example.appgestionvoluntariado.Utils.AuthInterceptor;
 
 import okhttp3.OkHttpClient;
@@ -41,6 +43,10 @@ public class APIClient {
         return getClient().create(VolunteerService.class);
     }
 
+    public static CategoryService getCategoriesService(){
+        return getClient().create(CategoryService.class);
+    }
+
     public static MatchesService getMatchesService(){
         return getClient().create(MatchesService.class);
     }
@@ -51,5 +57,9 @@ public class APIClient {
 
     public static AuthAPIService getAuthAPIService(){
         return getClient().create(AuthAPIService.class);
+    }
+
+    public static Retrofit getRetrofitInstance() {
+        return retrofit;
     }
 }

@@ -40,7 +40,7 @@ public class OrgProfileHubFragment extends Fragment {
 
         // Navegación
         view.findViewById(R.id.btnNavEditOrgData).setOnClickListener(v ->
-                replaceFragment(new OrgEditProfileFragment()));
+                replaceFragment(new OrgProfileEditFragment()));
 
         view.findViewById(R.id.btnNavOrgSecurity).setOnClickListener(v ->
                 replaceFragment(new OrgChangePasswordFragment()));

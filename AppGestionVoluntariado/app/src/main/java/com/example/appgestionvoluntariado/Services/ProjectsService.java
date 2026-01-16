@@ -1,6 +1,9 @@
 package com.example.appgestionvoluntariado.Services;
 
 import com.example.appgestionvoluntariado.Models.Project;
+import com.example.appgestionvoluntariado.Models.ProjectCreationRequest;
+import com.example.appgestionvoluntariado.Models.StatusRequest;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -11,6 +14,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ProjectsService {
 
@@ -40,14 +44,11 @@ public interface ProjectsService {
     // ==========================================
 
     // Listar todos los proyectos pendientes de aprobación
-    @GET("admin/projects/pending")
-    Call<List<Project>> getPendingProjects();
+    @GET("actividades")
+    Call<List<Project>> getProjects(@Query("estado")String estado);
 
-    @PATCH("projects/{id}/approve")
-    Call<Void> approveProject(@Path("id") int id);
-
-    @PATCH("projects/{id}/reject")
-    Call<Void> rejectProject(@Path("id") int id);
+    @PATCH("/actividades/{id}/estado")
+    Call<Void> changeState(@Path("id") int id, StatusRequest status);
 
 
     // ==========================================
@@ -60,7 +61,7 @@ public interface ProjectsService {
 
     // Crear una nueva oferta de voluntariado
     @POST("projects")
-    Call<Void> createProject(@Body Project project);
+    Call<Void> createProject(@Body ProjectCreationRequest request);
 
     @PUT("projects/{id}")
     Call<Void> updateProject(@Path("id") int id, @Body Project project);

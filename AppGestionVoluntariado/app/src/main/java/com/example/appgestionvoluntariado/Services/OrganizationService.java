@@ -9,6 +9,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -21,6 +22,11 @@ public interface OrganizationService {
     Call<Void> updateStatus(
             @Path("cif") String cif,
             @Body StatusRequest request
+    );
+
+    @PUT("organiations")
+    Call<Void> updateProfile(
+            @Body Organization org
     );
 
 }

@@ -56,7 +56,7 @@ public class VolunteerExploreFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // APIClient ya inyecta automáticamente el Token de Firebase en la cabecera
-        projectsService = APIClient.getProjectsAPIService();
+        projectsService = APIClient.getProjectsService();
     }
 
     private void loadAvailableProjects() {
@@ -85,17 +85,17 @@ public class VolunteerExploreFragment extends Fragment {
 
     private void updateUi() {
         // Usamos VOLUNTEER_AVAILABLE para mostrar el botón azul de "Apuntarse"
-        projectAdapter = new ProjectAdapter(getContext(), availableProjects, ViewMode.VOLUNTEER_AVAILABLE, new ProjectAdapter.OnItemAction() {
+        projectAdapter = new ProjectAdapter(availableProjects, new ProjectAdapter.OnProjectActionListener() {
             @Override
-            public void onPrimaryAction(Project item) {
-                enrollInProject(item);
-            }
+            public void onAccept(Project project) {}
+            @Override
+            public void onReject(Project project) {}
+            @Override
+            public void onDelete(Project project) {}
+            @Override
+            public void onApply(Project project) {enrollInProject(project);}
 
-            @Override
-            public void onSecondaryAction(Project item) {
-                // El adapter ya abre el popup de información detallada
-            }
-        });
+        }, ViewMode.VOLUNTEER_AVAILABLE);
         recyclerView.setAdapter(projectAdapter);
     }
 

@@ -74,7 +74,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
         etSearch = view.findViewById(R.id.etSearchProject);
 
         // APIClient ya debe incluir el AuthInterceptor para el Token
-        projectsService = APIClient.getProjectsAPIService();
+        projectsService = APIClient.getProjectsService();
         animationHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -104,17 +104,27 @@ public class VolunteerMyProjectsFragment extends Fragment {
 
     private void updateUi() {
         // Usamos el modo VOLUNTEER_MY_PROJECTS para mostrar el botón de anular en rojo
-        projectAdapter = new ProjectAdapter(getContext(), displayedProjects, ViewMode.VOLUNTEER_MY_PROJECTS, new ProjectAdapter.OnItemAction() {
+        projectAdapter = new ProjectAdapter(displayedProjects, new ProjectAdapter.OnProjectActionListener() {
             @Override
-            public void onPrimaryAction(Project item) {
-                performUnenrollment(item);
+            public void onAccept(Project project) {
+
             }
 
             @Override
-            public void onSecondaryAction(Project item) {
-                // Info extra gestionada por el adapter
+            public void onReject(Project project) {
+
             }
-        });
+
+            @Override
+            public void onDelete(Project project) {
+                performUnenrollment(project);
+            }
+
+            @Override
+            public void onApply(Project project) {
+
+            }
+        },ViewMode.VOLUNTEER_MY_PROJECTS);
         recyclerView.setAdapter(projectAdapter);
     }
 

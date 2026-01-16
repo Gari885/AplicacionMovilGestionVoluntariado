@@ -1,6 +1,7 @@
 package com.example.appgestionvoluntariado.Models;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Project {
@@ -11,11 +12,11 @@ public class Project {
     @SerializedName("nombre")
     private String title;
 
-    @SerializedName("descripcion") // Añadido para el popup de detalles
-    private String description;
-
     @SerializedName("estado")
     private String status;
+
+    @SerializedName("estadoAprobacion")
+    private String approvalStatus; // "pendiente", "aprobado", "rechazado"
 
     @SerializedName("direccion")
     private String address;
@@ -29,19 +30,34 @@ public class Project {
     @SerializedName("maxParticipantes")
     private int maxParticipants;
 
-    @SerializedName("ods")
-    private List<String> ods;
-
-    @SerializedName("habilidades")
-    private List<String> requiredSkills;
+    @SerializedName("cif_organizacion")
+    private String organizationCif;
 
     @SerializedName("nombre_organizacion")
     private String organizationName;
 
-    @SerializedName("cif_organizacion")
-    private String organizationCif;
+    // Cambiados a listas de objetos según tu esquema
+    @SerializedName("ods")
+    private List<TagItem> ods;
+
+    @SerializedName("habilidades")
+    private List<TagItem> skills;
+
+    @SerializedName("necesidades")
+    private List<TagItem> needs;
+
+    // Campo local para descripción (aunque no venga en el esquema, lo mantenemos para el popup)
+    @SerializedName("descripcion")
+    private String description;
 
     private boolean isEnrolled = false;
+
+    // --- CLASE INTERNA PARA MAPEAR OBJETOS DEL ARRAY ---
+    public static class TagItem {
+        @SerializedName("nombre")
+        private String name;
+        public String getName() { return name; }
+    }
 
     public Project() {
     }
@@ -50,37 +66,37 @@ public class Project {
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getStatus() { return status; }
+    public String getApprovalStatus() { return approvalStatus; }
     public String getAddress() { return address; }
     public String getStartDate() { return startDate; }
     public String getEndDate() { return endDate; }
     public int getMaxParticipants() { return maxParticipants; }
-    public List<String> getOds() { return ods; }
-    public List<String> getRequiredSkills() { return requiredSkills; }
-    public String getOrganizationName() { return organizationName; }
     public String getOrganizationCif() { return organizationCif; }
+    public String getOrganizationName() { return organizationName; }
+    public String getDescription() { return description != null ? description : "Sin descripción disponible."; }
+    public boolean isEnrolled() { return isEnrolled; }
 
-    public boolean isEnrolled() {
-        return isEnrolled;
+    // Helpers para obtener solo los Strings de los nombres
+    public List<String> getOdsNames() {
+        List<String> names = new ArrayList<>();
+        if (ods != null) for (TagItem item : ods) names.add(item.getName());
+        return names;
     }
 
-    public void setEnrolled(boolean enrolled) {
-        isEnrolled = enrolled;
+    public List<String> getSkillNames() {
+        List<String> names = new ArrayList<>();
+        if (skills != null) for (TagItem item : skills) names.add(item.getName());
+        return names;
     }
 
-    // Método corregido para devolver la descripción real de la actividad
-    public String getDescription() {
-        return description != null ? description : "Sin descripción disponible.";
+    public List<String> getNeedNames() {
+        List<String> names = new ArrayList<>();
+        if (needs != null) for (TagItem item : needs) names.add(item.getName());
+        return names;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    // Setters
+    public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
+    public void setEnrolled(boolean enrolled) { isEnrolled = enrolled; }
 
-    // Método helper para mostrar el rango de fechas en la tarjeta
-    public String getDateRange() {
-        if (startDate != null && endDate != null) {
-            return startDate + " - " + endDate;
-        }
-        return startDate != null ? startDate : "Fecha no definida";
-    }
 }

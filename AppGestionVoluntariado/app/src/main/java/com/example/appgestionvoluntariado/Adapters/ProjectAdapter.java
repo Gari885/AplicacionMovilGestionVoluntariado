@@ -1,59 +1,58 @@
 package com.example.appgestionvoluntariado.Adapters;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Models.Project;
-import com.example.appgestionvoluntariado.ViewMode;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.ViewMode;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.GridHolder> {
+public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectHolder> {
 
     private List<Project> projects;
-    private Context context;
-    private ViewMode currentMode;
-    private OnItemAction listener;
+    private final OnProjectActionListener listener;
+    private final ViewMode mode;
 
-    // Color corporativo Cuatrovientos
-    private final String COLOR_NAVY = "#1A3B85";
-
-    public interface OnItemAction {
-        void onPrimaryAction(Project item);    // Acción principal (Apuntar, Aceptar, Borrar)
-        void onSecondaryAction(Project item);  // Acción secundaria (Rechazar)
+    public interface OnProjectActionListener {
+        void onAccept(Project project);
+        void onReject(Project project);
+        void onDelete(Project project);
+        void onApply(Project project); // Nueva acción para voluntarios
     }
 
-    public ProjectAdapter(Context context, List<Project> projects, ViewMode mode, OnItemAction listener) {
-        this.context = context;
-        this.projects = projects;
-        this.currentMode = mode;
+    public ProjectAdapter(List<Project> projects, OnProjectActionListener listener, ViewMode mode) {
+        this.projects = new ArrayList<>(projects);
         this.listener = listener;
+        this.mode = mode;
     }
 
     @NonNull
     @Override
-    public GridHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_project_card, parent, false);
-        return new GridHolder(itemView);
+    public ProjectHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_project_card, parent, false);
+        return new ProjectHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GridHolder holder, int position) {
-        holder.assignData(projects.get(position));
+    public void onBindViewHolder(@NonNull ProjectHolder holder, int position) {
+        holder.bind(projects.get(position), listener, mode);
     }
 
     @Override
@@ -61,113 +60,113 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.GridHold
         return projects.size();
     }
 
-    public class GridHolder extends RecyclerView.ViewHolder {
-        TextView title, zone, date;
-        Button info;
-        Button btnPrimary, btnSecondary;
+    public void updateList(List<Project> newList) {
+        this.projects.clear();
+        this.projects.addAll(newList);
+        notifyDataSetChanged();
+    }
 
-        public GridHolder(@NonNull View itemView) {
+    public class ProjectHolder extends RecyclerView.ViewHolder {
+        TextView title, zone, date;
+        Button btnInfo;
+        AppCompatButton btnPrimary, btnSecondary;
+
+        public ProjectHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tvProjectTitle);
             zone = itemView.findViewById(R.id.tvProjectZone);
             date = itemView.findViewById(R.id.tvProjectDate);
-            info = itemView.findViewById(R.id.btnProjectInfo);
+            btnInfo = itemView.findViewById(R.id.btnProjectInfo);
             btnPrimary = itemView.findViewById(R.id.btnPrimaryAction);
             btnSecondary = itemView.findViewById(R.id.btnSecondaryAction);
         }
 
-        public void assignData(Project project) {
+        public void bind(Project project, OnProjectActionListener listener, ViewMode mode) {
+            Context context = itemView.getContext();
             title.setText(project.getTitle());
-            zone.setText("📍 " + project.getAddress());
+            zone.setText("📍 " + (project.getAddress() != null ? project.getAddress() : "No especificada"));
             date.setText("📅 " + project.getStartDate());
 
-            // Reset de visibilidad
+            // Reset de visibilidad para evitar errores al reciclar vistas
             btnPrimary.setVisibility(View.GONE);
             btnSecondary.setVisibility(View.GONE);
 
-            if (currentMode != null) {
-                switch (currentMode) {
-                    case ADMINISTRATOR:
-                        // El Admin acepta o rechaza propuestas
-                        configureButton(btnPrimary, "Aceptar", Color.parseColor("#2E7D32")); // Verde
-                        configureButton(btnSecondary, "Rechazar", Color.parseColor("#D32F2F")); // Rojo
-                        break;
+            switch(mode) {
+                case ADMINISTRATOR:
+                    btnPrimary.setVisibility(View.VISIBLE);
+                    btnSecondary.setVisibility(View.VISIBLE);
+                    configureButton(btnPrimary, "ACEPTAR", Color.parseColor("#2E7D32"));
+                    configureButton(btnSecondary, "RECHAZAR", Color.parseColor("#D32F2F"));
+                    btnPrimary.setOnClickListener(v -> listener.onAccept(project));
+                    btnSecondary.setOnClickListener(v -> listener.onReject(project));
+                    break;
 
-                    case ORGANIZATION:
-                        // El Organizador gestiona sus errores borrando/modificando
-                        configureButton(btnPrimary, "Borrar", Color.parseColor("#D32F2F"));
-                        // Podrías añadir btnSecondary para "Editar" si fuera necesario
-                        break;
+                case ORGANIZATION:
+                    btnPrimary.setVisibility(View.VISIBLE);
+                    // Usamos ContextCompat para obtener el color real del recurso
+                    configureButton(btnPrimary, "DAR DE BAJA", ContextCompat.getColor(context, R.color.white));
+                    btnPrimary.setOnClickListener(v -> listener.onDelete(project));
+                    break; // Agregado break
 
-                    case VOLUNTEER_AVAILABLE:
-                        // Voluntario buscando: Color corporativo para destacar
-                        configureButton(btnPrimary, "Apuntarse", Color.parseColor(COLOR_NAVY));
-                        break;
-
-                    case VOLUNTEER_MY_PROJECTS:
-                        // Voluntario inscrito: Opción de salida en rojo
-                        configureButton(btnPrimary, "Desapuntarse", Color.parseColor("#D32F2F"));
-                        break;
-                }
+                case VOLUNTEER_AVAILABLE:
+                    btnPrimary.setVisibility(View.VISIBLE);
+                    configureButton(btnPrimary, "APUNTARSE", ContextCompat.getColor(context, R.color.cuatrovientos_blue));
+                    btnPrimary.setOnClickListener(v -> listener.onApply(project));
+                    break;
+                case VOLUNTEER_MY_PROJECTS:
+                    btnPrimary.setVisibility(View.VISIBLE);
+                    configureButton(btnPrimary, "DESAPUNTARSE", ContextCompat.getColor(context, R.color.cuatrovientos_blue));
+                    btnPrimary.setOnClickListener(v -> listener.onDelete(project));
+                    break;
             }
-
-            btnPrimary.setOnClickListener(v -> listener.onPrimaryAction(project));
-            btnSecondary.setOnClickListener(v -> listener.onSecondaryAction(project));
-            info.setOnClickListener(v -> showInfoPopup(project));
+            btnInfo.setOnClickListener(v -> showDetailsBottomSheet(project));
         }
 
-        private void configureButton(Button btn, String text, int color) {
-            btn.setVisibility(View.VISIBLE);
+        private void configureButton(AppCompatButton btn, String text, int colorInt) {
             btn.setText(text);
-            btn.setBackgroundTintList(ColorStateList.valueOf(color));
+            btn.setBackgroundTintList(ColorStateList.valueOf(colorInt));
             btn.setTextColor(Color.WHITE);
         }
 
-        private void showInfoPopup(Project project) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            View popupView = LayoutInflater.from(context).inflate(R.layout.dialog_organization_project_details, null);
+        private void showDetailsBottomSheet(Project project) {
+            BottomSheetDialog dialog = new BottomSheetDialog(itemView.getContext());
+            View view = LayoutInflater.from(itemView.getContext()).inflate(R.layout.dialog_organization_project_details, null);
+            dialog.setContentView(view);
 
-            TextView description = popupView.findViewById(R.id.tvDescripcionVolVal);
-            TextView tvDate = popupView.findViewById(R.id.tvFechaVal);
-            LinearLayout needsContainer = popupView.findViewById(R.id.containerNecesidadesVol);
-            LinearLayout odsContainer = popupView.findViewById(R.id.containerODS);
-            View closeBtn = popupView.findViewById(R.id.btnCerrarPopup);
+            View parent = (View) view.getParent();
+            parent.setBackgroundResource(android.R.color.transparent);
 
-            description.setText(project.getDescription());
-            tvDate.setText(project.getEndDate());
+            TextView tvDesc = view.findViewById(R.id.tvDescripcionVolVal);
+            TextView tvFechaFin = view.findViewById(R.id.tvFechaVal);
+            ChipGroup chipGroupNeeds = view.findViewById(R.id.chipGroupNecesidades);
+            View btnClose = view.findViewById(R.id.btnCerrarPopup);
 
-            // Poblado dinámico de etiquetas (Skills y ODS)
-            populateTags(context, needsContainer, project.getRequiredSkills());
-            populateTags(context, odsContainer, project.getOds());
+            validateAndSet(tvDesc, project.getDescription());
+            tvFechaFin.setText(project.getEndDate() != null ? project.getEndDate() : "Sin fecha de fin");
 
-            builder.setView(popupView);
-            AlertDialog dialog = builder.create();
+            if (project.getRequiredSkills() != null) {
+                chipGroupNeeds.removeAllViews();
+                for (String skill : project.getRequiredSkills()) {
+                    Chip chip = new Chip(itemView.getContext());
+                    chip.setText(skill);
+                    chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue_light);
+                    chipGroupNeeds.addView(chip);
+                }
+            }
 
-            if (dialog.getWindow() != null)
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            closeBtn.setOnClickListener(x -> dialog.dismiss());
+            btnClose.setOnClickListener(v -> dialog.dismiss());
             dialog.show();
         }
 
-        private void populateTags(Context context, LinearLayout container, List<String> list) {
-            container.removeAllViews();
-            if (list == null || list.isEmpty()) return;
-
-            for (String text : list) {
-                TextView tag = new TextView(context);
-                tag.setText(text);
-                tag.setTextSize(12);
-                tag.setTextColor(Color.parseColor(COLOR_NAVY));
-                tag.setBackgroundResource(R.drawable.tag_bg_blue); // Asegúrate de tener este drawable
-                tag.setPadding(24, 12, 24, 12);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(0, 0, 16, 0);
-                tag.setLayoutParams(params);
-
-                container.addView(tag);
+        private void validateAndSet(TextView tv, String data) {
+            if (data == null || data.trim().isEmpty()) {
+                tv.setText("Información no proporcionada");
+                tv.setTextColor(Color.GRAY);
+                tv.setTypeface(null, android.graphics.Typeface.ITALIC);
+            } else {
+                tv.setText(data);
+                tv.setTextColor(Color.BLACK);
+                tv.setTypeface(null, android.graphics.Typeface.NORMAL);
             }
         }
     }

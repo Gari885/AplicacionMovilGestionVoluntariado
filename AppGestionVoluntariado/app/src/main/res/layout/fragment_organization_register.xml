@@ -1,63 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="#FFFFFF"
     android:fillViewport="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="50dp">
-
-        <Button
-            android:id="@+id/btnVolver"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/background_button_pill"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            android:text="← Volver"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            app:backgroundTint="#1A3B85"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
         <TextView
             android:id="@+id/tvTitulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Registrarse"
+            android:layout_marginTop="16dp"
+            android:text="Registro de ONG"
             android:textColor="#1A3B85"
-            android:textSize="38sp"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="1. IDENTIDAD"
+            android:textColor="#1A3B85"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnVolver" />
+            android:textSize="13sp" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilNombre"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="20dp"
-            android:hint="Nombre de la ONG"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:errorEnabled="true"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitulo">
-
+            android:layout_marginTop="8dp"
+            android:hint="Nombre de la Entidad"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etNombre"
                 android:layout_width="match_parent"
@@ -66,21 +47,13 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilCif"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginTop="12dp"
             android:hint="CIF (Ej: G12345678)"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:errorEnabled="true"
-            app:layout_constraintTop_toBottomOf="@+id/tilNombre">
-
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCif"
                 android:layout_width="match_parent"
@@ -88,22 +61,23 @@
                 android:inputType="textCapCharacters" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="2. ACCESO Y CONTACTO"
+            android:textColor="#1A3B85"
+            android:textStyle="bold"
+            android:textSize="13sp" />
+
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilCorreo"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginTop="8dp"
             android:hint="Correo Electrónico"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:errorEnabled="true"
-            app:layout_constraintTop_toBottomOf="@+id/tilCif">
-
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCorreo"
                 android:layout_width="match_parent"
@@ -112,22 +86,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilPassword"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginTop="12dp"
             android:hint="Contraseña"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
             app:endIconMode="password_toggle"
-            app:errorEnabled="true"
-            app:layout_constraintTop_toBottomOf="@+id/tilCorreo">
-
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
@@ -136,89 +102,145 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilSector"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
-            android:hint="Sector"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:errorEnabled="true"
-            app:layout_constraintTop_toBottomOf="@+id/tilPassword">
-
+            android:layout_marginTop="12dp"
+            android:hint="Teléfono móvil / Contacto"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etSector"
+                android:id="@+id/etContacto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text" />
+                android:inputType="phone" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="3. UBICACIÓN"
+            android:textColor="#1A3B85"
+            android:textStyle="bold"
+            android:textSize="13sp" />
+
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilZona"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
-            android:hint="Zona / Ciudad"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:errorEnabled="true"
-            app:layout_constraintTop_toBottomOf="@+id/tilSector">
-
+            android:layout_marginTop="8dp"
+            android:hint="Zona / Comarca"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etZona"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text" />
+                android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="Localidad"
+                app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLocalidad"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <View android:layout_width="12dp" android:layout_height="1dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="C.P."
+                app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDescripcion"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
-            android:hint="Misión de la organización..."
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:errorEnabled="true"
-            app:layout_constraintTop_toBottomOf="@+id/tilZona">
+            android:layout_marginTop="12dp"
+            android:hint="Dirección completa"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDireccion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="4. PERFIL SOCIAL"
+            android:textColor="#1A3B85"
+            android:textStyle="bold"
+            android:textSize="13sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Sector de actividad"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Misión de la entidad"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
-                android:gravity="top|start"
+                android:gravity="top"
                 android:inputType="textMultiLine" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRegistrar"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/background_button_pill"
-            android:backgroundTint="#1A3B85"
-            android:text="Registrarme"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="24dp"
+            android:text="REGISTRAR ORGANIZACIÓN"
             android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tilDescripcion" />
+            android:textStyle="bold"
+            android:backgroundTint="#1A3B85"
+            app:cornerRadius="12dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </ScrollView>

@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,15 +19,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.appgestionvoluntariado.Adapters.ProjectAdapter;
 import com.example.appgestionvoluntariado.Fragments.Auth.CreateProjectFragment;
 import com.example.appgestionvoluntariado.Models.Project;
+import com.example.appgestionvoluntariado.Models.StatusRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.ProjectsService;
 import com.example.appgestionvoluntariado.ViewMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,27 +34,26 @@ import retrofit2.Response;
 
 public class OrgActivitiesFragment extends Fragment {
 
-    // Vistas
     private RecyclerView recyclerView;
     private ProjectAdapter adapter;
     private TextView tabPending, tabAccepted;
     private EditText etSearch;
+    private View loadingLayout;
     private FloatingActionButton fabAdd;
 
-    // Datos y Lógica
     private List<Project> allProjects = new ArrayList<>();
-    private List<Project> filteredProjects = new ArrayList<>();
-    private ProjectsService projectsAPIService;
-    private boolean showingPending = true; // Controla qué pestaña está activa
+    private String currentStatus = "pendiente"; // PENDIENTE o APROBADO
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Usamos la plantilla de CoordinatorLayout que enviamos antes
         View view = inflater.inflate(R.layout.fragment_organization_my_projects, container, false);
 
         initViews(view);
-        setupListeners();
-        fetchOrganizationProjects();
+        setupTabs();
+        setupSearch();
+        loadMyProjects();
 
         return view;
     }
@@ -68,118 +65,116 @@ public class OrgActivitiesFragment extends Fragment {
         tabPending = view.findViewById(R.id.tabStatusPending);
         tabAccepted = view.findViewById(R.id.tabStatusAccepted);
         etSearch = view.findViewById(R.id.etSearchProject);
+        loadingLayout = view.findViewById(R.id.layoutLoading);
         fabAdd = view.findViewById(R.id.fabAddProject);
 
-        projectsAPIService = APIClient.getProjectsService();
+        // Botón para crear nuevo proyecto
+        fabAdd.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
+                .replace(R.id.organization_fragment_container, new CreateProjectFragment())
+                .addToBackStack(null)
+                .commit());
     }
 
-    private void setupListeners() {
-        // Cambio a pestaña PENDIENTES
+    private void setupTabs() {
         tabPending.setOnClickListener(v -> {
-            showingPending = true;
-            updateTabUI();
-            applyFilters();
+            currentStatus = "pendiente";
+            updateTabUI(tabPending, tabAccepted);
+            loadMyProjects();
         });
 
-        // Cambio a pestaña ACEPTADOS
         tabAccepted.setOnClickListener(v -> {
-            showingPending = false;
-            updateTabUI();
-            applyFilters();
-        });
-
-        // Buscador en tiempo real
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                applyFilters();
-            }
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-
-        // Botón Flotante para crear nuevo voluntariado
-        fabAdd.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.organization_fragment_container, new CreateProjectFragment())
-                    .addToBackStack(null)
-                    .commit();
+            currentStatus = "aprobado";
+            updateTabUI(tabAccepted, tabPending);
+            loadMyProjects();
         });
     }
 
-    private void fetchOrganizationProjects() {
-        // El APIClient inyecta el Token de Firebase. El servidor filtra por la identidad de la Org.
-        projectsAPIService.getMyCreatedProjects().enqueue(new Callback<List<Project>>() {
-            @Override
-            public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    allProjects = response.body();
-                    applyFilters();
-                } else {
-                    Toast.makeText(getContext(), "No se pudieron obtener tus proyectos", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Project>> call, Throwable t) {
-                Toast.makeText(getContext(), "Error de red: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void updateTabUI(TextView selected, TextView unselected) {
+        selected.setBackgroundResource(R.drawable.background_tab_selected);
+        selected.setTextColor(android.graphics.Color.WHITE);
+        unselected.setBackgroundResource(R.drawable.background_tab_unselected);
+        unselected.setTextColor(android.graphics.Color.parseColor("#1A3B85"));
     }
 
-    private void applyFilters() {
-        String query = etSearch.getText().toString().toLowerCase().trim();
+    private void loadMyProjects() {
+        loadingLayout.setVisibility(View.VISIBLE);
+        // El servidor filtra por el Token de Firebase de la organización
+        // Enviamos el estado como Query Param ?estado=
+        APIClient.getProjectsService().getProjects(currentStatus)
+                .enqueue(new Callback<List<Project>>() {
+                    @Override
+                    public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
+                        loadingLayout.setVisibility(View.GONE);
+                        if (response.isSuccessful() && response.body() != null) {
+                            allProjects = response.body();
+                            updateRecyclerView(allProjects);
+                        }
+                    }
 
-        // 1. Filtramos por pestaña (Pendiente/Rechazado vs Aprobado)
-        // 2. Filtramos por texto de búsqueda
-        filteredProjects = allProjects.stream()
-                .filter(p -> {
-                    boolean matchesStatus = showingPending ?
-                            !p.getStatus().equalsIgnoreCase("APPROVED") :
-                            p.getStatus().equalsIgnoreCase("APPROVED");
-
-                    boolean matchesQuery = p.getTitle().toLowerCase().contains(query);
-
-                    return matchesStatus && matchesQuery;
-                })
-                .collect(Collectors.toList());
-
-        updateRecyclerView();
+                    @Override
+                    public void onFailure(Call<List<Project>> call, Throwable t) {
+                        loadingLayout.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Error al cargar tus proyectos", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    private void updateRecyclerView() {
-        // Usamos ViewMode.ORG_PROJECTS para mostrar los chips de estado adecuados
-        adapter = new ProjectAdapter(getContext(), filteredProjects, ViewMode.ORG_PROJECTS, new ProjectAdapter.OnItemAction() {
+    private void updateRecyclerView(List<Project> list) {
+        // Usamos el adaptador unificado con el OnProjectActionListener
+        adapter = new ProjectAdapter(list, new ProjectAdapter.OnProjectActionListener() {
             @Override
-            public void onPrimaryAction(Project item) {
-                // TODO: Abrir fragmento de edición o detalles
-                Toast.makeText(getContext(), "Editar: " + item.getTitle(), Toast.LENGTH_SHORT).show();
-            }
-
+            public void onAccept(Project project) {}
             @Override
-            public void onSecondaryAction(Project item) {
-                // TODO: Ver lista de voluntarios inscritos en este proyecto específico
-            }
-        });
+            public void onReject(Project project) {}
+            @Override
+            public void onDelete(Project project) {cancelProject(project);}
+            @Override
+            public void onApply(Project project) {}
+        }, ViewMode.ORGANIZATION);
         recyclerView.setAdapter(adapter);
     }
 
-    private void updateTabUI() {
-        // Cambia los fondos y colores de las pestañas según la selección
-        if (showingPending) {
-            tabPending.setBackgroundResource(R.drawable.background_tab_selected);
-            tabPending.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+    private void cancelProject(Project project) {
+        loadingLayout.setVisibility(View.VISIBLE);
+        // No enviamos CIF, el token identifica que es tu proyecto
+        APIClient.getProjectsService().changeState(project.getId(), new StatusRequest("rechazado"))
+                .enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (response.isSuccessful()) {
+                            loadMyProjects();
+                        } else {
+                            loadingLayout.setVisibility(View.GONE);
+                            Toast.makeText(getContext(), "Error al cancelar proyecto", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-            tabAccepted.setBackgroundResource(R.drawable.background_tab_unselected);
-            tabAccepted.setTextColor(ContextCompat.getColor(requireContext(), R.color.cuatrovientos_blue));
-        } else {
-            tabPending.setBackgroundResource(R.drawable.background_tab_unselected);
-            tabPending.setTextColor(ContextCompat.getColor(requireContext(), R.color.cuatrovientos_blue));
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        loadingLayout.setVisibility(View.GONE);
+                    }
+                });
+    }
 
-            tabAccepted.setBackgroundResource(R.drawable.background_tab_selected);
-            tabAccepted.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filter(s.toString());
+            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void filter(String text) {
+        List<Project> filtered = new ArrayList<>();
+        String query = text.toLowerCase().trim();
+        for (Project p : allProjects) {
+            if (p.getTitle().toLowerCase().contains(query)) {
+                filtered.add(p);
+            }
         }
+        updateRecyclerView(filtered);
     }
 }
