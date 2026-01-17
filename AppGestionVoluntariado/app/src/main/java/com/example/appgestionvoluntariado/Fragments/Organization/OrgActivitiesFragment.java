@@ -137,7 +137,7 @@ public class OrgActivitiesFragment extends Fragment {
     private void cancelProject(Project project) {
         loadingLayout.setVisibility(View.VISIBLE);
         // No enviamos CIF, el token identifica que es tu proyecto
-        APIClient.getProjectsService().changeState(project.getId(), new StatusRequest("rechazado"))
+        APIClient.getProjectsService().changeState(project.getActivityId(), new StatusRequest("rechazado"))
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
@@ -171,7 +171,7 @@ public class OrgActivitiesFragment extends Fragment {
         List<Project> filtered = new ArrayList<>();
         String query = text.toLowerCase().trim();
         for (Project p : allProjects) {
-            if (p.getTitle().toLowerCase().contains(query)) {
+            if (p.getName().toLowerCase().contains(query)) {
                 filtered.add(p);
             }
         }

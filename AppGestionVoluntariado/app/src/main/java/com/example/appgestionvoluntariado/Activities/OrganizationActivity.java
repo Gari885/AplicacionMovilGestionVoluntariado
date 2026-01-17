@@ -7,8 +7,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Fragments.Auth.CreateProjectFragment;
 import com.example.appgestionvoluntariado.Fragments.Organization.OrgActivitiesFragment;
-import com.example.appgestionvoluntariado.Fragments.Organization.OrgCreateProjectFragment;
-import com.example.appgestionvoluntariado.Fragments.Organization.OrgProfileFragment;
 import com.example.appgestionvoluntariado.R;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;

@@ -1,15 +1,14 @@
-package com.example.appgestionvoluntariado.Activities.Volunteer;
+package com.example.appgestionvoluntariado.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Activities.MainActivity;
 import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerExploreFragment;
 import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerMyProjectsFragment;
-import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerProfileHubFragment;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.Utils.SessionManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,7 +39,6 @@ public class VolunteerActivity extends AppCompatActivity {
 
             if (id == R.id.nav_search) selected = new VolunteerExploreFragment();
             else if (id == R.id.nav_my_inscriptions) selected = new VolunteerMyProjectsFragment();
-            else if (id == R.id.nav_profile) selected = new VolunteerProfileHubFragment();
 
             if (selected != null) {
                 getSupportFragmentManager().beginTransaction()

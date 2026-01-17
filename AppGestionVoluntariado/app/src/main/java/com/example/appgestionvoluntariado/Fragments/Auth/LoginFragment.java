@@ -1,32 +1,27 @@
 package com.example.appgestionvoluntariado.Fragments.Auth;
 
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Activities.OrganizationActivity;
 import com.example.appgestionvoluntariado.Activities.AdminActivity;
+import com.example.appgestionvoluntariado.Activities.OrganizationActivity;
+;
 import com.example.appgestionvoluntariado.Activities.VolunteerActivity;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.FindVolunteerService;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,164 +30,165 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Login logic in English, UI feedback in Spanish [cite: 2026-01-16].
+ */
 public class LoginFragment extends Fragment {
 
-    private TextView txtRegister;
-    private EditText etEmail;
-    private EditText etPassword;
+    private EditText etEmail, etPassword;
     private Button btnLogin;
+    private TextView tvRegisterPrompt;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    private String emailRegex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_auth_login, container, false);
 
+        initViews(view);
+        setupListeners();
+
+        return view;
+    }
+
+    private void initViews(View view) {
         etEmail = view.findViewById(R.id.etEmail);
         etPassword = view.findViewById(R.id.etPassword);
-        txtRegister = view.findViewById(R.id.tvSignupPrompt);
         btnLogin = view.findViewById(R.id.btnLogin);
+        tvRegisterPrompt = view.findViewById(R.id.tvSignupPrompt);
+    }
 
-        txtRegister.setOnClickListener(v -> {
+    private void setupListeners() {
+        tvRegisterPrompt.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new RegisterMenuFragment()) // Using new fragment
+                    .replace(R.id.fragmentContainer, new RegisterMenuFragment())
                     .addToBackStack(null)
                     .commit();
         });
 
         btnLogin.setOnClickListener(v -> {
-            Context context = v.getContext();
-            String emailInput = etEmail.getText().toString().trim();
-            String passInput = etPassword.getText().toString().trim();
-            String error = "";
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-            if (emailInput.isEmpty() || passInput.isEmpty()) {
-                error = "No puedes dejar los campos vacíos";
-            } else if (!emailInput.matches(emailRegex)) {
-                error = "Introduce un correo válido";
-            }
-
-            if (error.equals("")) {
-                performLogin(context, emailInput, passInput);
-            } else {
-                showErrorDialog(context, error);
+            if (validateInput(email, password)) {
+                performLogin(email, password);
             }
         });
-
-        return view;
     }
 
-    private void performLogin(Context context, String email, String password) {
+    private boolean validateInput(String email, String password) {
+        if (email.isEmpty() || password.isEmpty()) {
+            StatusHelper.showStatus(getContext(), "Campos vacíos", "Por favor, rellena todos los datos", true);
+            return false;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            StatusHelper.showStatus(getContext(), "Correo inválido", "Introduce un email correcto", true);
+            return false;
+        }
+        return true;
+    }
+
+    private void performLogin(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                if (user.isEmailVerified()) {
-                                    checkUserRole(context, user.getUid());
-                                } else {
-                                    user.sendEmailVerification();
-                                    showErrorDialog(context, "Debes verificar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada (y Spam).");
-                                    mAuth.signOut();
-                                }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            if (user.isEmailVerified()) {
+                                fetchUserRole(user.getUid());
+                            } else {
+                                StatusHelper.showStatus(getContext(), "Verificación pendiente", "Debes verificar tu correo antes de entrar", true);
+                                mAuth.signOut();
                             }
-                        } else {
-                            showErrorDialog(context, "Credenciales incorrectas o error de conexión.");
                         }
+                    } else {
+                        StatusHelper.showStatus(getContext(), "Error de acceso", "Credenciales incorrectas o fallo de red", true);
                     }
                 });
     }
 
-    private void checkUserRole(Context context, String uid) {
+    private void fetchUserRole(String uid) {
+        // Fetch role from Firestore "usuarios" collection [cite: 2026-01-16]
         db.collection("usuarios").document(uid).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String role = documentSnapshot.getString("rol");
                         if (role != null) {
-                            redirectUser(context, role);
-                        } else {
-                            showErrorDialog(context, "El usuario no tiene un rol asignado.");
+                            handleRoleRedirection(role.toLowerCase().trim());
                         }
                     } else {
-                        showErrorDialog(context, "Usuario no encontrado en la base de datos.");
+                        StatusHelper.showStatus(getContext(), "Error", "No se encontró perfil de usuario", true);
                     }
                 })
-                .addOnFailureListener(e -> {
-                    showErrorDialog(context, "Error al conectar con la base de datos: " + e.getMessage());
-                });
+                .addOnFailureListener(e -> StatusHelper.showStatus(getContext(), "Error", "Fallo al conectar con la base de datos", true));
     }
 
-    private void redirectUser(Context context, String role) {
-        Intent intent = null;
-        String normalizedRole = role.trim().toLowerCase();
-        String email = etEmail.getText().toString();
+    private void handleRoleRedirection(String role) {
+        String email = etEmail.getText().toString().trim();
 
-        switch (normalizedRole) {
+        switch (role) {
             case "voluntario":
-                FindVolunteerService findVolunteerService = APIClient.getFindVolunteerService();
-                findVolunteerService.getVolunteer(email).enqueue(new Callback<Volunteer>() {
-                    @Override
-                    public void onResponse(Call<Volunteer> call, Response<Volunteer> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            GlobalSession.loginVolunteer(response.body());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Volunteer> call, Throwable t) {
-                    }
-                });
-                intent = new Intent(context, VolunteerActivity.class);
-                break;
-
-            case "admin":
-                GlobalSession.loginAdmin();
-                intent = new Intent(context, AdminActivity.class);
+                checkVolunteerStatusAndLogin(email);
                 break;
             case "organizacion":
-                intent = new Intent(context, OrganizationActivity.class);
+                startActivityAndFinish(OrganizationActivity.class);
+                break;
+            case "admin":
+                startActivityAndFinish(AdminActivity.class);
                 break;
             default:
-                showErrorDialog(context, "Rol de usuario desconocido: " + role);
-                return;
-        }
-
-        if (intent != null) {
-            startActivity(intent);
-            if (getActivity() != null) {
-                getActivity().finish();
-            }
+                StatusHelper.showStatus(getContext(), "Error", "Rol no reconocido: " + role, true);
         }
     }
 
-    private void showErrorDialog(Context context, String errorMessage) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View popupView = LayoutInflater.from(context).inflate(R.layout.dialog_error_message, null);
+    /**
+     * Logic for volunteer verification: Must be 'Aceptado' to enter [cite: 2026-01-16].
+     */
+    private void checkVolunteerStatusAndLogin(String email) {
+        APIClient.getFindVolunteerService().getVolunteer(email).enqueue(new Callback<Volunteer>() {
+            @Override
+            public void onResponse(@NonNull Call<Volunteer> call, @NonNull Response<Volunteer> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Volunteer volunteer = response.body();
 
-        TextView txtError = popupView.findViewById(R.id.tvErrorMessage);
-        LinearLayout btnClose = popupView.findViewById(R.id.btnClosePopup);
+                    // The "Concept": Block if not accepted [cite: 2026-01-16]
+                    if ("Aceptado".equalsIgnoreCase(volunteer.getStatus())) {
+                        // Success - Save session and enter
+                        // GlobalSession.loginVolunteer(volunteer);
+                        startActivityAndFinish(VolunteerActivity.class);
+                    } else {
+                        mAuth.signOut();
+                        StatusHelper.showStatus(getContext(), "Cuenta Pendiente",
+                                "Tu cuenta aún no ha sido verificada por un administrador. Te avisaremos por email.", true);
+                    }
+                } else {
+                    mAuth.signOut();
+                    StatusHelper.showStatus(getContext(), "Error", "No se pudo obtener tu información de voluntario", true);
+                }
+            }
 
-        txtError.setText(errorMessage);
-        builder.setView(popupView);
-        AlertDialog dialog = builder.create();
+            @Override
+            public void onFailure(@NonNull Call<Volunteer> call, @NonNull Throwable t) {
+                mAuth.signOut();
+                StatusHelper.showStatus(getContext(), "Error de red", "No se pudo verificar tu estado", true);
+            }
+        });
+    }
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    private void startActivityAndFinish(Class<?> activityClass) {
+        Intent intent = new Intent(getContext(), activityClass);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().finish();
         }
-
-        btnClose.setOnClickListener(x -> dialog.dismiss());
-        dialog.show();
     }
 }

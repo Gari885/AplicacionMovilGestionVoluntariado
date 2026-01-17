@@ -166,7 +166,7 @@ public class AdminOrganizationListFragment extends Fragment {
         View btnClose = view.findViewById(R.id.btnCerrarPopup);
 
         // Datos Obligatorios (Nombre ya sale en la tarjeta, aquí ponemos el resto)
-        tvCif.setText(org.getCif());
+        tvCif.setText(org.getVat());
         tvCorreo.setText(org.getEmail());
 
         // Datos Opcionales con validación de "Sin datos"
@@ -197,7 +197,7 @@ public class AdminOrganizationListFragment extends Fragment {
 
     public void processStatusChange( Organization org,StatusRequest request) {
         loadingLayout.setVisibility(View.VISIBLE);
-        APIClient.getOrganizationService().updateStatus(org.getCif() , request)
+        APIClient.getOrganizationService().updateStatus(org.getVat() , request)
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
@@ -233,7 +233,7 @@ public class AdminOrganizationListFragment extends Fragment {
 
         for (Organization org : fullList) {
             if (org.getName().toLowerCase().contains(query) ||
-                    org.getCif().toLowerCase().contains(query)) {
+                    org.getVat().toLowerCase().contains(query)) {
                 filtered.add(org);
             }
         }

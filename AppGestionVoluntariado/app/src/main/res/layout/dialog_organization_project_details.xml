@@ -1,159 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/background_bottom_sheet"
-    android:padding="24dp">
+    android:orientation="vertical"
+    android:paddingBottom="24dp">
 
     <View
-        android:id="@+id/sheetHandle"
         android:layout_width="40dp"
         android:layout_height="4dp"
-        android:background="#E0E0E0"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="#E0E0E0" />
 
-    <TextView
-        android:id="@+id/tvTitlePopup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Detalles del Proyecto"
-        android:textColor="#1A3B85"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/sheetHandle" />
-
-    <TextView
-        android:id="@+id/lblDescripcionVol"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Descripción:"
-        android:textColor="#1A3B85"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTitlePopup" />
-
-    <TextView
-        android:id="@+id/tvDescripcionVolVal"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="#333333"
-        android:textSize="15sp"
-        tools:text="Descripción detallada del proyecto de voluntariado..."
-        app:layout_constraintTop_toBottomOf="@id/lblDescripcionVol" />
-
-    <TextView
-        android:id="@+id/lblFecha"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Fecha prevista:"
-        android:textColor="#1A3B85"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDescripcionVolVal" />
-
-    <TextView
-        android:id="@+id/tvFechaVal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="#333333"
-        android:textSize="15sp"
-        tools:text="15 de Enero, 2026"
-        app:layout_constraintTop_toBottomOf="@id/lblFecha" />
-
-    <TextView
-        android:id="@+id/lblNecesidadesVol"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Habilidades/Necesidades:"
-        android:textColor="#1A3B85"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvFechaVal" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chipGroupNecesidades"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:chipSpacing="8dp"
-        app:layout_constraintTop_toBottomOf="@id/lblNecesidadesVol" />
-
-    <TextView
-        android:id="@+id/lblODS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Objetivos de Desarrollo Sostenible (ODS):"
-        android:textColor="#1A3B85"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chipGroupNecesidades" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chipGroupODS"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:chipSpacing="8dp"
-        app:layout_constraintTop_toBottomOf="@id/lblODS" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/infoOcultaAceptado"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="#E8F5E9"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/chipGroupODS">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="24dp">
+
+            <TextView
+                android:id="@+id/tvDescripcionVolVal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Nombre de la Actividad"
+                android:textColor="#1A3B85"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvFechaVal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Finaliza: 20/12/2026"
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvMaxParticipantes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Máx. Participantes: 15"
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="20dp"
+                android:background="#F0F0F0" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="✓ Proyecto Validado"
-                android:textColor="#2E7D32"
+                android:layout_marginTop="20dp"
+                android:text="Objetivos (ODS)"
+                android:textColor="#1A3B85"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupOds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:chipSpacing="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Habilidades Requeridas"
+                android:textColor="#1A3B85"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupHabilidades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:chipSpacing="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Otras Necesidades"
+                android:textColor="#1A3B85"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupNecesidades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:chipSpacing="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCerrarPopup"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="32dp"
+                android:text="ENTENDIDO"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
                 android:textStyle="bold"
-                android:textSize="16sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Este proyecto ya ha sido aprobado por la administración."
-                android:textColor="#444444"
-                android:textSize="13sp"/>
+                app:backgroundTint="#1A3B85"
+                app:cornerRadius="12dp" />
+
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCerrarPopup"
-        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginTop="32dp"
-        android:backgroundTint="#1A3B85"
-        android:text="CERRAR DETALLES"
-        android:textColor="#FFFFFF"
-        app:cornerRadius="12dp"
-        app:layout_constraintTop_toBottomOf="@id/infoOcultaAceptado"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

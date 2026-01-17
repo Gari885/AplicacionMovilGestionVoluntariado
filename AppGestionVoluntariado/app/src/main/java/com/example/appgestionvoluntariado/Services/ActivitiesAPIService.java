@@ -1,6 +1,7 @@
 package com.example.appgestionvoluntariado.Services;
 
 import com.example.appgestionvoluntariado.Models.ActividadCreacionRequest;
+import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.Models.VoluntarioInscribirseRequest;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import retrofit2.http.Path;
 
 public interface ActivitiesAPIService {
     @GET("actividades")
-    Call<List<Voluntariado>> getActivities();
+    Call<List<Project>> getActivities();
     @POST("actividades/crear")
     Call<Void> crearActividad(@Body ActividadCreacionRequest request);
 

@@ -106,17 +106,17 @@ public class AdminProjectListFragment extends Fragment {
             adapter = new ProjectAdapter(list, new ProjectAdapter.OnProjectActionListener() {
                 @Override
                 public void onAccept(Project p) {
-                    updateStatus(p.getId(), "aprobado");
+                    updateStatus(p.getActivityId(), "aprobado");
                 }
 
                 @Override
                 public void onReject(Project p) {
-                    updateStatus(p.getId(), "rechazado");
+                    updateStatus(p.getActivityId(), "rechazado");
                 }
 
                 @Override
                 public void onDelete(Project p) {
-                    updateStatus(p.getId(), "rechazado");
+                    updateStatus(p.getActivityId(), "rechazado");
                 }
 
                 @Override
@@ -162,7 +162,7 @@ public class AdminProjectListFragment extends Fragment {
         List<Project> filtered = new ArrayList<>();
         String query = text.toLowerCase().trim();
         for (Project p : fullList) {
-            if (p.getTitle().toLowerCase().contains(query)) {
+            if (p.getName().toLowerCase().contains(query)) {
                 filtered.add(p);
             }
         }

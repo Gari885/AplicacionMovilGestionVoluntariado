@@ -103,7 +103,7 @@ public class VolunteerExploreFragment extends Fragment {
         showLoading("Tramitando tu inscripción...");
 
         // Llamada simplificada: solo pasamos el ID del proyecto
-        projectsService.enroll(item.getId()).enqueue(new Callback<Void>() {
+        projectsService.enroll(item.getActivityId()).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 hideLoading();

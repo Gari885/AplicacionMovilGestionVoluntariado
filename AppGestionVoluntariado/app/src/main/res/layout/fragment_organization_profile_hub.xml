@@ -1,141 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
-    android:orientation="vertical">
+    android:background="#F8F9FA">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:background="#1A3B85"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp">
-
-        <TextView
-            android:id="@+id/tvHubOrgName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nombre de la Organización"
-            android:textColor="#FFFFFF"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/tvHubOrgCif"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CIF: Cargando..."
-            android:textColor="#BBDEFB"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp" />
-    </LinearLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="-40dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="6dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
+            android:background="#1A3B85"
+            android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="24dp">
 
-            <LinearLayout
-                android:id="@+id/btnNavEditOrgData"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="16dp">
+            <TextView
+                android:id="@+id/tvHubOrgName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cargando..."
+                android:textColor="#FFFFFF"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textAlignment="center" />
 
-                <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:src="@drawable/ic_person"
-                    app:tint="#1A3B85" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_weight="1"
-                    android:text="Datos de la organización"
-                    android:textColor="#333333"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron"
-                    app:tint="#BDBDBD" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginHorizontal="16dp"
-                android:background="#F0F0F0" />
-
-            <LinearLayout
-                android:id="@+id/btnNavOrgSecurity"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="16dp">
-
-                <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:src="@drawable/ic_lock"
-                    app:tint="#1A3B85" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_weight="1"
-                    android:text="Seguridad y contraseña"
-                    android:textColor="#333333"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron"
-                    app:tint="#BDBDBD" />
-            </LinearLayout>
-
+            <TextView
+                android:id="@+id/tvHubOrgCif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Identificando entidad..."
+                android:textColor="#BBDEFB"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogoutOrg"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="40dp"
-        android:text="CERRAR SESIÓN"
-        android:textColor="#D32F2F"
-        android:textStyle="bold"
-        android:letterSpacing="0.1"
-        app:icon="@drawable/ic_log_out"
-        app:iconGravity="textStart"
-        app:iconTint="#D32F2F" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="-40dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp">
 
-</LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <LinearLayout
+                    android:id="@+id/btnNavEditOrgData"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_person"
+                        app:tint="#1A3B85" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:text="Datos de la organización"
+                        android:textColor="#333333"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron"
+                        app:tint="#BDBDBD" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="#F0F0F0" />
+
+                <LinearLayout
+                    android:id="@+id/btnNavOrgSecurity"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_lock"
+                        app:tint="#1A3B85" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:text="Seguridad y contraseña"
+                        android:textColor="#333333"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron"
+                        app:tint="#BDBDBD" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogoutOrg"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="40dp"
+            android:text="CERRAR SESIÓN"
+            android:textColor="#D32F2F"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            app:icon="@drawable/ic_log_out"
+            app:iconGravity="textStart"
+            app:iconTint="#D32F2F" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/pbLoadingHub"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:indeterminateTint="#1A3B85"
+        android:visibility="gone" />
+
+</FrameLayout>

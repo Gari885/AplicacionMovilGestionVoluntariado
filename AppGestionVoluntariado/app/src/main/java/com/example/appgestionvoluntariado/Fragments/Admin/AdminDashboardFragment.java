@@ -19,6 +19,7 @@ import com.example.appgestionvoluntariado.Models.AdminStatsResponse;
 import com.example.appgestionvoluntariado.Models.Stat;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Services.StatsService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,10 +66,9 @@ public class AdminDashboardFragment extends Fragment {
     }
 
     private void fetchDashboardStats() {
-        AdminService adminService = APIClient.getAdminService();
+        StatsService statsService = APIClient.getStatsService();
 
-        // Una única llamada para todas las estadísticas
-        adminService.getSummaryStats().enqueue(new Callback<AdminStatsResponse>() {
+        statsService.getStats().enqueue(new Callback<AdminStatsResponse>() {
             @Override
             public void onResponse(Call<AdminStatsResponse> call, Response<AdminStatsResponse> response) {
                 stopLoadingAnimation();

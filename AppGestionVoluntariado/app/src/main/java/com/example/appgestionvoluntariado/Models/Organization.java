@@ -3,10 +3,14 @@ package com.example.appgestionvoluntariado.Models;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
+/**
+ * Model representing an Organization.
+ * Variables in English, API mapping in Spanish.
+ */
 public class Organization {
 
     @SerializedName("cif")
-    private String cif;
+    private String vat;
 
     @SerializedName("nombre")
     private String name;
@@ -21,16 +25,16 @@ public class Organization {
     private String address;
 
     @SerializedName("localidad")
-    private String city;
+    private String locality;
 
     @SerializedName("cp")
-    private String zipCode;
+    private String postalCode;
 
     @SerializedName("descripcion")
     private String description;
 
     @SerializedName("contacto")
-    private String contactPerson;
+    private String contactPhone;
 
     @SerializedName("estado")
     private String status;
@@ -38,22 +42,55 @@ public class Organization {
     @SerializedName("actividades")
     private List<Project> projects;
 
+    // Default constructor for GSON
     public Organization() {
     }
 
-    public String getCif() { return cif; }
-    public String getName() { return name; }
-    public String getEmail() { return email; }
-    public String getSector() { return sector; }
-    public String getAddress() { return address; }
-    public String getCity() { return city; }
-    public String getZipCode() { return zipCode; }
-    public String getDescription() { return description; }
-    public String getContactPerson() { return contactPerson; }
-    public String getStatus() { return status; }
-    public List<Project> getProjects() { return projects; }
+    /**
+     * Parameterized constructor for profile updates.
+     */
+    public Organization(String name, String sector, String address, String locality,
+                        String postalCode, String description, String contactPhone) {
+        this.name = name;
+        this.sector = sector;
+        this.address = address;
+        this.locality = locality;
+        this.postalCode = postalCode;
+        this.description = description;
+        this.contactPhone = contactPhone;
+    }
 
+    // Getters and Setters (Matching Fragment logic)
+    public String getVat() { return vat; }
+    public void setVat(String vat) { this.vat = vat; }
+
+    public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public String getSector() { return sector; }
+    public void setSector(String sector) { this.sector = sector; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getLocality() { return locality; }
+    public void setLocality(String locality) { this.locality = locality; }
+
+    public String getPostalCode() { return postalCode; }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getContactPhone() { return contactPhone; }
+    public void setContactPhone(String contactPhone) { this.contactPhone = contactPhone; }
+
+    public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public List<Project> getProjects() { return projects; }
+    public void setProjects(List<Project> projects) { this.projects = projects; }
 }

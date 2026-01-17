@@ -1,22 +1,25 @@
 package com.example.appgestionvoluntariado.Models;
 
 import com.google.gson.annotations.SerializedName;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Model representing an activity (Project) detail.
+ * Variables are in English, API mapping in Spanish [cite: 2026-01-09, 2026-01-16].
+ */
 public class Project {
 
     @SerializedName("codActividad")
-    private int id;
+    private int activityId;
 
     @SerializedName("nombre")
-    private String title;
+    private String name;
 
     @SerializedName("estado")
     private String status;
 
     @SerializedName("estadoAprobacion")
-    private String approvalStatus; // "pendiente", "aprobado", "rechazado"
+    private String approvalStatus;
 
     @SerializedName("direccion")
     private String address;
@@ -31,72 +34,60 @@ public class Project {
     private int maxParticipants;
 
     @SerializedName("cif_organizacion")
-    private String organizationCif;
+    private String organizationVat;
 
     @SerializedName("nombre_organizacion")
     private String organizationName;
 
-    // Cambiados a listas de objetos según tu esquema
     @SerializedName("ods")
-    private List<TagItem> ods;
+    private List<Ods> odsList;
 
     @SerializedName("habilidades")
-    private List<TagItem> skills;
+    private List<Skill> skillsList;
 
     @SerializedName("necesidades")
-    private List<TagItem> needs;
-
-    // Campo local para descripción (aunque no venga en el esquema, lo mantenemos para el popup)
-    @SerializedName("descripcion")
-    private String description;
-
-    private boolean isEnrolled = false;
-
-    // --- CLASE INTERNA PARA MAPEAR OBJETOS DEL ARRAY ---
-    public static class TagItem {
-        @SerializedName("nombre")
-        private String name;
-        public String getName() { return name; }
-    }
+    private List<Need> needsList;
 
     public Project() {
     }
 
-    // Getters
-    public int getId() { return id; }
-    public String getTitle() { return title; }
+    // Getters and Setters (English) [cite: 2026-01-09]
+    public int getActivityId() { return activityId; }
+    public void setActivityId(int activityId) { this.activityId = activityId; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
     public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
     public String getApprovalStatus() { return approvalStatus; }
-    public String getAddress() { return address; }
-    public String getStartDate() { return startDate; }
-    public String getEndDate() { return endDate; }
-    public int getMaxParticipants() { return maxParticipants; }
-    public String getOrganizationCif() { return organizationCif; }
-    public String getOrganizationName() { return organizationName; }
-    public String getDescription() { return description != null ? description : "Sin descripción disponible."; }
-    public boolean isEnrolled() { return isEnrolled; }
-
-    // Helpers para obtener solo los Strings de los nombres
-    public List<String> getOdsNames() {
-        List<String> names = new ArrayList<>();
-        if (ods != null) for (TagItem item : ods) names.add(item.getName());
-        return names;
-    }
-
-    public List<String> getSkillNames() {
-        List<String> names = new ArrayList<>();
-        if (skills != null) for (TagItem item : skills) names.add(item.getName());
-        return names;
-    }
-
-    public List<String> getNeedNames() {
-        List<String> names = new ArrayList<>();
-        if (needs != null) for (TagItem item : needs) names.add(item.getName());
-        return names;
-    }
-
-    // Setters
     public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
-    public void setEnrolled(boolean enrolled) { isEnrolled = enrolled; }
 
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getStartDate() { return startDate; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
+
+    public String getEndDate() { return endDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
+
+    public int getMaxParticipants() { return maxParticipants; }
+    public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
+
+    public String getOrganizationVat() { return organizationVat; }
+    public void setOrganizationVat(String organizationVat) { this.organizationVat = organizationVat; }
+
+    public String getOrganizationName() { return organizationName; }
+    public void setOrganizationName(String organizationName) { this.organizationName = organizationName; }
+
+    public List<Ods> getOdsList() { return odsList; }
+    public void setOdsList(List<Ods> odsList) { this.odsList = odsList; }
+
+    public List<Skill> getSkillsList() { return skillsList; }
+    public void setSkillsList(List<Skill> skillsList) { this.skillsList = skillsList; }
+
+    public List<Need> getNeedsList() { return needsList; }
+    public void setNeedsList(List<Need> needsList) { this.needsList = needsList; }
 }

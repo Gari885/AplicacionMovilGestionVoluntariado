@@ -39,7 +39,7 @@ public class AdminMatchesListFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_admin_matches_list, container, false);
 
         loadingLayout = v.findViewById(R.id.layoutLoading);
-        tabInProgress = v.findViewById(R.id.tabStatusInProgress);
+        tabInProgress = v.findViewById(R.id.tabStatusPending);
         tabCompleted = v.findViewById(R.id.tabStatusCompleted);
         recyclerView = v.findViewById(R.id.rvMatches);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -47,7 +47,6 @@ public class AdminMatchesListFragment extends Fragment {
         setupTabs();
         loadMatches(); // Carga inicial
 
-        v.findViewById(R.id.btnBack).setOnClickListener(view -> getParentFragmentManager().popBackStack());
 
         return v;
     }
@@ -68,7 +67,7 @@ public class AdminMatchesListFragment extends Fragment {
 
     private void loadMatches() {
         loadingLayout.setVisibility(View.VISIBLE);
-        APIClient.getMatchesService().getMatches(currentFilter)
+        APIClient.getMatchesService().getMatches(currentFilter.toUpperCase())
                 .enqueue(new Callback<List<Match>>() {
                     @Override
                     public void onResponse(Call<List<Match>> call, Response<List<Match>> response) {
@@ -98,7 +97,7 @@ public class AdminMatchesListFragment extends Fragment {
     private void updateMatchStatus(Match match, String newStatus) {
         loadingLayout.setVisibility(View.VISIBLE);
         // Usamos Token de Firebase. Se envía el ID del match en la URL o RequestBody
-        APIClient.getMatchesService().updateStatus(match.getEnrollmentId(), new StatusRequest(newStatus))
+        APIClient.getMatchesService().updateStatus(match.getRegistrationId(), new StatusRequest(newStatus))
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {

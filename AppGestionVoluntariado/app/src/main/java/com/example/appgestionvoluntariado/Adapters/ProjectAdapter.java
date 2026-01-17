@@ -14,7 +14,10 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.appgestionvoluntariado.Models.Need;
+import com.example.appgestionvoluntariado.Models.Ods;
 import com.example.appgestionvoluntariado.Models.Project;
+import com.example.appgestionvoluntariado.Models.Skill;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.ViewMode;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -24,23 +27,27 @@ import com.google.android.material.chip.ChipGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter for managing and displaying projects (Activities).
+ * Variables in English, UI labels in Spanish [cite: 2026-01-16].
+ */
 public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectHolder> {
 
     private List<Project> projects;
-    private final OnProjectActionListener listener;
-    private final ViewMode mode;
+    private final OnProjectActionListener actionListener;
+    private final ViewMode viewMode;
 
     public interface OnProjectActionListener {
         void onAccept(Project project);
         void onReject(Project project);
         void onDelete(Project project);
-        void onApply(Project project); // Nueva acción para voluntarios
+        void onApply(Project project);
     }
 
     public ProjectAdapter(List<Project> projects, OnProjectActionListener listener, ViewMode mode) {
         this.projects = new ArrayList<>(projects);
-        this.listener = listener;
-        this.mode = mode;
+        this.actionListener = listener;
+        this.viewMode = mode;
     }
 
     @NonNull
@@ -52,7 +59,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
 
     @Override
     public void onBindViewHolder(@NonNull ProjectHolder holder, int position) {
-        holder.bind(projects.get(position), listener, mode);
+        holder.bind(projects.get(position), actionListener, viewMode);
     }
 
     @Override
@@ -67,15 +74,16 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
     }
 
     public class ProjectHolder extends RecyclerView.ViewHolder {
-        TextView title, zone, date;
+        TextView tvTitle, tvZone, tvDate, tvOrgName;
         Button btnInfo;
         AppCompatButton btnPrimary, btnSecondary;
 
         public ProjectHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.tvProjectTitle);
-            zone = itemView.findViewById(R.id.tvProjectZone);
-            date = itemView.findViewById(R.id.tvProjectDate);
+            tvTitle = itemView.findViewById(R.id.tvProjectTitle);
+            tvZone = itemView.findViewById(R.id.tvProjectZone);
+            tvDate = itemView.findViewById(R.id.tvProjectDate);
+            tvOrgName = itemView.findViewById(R.id.tvOrganizationName); // Nuevo campo del modelo
             btnInfo = itemView.findViewById(R.id.btnProjectInfo);
             btnPrimary = itemView.findViewById(R.id.btnPrimaryAction);
             btnSecondary = itemView.findViewById(R.id.btnSecondaryAction);
@@ -83,14 +91,19 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
 
         public void bind(Project project, OnProjectActionListener listener, ViewMode mode) {
             Context context = itemView.getContext();
-            title.setText(project.getTitle());
-            zone.setText("📍 " + (project.getAddress() != null ? project.getAddress() : "No especificada"));
-            date.setText("📅 " + project.getStartDate());
 
-            // Reset de visibilidad para evitar errores al reciclar vistas
+            // Actualizado para usar los nuevos campos del modelo [cite: 2026-01-09]
+            tvTitle.setText(project.getName());
+            tvZone.setText("📍 " + (project.getAddress() != null ? project.getAddress() : "No especificada"));
+            tvDate.setText("📅 " + project.getStartDate());
+            if (tvOrgName != null) {
+                tvOrgName.setText("🏢 " + project.getOrganizationName());
+            }
+
             btnPrimary.setVisibility(View.GONE);
             btnSecondary.setVisibility(View.GONE);
 
+            // Lógica de botones por modo de visualización [cite: 2026-01-16]
             switch(mode) {
                 case ADMINISTRATOR:
                     btnPrimary.setVisibility(View.VISIBLE);
@@ -103,16 +116,16 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
 
                 case ORGANIZATION:
                     btnPrimary.setVisibility(View.VISIBLE);
-                    // Usamos ContextCompat para obtener el color real del recurso
-                    configureButton(btnPrimary, "DAR DE BAJA", ContextCompat.getColor(context, R.color.white));
+                    configureButton(btnPrimary, "DAR DE BAJA", Color.parseColor("#D32F2F"));
                     btnPrimary.setOnClickListener(v -> listener.onDelete(project));
-                    break; // Agregado break
+                    break;
 
                 case VOLUNTEER_AVAILABLE:
                     btnPrimary.setVisibility(View.VISIBLE);
                     configureButton(btnPrimary, "APUNTARSE", ContextCompat.getColor(context, R.color.cuatrovientos_blue));
                     btnPrimary.setOnClickListener(v -> listener.onApply(project));
                     break;
+
                 case VOLUNTEER_MY_PROJECTS:
                     btnPrimary.setVisibility(View.VISIBLE);
                     configureButton(btnPrimary, "DESAPUNTARSE", ContextCompat.getColor(context, R.color.cuatrovientos_blue));
@@ -138,19 +151,40 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
 
             TextView tvDesc = view.findViewById(R.id.tvDescripcionVolVal);
             TextView tvFechaFin = view.findViewById(R.id.tvFechaVal);
+            TextView tvParticipantes = view.findViewById(R.id.tvMaxParticipantes); // Campo nuevo
+            ChipGroup chipGroupOds = view.findViewById(R.id.chipGroupOds);
+            ChipGroup chipGroupSkills = view.findViewById(R.id.chipGroupHabilidades);
             ChipGroup chipGroupNeeds = view.findViewById(R.id.chipGroupNecesidades);
             View btnClose = view.findViewById(R.id.btnCerrarPopup);
 
-            validateAndSet(tvDesc, project.getDescription());
-            tvFechaFin.setText(project.getEndDate() != null ? project.getEndDate() : "Sin fecha de fin");
+            // Mapeo de datos detallados
+            tvDesc.setText(project.getName()); // Usando nombre como descripción si no hay campo dedicado
+            tvFechaFin.setText(project.getEndDate() != null ? project.getEndDate() : "Indefinida");
+            if (tvParticipantes != null) {
+                tvParticipantes.setText("Máx. Participantes: " + project.getMaxParticipants());
+            }
 
-            if (project.getRequiredSkills() != null) {
+            // Procesamiento de ODS [cite: 2026-01-16]
+            if (project.getOdsList() != null && chipGroupOds != null) {
+                chipGroupOds.removeAllViews();
+                for (Ods ods : project.getOdsList()) {
+                    addChipToGroup(chipGroupOds, ods.getName(), R.color.cuatrovientos_blue);
+                }
+            }
+
+            // Procesamiento de Habilidades
+            if (project.getSkillsList() != null && chipGroupSkills != null) {
+                chipGroupSkills.removeAllViews();
+                for (Skill skill : project.getSkillsList()) {
+                    addChipToGroup(chipGroupSkills, skill.getName(), R.color.cuatrovientos_blue_light);
+                }
+            }
+
+            // Procesamiento de Necesidades
+            if (project.getNeedsList() != null && chipGroupNeeds != null) {
                 chipGroupNeeds.removeAllViews();
-                for (String skill : project.getRequiredSkills()) {
-                    Chip chip = new Chip(itemView.getContext());
-                    chip.setText(skill);
-                    chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue_light);
-                    chipGroupNeeds.addView(chip);
+                for (Need need : project.getNeedsList()) {
+                    addChipToGroup(chipGroupNeeds, need.getName(), R.color.cuatrovientos_blue);
                 }
             }
 
@@ -158,16 +192,12 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
             dialog.show();
         }
 
-        private void validateAndSet(TextView tv, String data) {
-            if (data == null || data.trim().isEmpty()) {
-                tv.setText("Información no proporcionada");
-                tv.setTextColor(Color.GRAY);
-                tv.setTypeface(null, android.graphics.Typeface.ITALIC);
-            } else {
-                tv.setText(data);
-                tv.setTextColor(Color.BLACK);
-                tv.setTypeface(null, android.graphics.Typeface.NORMAL);
-            }
+        private void addChipToGroup(ChipGroup group, String text, int colorRes) {
+            Chip chip = new Chip(itemView.getContext());
+            chip.setText(text);
+            chip.setChipBackgroundColorResource(colorRes);
+            chip.setTextColor(Color.WHITE);
+            group.addView(chip);
         }
     }
 }

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.Fragments.Admin.AdminCategoriesAddFragment;
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminDashboardFragment;
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminMatchesListFragment;
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminOrganizationListFragment;
@@ -80,7 +81,7 @@ public class AdminActivity extends AppCompatActivity {
 
         // New ODS & Skills Management Option [cite: 2026-01-16]
         view.findViewById(R.id.optionCategories).setOnClickListener(v -> {
-            replaceFragment(new Admin());
+            replaceFragment(new AdminCategoriesAddFragment());
             dialog.dismiss();
         });
 

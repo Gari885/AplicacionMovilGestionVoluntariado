@@ -13,7 +13,7 @@ public class CategoryManager {
     private final CategoryService service;
 
     public CategoryManager() {
-        this.service = APIClient.getRetrofitInstance().create(CategoryService.class);
+        this.service = APIClient.getClient().create(CategoryService.class);
     }
 
     public interface CategoryCallback<T> {

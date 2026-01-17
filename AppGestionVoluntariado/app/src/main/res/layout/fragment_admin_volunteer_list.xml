@@ -7,138 +7,17 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FFFFFF">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:text="Voluntarios"
-                android:textColor="#1A3B85"
-                android:textSize="34sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/etSearchVolunteer"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/background_search_bar"
-                android:drawableStart="@android:drawable/ic_menu_search"
-                android:drawablePadding="10dp"
-                android:drawableTint="#757575"
-                android:elevation="2dp"
-                android:hint="Buscar por nombre o DNI..."
-                android:inputType="text"
-                android:paddingStart="16dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <TextView
-                    android:id="@+id/tabStatusPending"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="4dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/background_tab_selected"
-                    android:gravity="center"
-                    android:text="Pendientes"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tabStatusAccepted"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/background_tab_unselected"
-                    android:gravity="center"
-                    android:text="Aceptados"
-                    android:textColor="#1A3B85"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="15dp">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvVolunteers"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingBottom="80dp" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutLoading"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#E6FFFFFF"
-                    android:visibility="gone">
-
-                    <ProgressBar
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:indeterminateTint="#1A3B85"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.3" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </FrameLayout>
-
-        </LinearLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabAddVolunteer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="24dp"
-            android:contentDescription="Añadir voluntario"
-            android:src="@android:drawable/ic_input_add"
-            app:backgroundTint="#1A3B85"
-            app:elevation="6dp"
-            app:tint="#FFFFFF" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tvVolunteerTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
             android:text="Voluntarios"
             android:textColor="#1A3B85"
             android:textSize="34sp"
@@ -149,49 +28,49 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"
+            android:layout_marginEnd="20dp"
             android:background="@drawable/background_search_bar"
-            android:hint="Buscar por nombre o DNI..."
-            android:inputType="text"
-            android:paddingStart="16dp"
             android:drawableStart="@android:drawable/ic_menu_search"
             android:drawablePadding="10dp"
             android:drawableTint="#757575"
-            android:elevation="2dp"/>
+            android:elevation="2dp"
+            android:hint="Buscar por nombre o DNI..."
+            android:inputType="text"
+            android:paddingStart="16dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp"
             android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
             <TextView
                 android:id="@+id/tabStatusPending"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:background="@drawable/background_tab_selected"
+                android:gravity="center"
                 android:text="Pendientes"
                 android:textColor="#FFFFFF"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:layout_marginEnd="4dp" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabStatusAccepted"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:background="@drawable/background_tab_unselected"
+                android:gravity="center"
                 android:text="Aceptados"
                 android:textColor="#1A3B85"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:layout_marginStart="4dp" />
+                android:textStyle="bold" />
         </LinearLayout>
 
         <FrameLayout
@@ -204,22 +83,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="80dp" /> <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutLoading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#E6FFFFFF"
-            android:visibility="gone">
-            <ProgressBar
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:indeterminateTint="#1A3B85"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.3" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:paddingBottom="80dp" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutLoading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E6FFFFFF"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:indeterminateTint="#1A3B85"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.3" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
 
     </LinearLayout>
@@ -230,10 +112,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
+        android:contentDescription="Añadir voluntario"
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="#1A3B85"
-        app:tint="#FFFFFF"
         app:elevation="6dp"
-        android:contentDescription="Añadir voluntario" />
+        app:tint="#FFFFFF" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

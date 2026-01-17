@@ -5,30 +5,37 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Activities.LoginActivity;
 import com.example.appgestionvoluntariado.Activities.MainActivity;
 import com.example.appgestionvoluntariado.Models.Organization;
+import com.example.appgestionvoluntariado.Models.ProfileResponse;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Services.OrganizationService; // Deberás crear este Service
 import com.example.appgestionvoluntariado.Utils.SessionManager;
+import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Hub for Organization profile.
+ * Fetches generic ProfileResponse and decodes it based on user type [cite: 2026-01-16].
+ */
 public class OrgProfileHubFragment extends Fragment {
 
-    private TextView tvName, tvCif;
-    private OrganizationService organizationService;
+    private TextView tvName, tvVat;
+    private ProgressBar pbLoading;
+    private Organization organization;
+    private final Gson gson = new Gson();
 
     @Nullable
     @Override
@@ -36,9 +43,19 @@ public class OrgProfileHubFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_organization_profile_hub, container, false);
 
         initViews(view);
-        fetchOrganizationData();
+        fetchProfileData();
+        setupNavigation(view);
 
-        // Navegación
+        return view;
+    }
+
+    private void initViews(View v) {
+        tvName = v.findViewById(R.id.tvHubOrgName);
+        tvVat = v.findViewById(R.id.tvHubOrgCif);
+        pbLoading = v.findViewById(R.id.pbLoadingHub); // Asegúrate de añadirlo al XML
+    }
+
+    private void setupNavigation(View view) {
         view.findViewById(R.id.btnNavEditOrgData).setOnClickListener(v ->
                 replaceFragment(new OrgProfileEditFragment()));
 
@@ -46,33 +63,52 @@ public class OrgProfileHubFragment extends Fragment {
                 replaceFragment(new OrgChangePasswordFragment()));
 
         view.findViewById(R.id.btnLogoutOrg).setOnClickListener(v -> performLogout());
-
-        return view;
     }
 
-    private void initViews(View v) {
-        tvName = v.findViewById(R.id.tvHubOrgName);
-        tvCif = v.findViewById(R.id.tvHubOrgCif);
-        organizationService = APIClient.getOrganizationService();
-    }
+    private void fetchProfileData() {
+        toggleLoading(true);
 
-    private void fetchOrganizationData() {
-        // El servidor identifica a la Org por el Token
-        organizationService.getProfile().enqueue(new Callback<Organization>() {
+        // Uses the Auth API to get the generic profile wrapper [cite: 2026-01-16]
+        APIClient.getAuthAPIService().getProfile().enqueue(new Callback<ProfileResponse>() {
             @Override
-            public void onResponse(Call<Organization> call, Response<Organization> response) {
+            public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
+                toggleLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
-                    Organization org = response.body();
-                    tvName.setText(org.getName());
-                    tvCif.setText("CIF: " + org.getCif());
+                    handleProfileResponse(response.body());
+                } else {
+                    StatusHelper.showStatus(getContext(), "Error", "No se pudo obtener el perfil", true);
                 }
             }
 
             @Override
-            public void onFailure(Call<Organization> call, Throwable t) {
-                tvName.setText("Error al cargar");
+            public void onFailure(@NonNull Call<ProfileResponse> call, @NonNull Throwable t) {
+                toggleLoading(false);
+                StatusHelper.showStatus(getContext(), "Error de red", "Sin conexión con el servidor", true);
             }
         });
+    }
+
+    private void handleProfileResponse(ProfileResponse wrapper) {
+        if ("organizacion".equalsIgnoreCase(wrapper.getType())) {
+            // Decode the nested data into the Organization model [cite: 2026-01-16]
+            organization = gson.fromJson(wrapper.getData(), Organization.class);
+            updateUI();
+        } else {
+            StatusHelper.showStatus(getContext(), "Error de Tipo", "El perfil no pertenece a una organización", true);
+        }
+    }
+
+    private void updateUI() {
+        if (organization != null) {
+            tvName.setText(organization.getName());
+            tvVat.setText("CIF: " + (organization.getVat() != null ? organization.getVat() : "N/A"));
+        }
+    }
+
+    private void toggleLoading(boolean isLoading) {
+        if (pbLoading != null) {
+            pbLoading.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void replaceFragment(Fragment fragment) {

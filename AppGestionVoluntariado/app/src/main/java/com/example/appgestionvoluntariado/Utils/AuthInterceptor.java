@@ -19,28 +19,29 @@ public class AuthInterceptor implements Interceptor {
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request originalRequest = chain.request();
-        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        String url = originalRequest.url().toString();
 
-        if (mUser == null) {
-            return chain.proceed(originalRequest);
+        // LIST OF PUBLIC ENDPOINTS TO IGNORE
+        if (url.contains("/categories/") || url.contains("/login") || url.contains("/register")) {
+             return chain.proceed(originalRequest);
         }
 
-        try {
-            // Obtenemos el token de Firebase de forma síncrona (esperamos a que llegue)
-            // Esto es seguro porque Retrofit corre en hilos secundarios
-            GetTokenResult tokenResult = Tasks.await(mUser.getIdToken(false));
-            String token = tokenResult.getToken();
+        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
 
-            if (token != null) {
-                // Añadimos la cabecera de autorización
-                Request newRequest = originalRequest.newBuilder()
-                        .header("Authorization", "Bearer " + token)
-                        .build();
-                return chain.proceed(newRequest);
+        if (mUser != null) {
+            try {
+                GetTokenResult tokenResult = Tasks.await(mUser.getIdToken(false));
+                String token = tokenResult.getToken();
+
+                if (token != null) {
+                    Request newRequest = originalRequest.newBuilder()
+                            .header("Authorization", "Bearer " + token)
+                            .build();
+                    return chain.proceed(newRequest);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
         }
 
         return chain.proceed(originalRequest);

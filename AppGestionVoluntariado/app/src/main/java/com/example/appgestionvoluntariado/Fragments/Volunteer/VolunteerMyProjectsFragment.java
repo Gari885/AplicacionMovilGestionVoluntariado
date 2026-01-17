@@ -132,7 +132,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
         startLoadingAnimation("Anulando inscripción");
 
         // Tampoco pasamos el DNI aquí; la seguridad la da el Token
-        projectsService.unenroll(item.getId()).enqueue(new Callback<Void>() {
+        projectsService.unenroll(item.getActivityId()).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 stopLoadingAnimation();
@@ -178,7 +178,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
         } else {
             String query = text.toLowerCase().trim();
             for (Project p : allEnrolledProjects) {
-                if (p.getTitle().toLowerCase().contains(query) ||
+                if (p.getName().toLowerCase().contains(query) ||
                         p.getAddress().toLowerCase().contains(query)) {
                     displayedProjects.add(p);
                 }

@@ -11,15 +11,15 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface CategoryService {
-    @GET("categorias/ods")
+    @GET("categories/ods")
     Call<List<Ods>> getOds();
 
-    @GET("categorias/habilidades")
+    @GET("categories/habilidades")
     Call<List<Skill>> getSkills();
 
-    @GET("categorias/intereses")
+    @GET("categories/intereses")
     Call<List<Interest>> getInterests();
 
-    @GET("categorias/necesidades")
+    @GET("categories/necesidades")
     Call<List<Need>> getNeeds();
 }
