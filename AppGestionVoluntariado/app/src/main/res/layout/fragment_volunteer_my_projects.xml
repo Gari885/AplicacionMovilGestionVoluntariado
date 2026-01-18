@@ -38,6 +38,43 @@
             android:inputType="text"
             android:paddingStart="16dp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTabPending"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Pendientes"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:backgroundTint="#1A3B85"
+                app:cornerRadius="25dp"
+                app:strokeColor="#1A3B85"
+                app:strokeWidth="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTabAccepted"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Aceptados"
+                android:textColor="#1A3B85"
+                android:textStyle="bold"
+                android:backgroundTint="#FFFFFF"
+                app:cornerRadius="25dp"
+                app:strokeColor="#1A3B85"
+                app:strokeWidth="2dp" />
+
+        </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvProjects"
             android:layout_width="match_parent"

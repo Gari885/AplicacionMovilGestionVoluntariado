@@ -13,12 +13,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Activities.MainActivity;
+import com.example.appgestionvoluntariado.Models.ProfileResponse;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Services.AuthAPIService;
 import com.example.appgestionvoluntariado.Services.VolunteerService;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,7 +31,9 @@ import retrofit2.Response;
 public class VolunteerProfileHubFragment extends Fragment {
 
     private TextView tvName;
-    private VolunteerService volunteerService;
+    private AuthAPIService authAPIService;
+
+    private Volunteer volunteer;
 
     @Nullable
     @Override
@@ -36,7 +42,7 @@ public class VolunteerProfileHubFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_volunteer_profile_hub, container, false);
 
         tvName = view.findViewById(R.id.tvHubUserName);
-        volunteerService = APIClient.getVolunteerService();
+        authAPIService = APIClient.getAuthAPIService();
 
         // Cargamos el nombre real desde la API usando el Token de Firebase
         fetchProfileName();
@@ -57,22 +63,34 @@ public class VolunteerProfileHubFragment extends Fragment {
 
     private void fetchProfileName() {
         // La API sabe quién es el usuario gracias al AuthInterceptor
-        volunteerService.getProfile().enqueue(new Callback<Volunteer>() {
+        authAPIService.getProfile().enqueue(new Callback<ProfileResponse>() {
             @Override
-            public void onResponse(Call<Volunteer> call, Response<Volunteer> response) {
+            public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     // Usamos el helper getFullName() que definimos en el modelo
-                    tvName.setText(response.body().getFullName());
+                    ProfileResponse wrapper = response.body();
+                    Gson gson = new Gson();
+                    if ("voluntario".equalsIgnoreCase(wrapper.getType())) {
+                        volunteer = gson.fromJson(wrapper.getData(), Volunteer.class);
+                        updateUI();
+                    }
+
                 } else {
                     tvName.setText("Usuario");
                 }
             }
 
             @Override
-            public void onFailure(Call<Volunteer> call, Throwable t) {
+            public void onFailure(Call<ProfileResponse> call, Throwable t) {
                 tvName.setText("Error al cargar");
             }
         });
+    }
+
+    private void updateUI() {
+        if (volunteer != null) {
+            tvName.setText(volunteer.getFullName());
+        }
     }
 
     private void replaceFragment(Fragment fragment) {

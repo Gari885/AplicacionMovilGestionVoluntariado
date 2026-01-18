@@ -39,7 +39,7 @@ public class OrgProfileEditFragment extends Fragment {
     private TextInputEditText etName, etEmail, etVat, etPhone, etAddress, etLocality, etPostalCode, etDescription;
     private TextInputLayout tilName, tilEmail, tilPhone, tilAddress, tilLocality, tilPostalCode, tilDescription;
     private MaterialButton btnSave;
-    private ProgressBar pbLoading;
+    private View loadingOverlay;
 
     private FirebaseAuth mAuth;
     private final Gson gson = new Gson();
@@ -88,7 +88,7 @@ public class OrgProfileEditFragment extends Fragment {
         tilDescription = v.findViewById(R.id.tilEditDescription);
 
         btnSave = v.findViewById(R.id.btnSaveProfile);
-        pbLoading = v.findViewById(R.id.pbLoading);
+        loadingOverlay = v.findViewById(R.id.loadingOverlay);
     }
 
     private void fetchProfileData() {
@@ -194,7 +194,7 @@ public class OrgProfileEditFragment extends Fragment {
     }
 
     private void toggleLoading(boolean isLoading) {
-        if (pbLoading != null) pbLoading.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        if (loadingOverlay != null) loadingOverlay.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         btnSave.setEnabled(!isLoading);
     }
 

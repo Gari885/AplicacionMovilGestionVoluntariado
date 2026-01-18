@@ -187,9 +187,9 @@ public class AdminVolunteerListFragment extends Fragment {
 
         // Crear chips dinámicamente para que no se corten
         if (v.getSkills() != null) {
-            for (String skill : v.getSkills().split(",")) {
+            for (String skill : v.getSkills()) {
                 Chip chip = new Chip(getContext());
-                chip.setText(skill.trim());
+                chip.setText(skill);
                 chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue_light); // Define un azul claro en colors
                 cgHabilidades.addView(chip);
             }

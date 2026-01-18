@@ -36,6 +36,9 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
     private List<Project> projects;
     private final OnProjectActionListener actionListener;
     private final ViewMode viewMode;
+    private boolean showStatusLabel = false;
+
+
 
     public interface OnProjectActionListener {
         void onAccept(Project project);
@@ -48,6 +51,17 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
         this.projects = new ArrayList<>(projects);
         this.actionListener = listener;
         this.viewMode = mode;
+    }
+
+    public void setShowStatusLabel(boolean show) {
+        this.showStatusLabel = show;
+    }
+
+    public void notifyAdapter(List<Project> projects) {
+        this.projects.clear();
+        this.projects = projects;
+        notifyDataSetChanged();
+
     }
 
     @NonNull
@@ -74,7 +88,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
     }
 
     public class ProjectHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle, tvZone, tvDate, tvOrgName;
+        TextView tvTitle, tvZone, tvDate, tvOrgName, tvStatusLabel;
         Button btnInfo;
         AppCompatButton btnPrimary, btnSecondary;
 
@@ -87,6 +101,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
             btnInfo = itemView.findViewById(R.id.btnProjectInfo);
             btnPrimary = itemView.findViewById(R.id.btnPrimaryAction);
             btnSecondary = itemView.findViewById(R.id.btnSecondaryAction);
+            tvStatusLabel = itemView.findViewById(R.id.tvStatusLabel);
         }
 
         public void bind(Project project, OnProjectActionListener listener, ViewMode mode) {
@@ -98,6 +113,22 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
             tvDate.setText("📅 " + project.getStartDate());
             if (tvOrgName != null) {
                 tvOrgName.setText("🏢 " + project.getOrganizationName());
+            }
+
+            // Configurar etiqueta de estado [cite: 2026-01-18]
+            if (showStatusLabel && tvStatusLabel != null) {
+                tvStatusLabel.setVisibility(View.VISIBLE);
+                String status = project.getStatus() != null ? project.getStatus() : "Desconocido";
+                tvStatusLabel.setText(status);
+                
+                // Color por estado (Simple logic)
+                int color = Color.parseColor("#757575"); // Default Gray
+                if (status.equalsIgnoreCase("ABIERTA") || status.equalsIgnoreCase("EN CURSO")) color = Color.parseColor("#2E7D32"); // Green
+                else if (status.equalsIgnoreCase("CERRADA") || status.equalsIgnoreCase("FINALIZADA")) color = Color.parseColor("#C62828"); // Red
+                
+                tvStatusLabel.setBackgroundTintList(ColorStateList.valueOf(color));
+            } else if (tvStatusLabel != null) {
+                tvStatusLabel.setVisibility(View.GONE);
             }
 
             btnPrimary.setVisibility(View.GONE);

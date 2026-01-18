@@ -69,5 +69,15 @@ public class CategoryManager {
             @Override
             public void onFailure(Call<List<Need>> call, Throwable t) { needCb.onError(t.getMessage()); }
         });
+
+        service.getNeeds().enqueue(new Callback<List<Need>>() {
+            @Override
+            public void onResponse(Call<List<Need>> call, Response<List<Need>> response) {
+                if (response.isSuccessful()) needCb.onSuccess(response.body());
+                else needCb.onError("Error loading Needs");
+            }
+            @Override
+            public void onFailure(Call<List<Need>> call, Throwable t) { needCb.onError(t.getMessage()); }
+        });
     }
 }

@@ -112,7 +112,7 @@ public class VolunteerExploreFragment extends Fragment {
 
                     // Quitamos el proyecto de la lista de disponibles para que no aparezca dos veces
                     availableProjects.remove(item);
-                    projectAdapter.notifyDataSetChanged();
+                    projectAdapter.notifyAdapter(availableProjects);
                 } else {
                     Toast.makeText(getContext(), "Error: El servidor rechazó la inscripción", Toast.LENGTH_SHORT).show();
                 }

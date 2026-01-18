@@ -2,6 +2,7 @@ package com.example.appgestionvoluntariado.Services;
 
 import com.example.appgestionvoluntariado.Models.StatusRequest;
 import com.example.appgestionvoluntariado.Models.Organization;
+import com.example.appgestionvoluntariado.Models.Volunteer;
 
 import java.util.List;
 
@@ -28,5 +29,8 @@ public interface OrganizationService {
     Call<Void> updateProfile(
             @Body Organization org
     );
+
+    @PUT("auth/profile")
+    Call<Void> editProfile(@Body Organization organization);
 
 }

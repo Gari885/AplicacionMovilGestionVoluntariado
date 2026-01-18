@@ -1,15 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingStart="24dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="100dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBack"
@@ -139,6 +146,67 @@
                 android:inputType="none" />
         </com.google.android.material.textfield.TextInputLayout>
 
+
+
+
+        <!-- New Skills Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Habilidades"
+            android:textColor="#1A3B85"
+            android:textStyle="bold"
+            android:textSize="15sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEditSelectSkills"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="8dp"
+            android:text="EDITAR HABILIDADES"
+            android:textColor="#1A3B85"
+            android:textStyle="bold"
+            app:strokeColor="#1A3B85"
+            app:cornerRadius="12dp"
+            app:icon="@android:drawable/ic_input_add" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgEditSelectedSkills"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" />
+
+        <!-- New Interests Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Intereses"
+            android:textColor="#1A3B85"
+            android:textStyle="bold"
+            android:textSize="15sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEditSelectInterests"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="8dp"
+            android:text="EDITAR INTERESES"
+            android:textColor="#1A3B85"
+            android:textStyle="bold"
+            app:strokeColor="#1A3B85"
+            app:cornerRadius="12dp"
+            app:icon="@android:drawable/btn_star" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgEditSelectedInterests"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveFullData"
             android:layout_width="match_parent"
@@ -151,4 +219,22 @@
             app:cornerRadius="12dp" />
 
     </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Loading Overlay -->
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80FFFFFF"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="#1A3B85" />
+    </FrameLayout>
+
+</FrameLayout>

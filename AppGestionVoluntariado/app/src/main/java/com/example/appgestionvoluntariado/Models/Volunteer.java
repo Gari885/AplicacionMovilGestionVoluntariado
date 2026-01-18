@@ -1,6 +1,8 @@
 package com.example.appgestionvoluntariado.Models;
 
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.SerializedName;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Volunteer {
@@ -36,13 +38,13 @@ public class Volunteer {
     private String cycle;
 
     @SerializedName("habilidades")
-    private String skills;
+    private List<String> skills;
 
     @SerializedName("intereses")
-    private String interests;
+    private List<String> interests;
 
     @SerializedName("idiomas")
-    private String languages;
+    private List<String> languages;
 
     @SerializedName("estado_voluntario")
     private String status;
@@ -64,9 +66,9 @@ public class Volunteer {
     public String getExperience() { return experience; }
     public boolean getHasCar() { return hasCar; }
     public String getCycle() { return cycle; }
-    public String getSkills() { return skills; }
-    public String getInterests() { return interests; }
-    public String getLanguages() { return languages; }
+    public List<String> getSkills() { return skills != null ? skills : new ArrayList<>(); }
+    public List<String> getInterests() { return interests != null ? interests : new ArrayList<>(); }
+    public List<String> getLanguages() { return languages != null ? languages : new ArrayList<>(); }
     public String getStatus() { return status; }
     public List<Enrollment> getEnrollments() { return enrollments; }
 
@@ -84,8 +86,16 @@ public class Volunteer {
     public void setExperience(String experience) { this.experience = experience; }
     public void setHasCar(boolean hasCar) { this.hasCar = hasCar; }
     public void setCycle(String cycle) { this.cycle = cycle; }
-    public void setLanguages(String languages) { this.languages = languages; }
+    public void setLanguages(List<String> languages) { this.languages = languages; }
     public void setStatus(String status) { this.status = status; }
+
+    public void setSkills(List<String> selectedSkills) {
+        this.skills = selectedSkills;
+    }
+
+    public void setInterests(List<String> selectedInterests) {
+        this.interests = selectedInterests;
+    }
 
     // --- CLASE INTERNA ENROLLMENT ---
     public static class Enrollment {

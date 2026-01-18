@@ -14,8 +14,11 @@ import com.example.appgestionvoluntariado.Fragments.Admin.AdminOrganizationListF
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminProfileHubFragment;
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminVolunteerListFragment;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.Utils.SessionManager;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminActivity extends AppCompatActivity {
 
@@ -25,10 +28,14 @@ public class AdminActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_main);
 
         // 1. Configurar Toolbar y Perfil (Icono arriba a la derecha)
-        Toolbar topAppBar = findViewById(R.id.topAppBarAdmin);
+        MaterialToolbar topAppBar = findViewById(R.id.topAppBarAdmin);
         topAppBar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_user) {
+            int id = item.getItemId();
+            if (id == R.id.action_user) {
                 replaceFragment(new AdminProfileHubFragment());
+                return true;
+            } else if (id == R.id.action_logout) {
+                performLogout();
                 return true;
             }
             return false;
@@ -91,7 +98,16 @@ public class AdminActivity extends AppCompatActivity {
 
     private void replaceFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, fragment)
+                .replace(R.id.admin_fragment_container, fragment)
                 .commit();
+    }
+
+    private void performLogout() {
+        FirebaseAuth.getInstance().signOut();
+        SessionManager.getInstance(this).logout();
+        android.content.Intent intent = new android.content.Intent(this, MainActivity.class);
+        intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

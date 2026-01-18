@@ -36,6 +36,22 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
+            android:id="@+id/tvStatusLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/badge_background"
+            android:backgroundTint="#4CAF50"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="En curso"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/tvProjectTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

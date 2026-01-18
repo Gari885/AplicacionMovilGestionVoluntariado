@@ -25,17 +25,19 @@ public interface ProjectsService {
     // Obtener proyectos en los que el voluntario NO está inscrito todavía
     @GET("actividades")
     Call<List<Project>> getAvailableProjects();
+    ;
 
     // Obtener los proyectos donde el voluntario YA está inscrito
-    @GET("projects/enrolled")
-    Call<List<Project>> getEnrolledProjects();
+    @GET("inscripciones/me")
+    Call<List<Project>> getEnrolledProjects(@Query("estado")String status);
 
     // Inscribirse en un proyecto (El ID del usuario sale del Token)
-    @POST("projects/{id}/enroll")
-    Call<Void> enroll(@Path("id") int projectId);
+    @POST("actividades/{codActividad}/inscribir")
+    Call<Void> enroll(@Path("codActividad") int projectId);
 
     // Anular inscripción (El ID del usuario sale del Token)
-    @DELETE("projects/{id}/unenroll")
+    // CAMBIO: Usar convención en español para coincidir con el backend [cite: 2026-01-18]
+    @DELETE("actividades/{id}/desinscribir")
     Call<Void> unenroll(@Path("id") int projectId);
 
 

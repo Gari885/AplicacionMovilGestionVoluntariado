@@ -24,7 +24,6 @@ import com.example.appgestionvoluntariado.Models.*;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Utils.CategoryManager;
-import com.example.appgestionvoluntariado.Utils.GlobalData;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -49,20 +48,36 @@ import retrofit2.Response;
 
 public class VolunteerRegisterFragment extends Fragment {
 
-    private Button btnRegister, btnAddAvailability, btnAddLanguage, btnSelectOds, btnSelectSkills, btnSelectInterests;
+    private Button btnRegister, btnAddAvailability, btnAddLanguage, btnSelectSkills, btnSelectInterests;
     private TextInputEditText etName, etEmail, etDni, etPassword, etBirthDate;
-    private TextInputLayout tilName, tilEmail, tilDni, tilPassword,tilBirthDate;
+    private TextInputLayout tilName, tilEmail, tilDni, tilPassword, tilBirthDate, tilCycle, tilZona;
     private AutoCompleteTextView actvLanguages, actvExperience, actvCar, actvCycle, actvZona, actvDays, actvTimeSlots;
-    private ChipGroup cgSelectedOds, cgSelectedSkills, cgSelectedInterests, cgSummary;
+    private ChipGroup cgSelectedSkills, cgSelectedInterests, cgSummary;
     private View loadingOverlay;
 
-    private final List<Ods> masterOdsList = new ArrayList<>();
     private final List<Skill> masterSkillsList = new ArrayList<>();
     private final List<Interest> masterInterestsList = new ArrayList<>();
 
-    private final List<String> selectedOds = new ArrayList<>(), selectedSkills = new ArrayList<>(),
-            selectedInterests = new ArrayList<>(), selectedAvailability = new ArrayList<>(),
-            selectedLanguages = new ArrayList<>();
+    // Selections initialized to avoid NullPointerExceptions [cite: 2026-01-18]
+    private final List<String> selectedSkills = new ArrayList<>();
+    private final List<String> selectedInterests = new ArrayList<>();
+    private final List<String> selectedAvailability = new ArrayList<>();
+    private final List<String> selectedLanguages = new ArrayList<>();
+
+    // Static Data Lists
+    private final String[] CYCLE_LIST = {"SMR", "ASIR", "DAM", "DAW", "Marketing", "Administración", "Otros"};
+    private final String[] EXPERIENCE_LIST = {"Ninguna", "Menos de 1 año", "Entre 1 y 3 años", "Más de 3 años"};
+    private final String[] CAR_LIST = {"Sí", "No"};
+    private final String[] LANGUAGE_LIST = {"Castellano", "Inglés", "Francés", "Euskera", "Alemán", "Otros"};
+    private final String[] DAYS_LIST = {"Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo", "Lunes a Viernes", "Fines de semana"};
+    private final String[] TIME_SLOTS_LIST = {"Mañana", "Tarde", "Noche"};
+    private final String[] ZONES_LIST = {
+            "Casco Viejo", "Ensanche", "Iturrama", "San Juan / Donibane", "Mendebaldea / Ermitagaña",
+            "Milagrosa / Arrosadia", "Azpilagaña", "Chantrea / Txantrea", "Rochapea / Arrotxapea",
+            "San Jorge / Sanduzelai", "Buztintxuri", "Mendillorri", "Lezkairu", "Erripagaña",
+            "Ansoáin / Antsoain", "Barañáin", "Burlada / Burlata", "Villava / Atarrabia",
+            "Zizur Mayor / Zizur Nagusia", "Mutilva / Mutiloa", "Sarriguren"
+    };
 
     private FirebaseAuth mAuth;
 
@@ -85,11 +100,9 @@ public class VolunteerRegisterFragment extends Fragment {
         btnRegister = v.findViewById(R.id.btnRegister);
         btnAddAvailability = v.findViewById(R.id.btnAddAvailability);
         btnAddLanguage = v.findViewById(R.id.btnAddLanguage);
-        btnSelectOds = v.findViewById(R.id.btnSelectOds);
         btnSelectSkills = v.findViewById(R.id.btnSelectSkills);
         btnSelectInterests = v.findViewById(R.id.btnSelectInterests);
 
-        cgSelectedOds = v.findViewById(R.id.cgSelectedOds);
         cgSelectedSkills = v.findViewById(R.id.cgSelectedSkills);
         cgSelectedInterests = v.findViewById(R.id.cgSelectedInterests);
         cgSummary = v.findViewById(R.id.cgSummary);
@@ -99,11 +112,14 @@ public class VolunteerRegisterFragment extends Fragment {
         etDni = v.findViewById(R.id.etDni);
         etPassword = v.findViewById(R.id.etPassword);
         etBirthDate = v.findViewById(R.id.etBirthDate);
+
         tilName = v.findViewById(R.id.tilName);
         tilEmail = v.findViewById(R.id.tilEmail);
         tilDni = v.findViewById(R.id.tilDni);
         tilPassword = v.findViewById(R.id.tilPassword);
         tilBirthDate = v.findViewById(R.id.tilBirthDate);
+        tilCycle = v.findViewById(R.id.tilCycle);
+        tilZona = v.findViewById(R.id.tilZone);
 
         actvLanguages = v.findViewById(R.id.actvIdiomas);
         actvCycle = v.findViewById(R.id.actvCycle);
@@ -116,11 +132,8 @@ public class VolunteerRegisterFragment extends Fragment {
     }
 
     private void setupListeners() {
-
         etBirthDate.setOnClickListener(v -> showDatePickerDialog());
 
-        
-        btnSelectOds.setOnClickListener(v -> openMultiSelectSheet("Seleccionar ODS", masterOdsList, selectedOds, cgSelectedOds));
         btnSelectSkills.setOnClickListener(v -> openMultiSelectSheet("Seleccionar Habilidades", masterSkillsList, selectedSkills, cgSelectedSkills));
         btnSelectInterests.setOnClickListener(v -> openMultiSelectSheet("Seleccionar Intereses", masterInterestsList, selectedInterests, cgSelectedInterests));
 
@@ -134,11 +147,15 @@ public class VolunteerRegisterFragment extends Fragment {
         });
 
         btnAddAvailability.setOnClickListener(v -> {
-            String combo = actvDays.getText().toString() + " (" + actvTimeSlots.getText().toString() + ")";
-            if (!combo.equals(" ()") && !selectedAvailability.contains(combo)) {
-                selectedAvailability.add(combo);
-                updateGlobalSummary();
-                actvDays.setText(""); actvTimeSlots.setText("");
+            String dayStr = actvDays.getText().toString();
+            String timeStr = actvTimeSlots.getText().toString();
+            if (!dayStr.isEmpty() && !timeStr.isEmpty()) {
+                String combo = dayStr + " (" + timeStr + ")";
+                if (!selectedAvailability.contains(combo)) {
+                    selectedAvailability.add(combo);
+                    updateGlobalSummary();
+                    actvDays.setText(""); actvTimeSlots.setText("");
+                }
             }
         });
 
@@ -147,21 +164,13 @@ public class VolunteerRegisterFragment extends Fragment {
 
     private void showDatePickerDialog() {
         final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
         DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
-                (view, year1, monthOfYear, dayOfMonth) -> {
-                    // Formateamos a YYYY-MM-DD para la API [cite: 2026-01-16]
-                    String monthStr = (monthOfYear + 1) < 10 ? "0" + (monthOfYear + 1) : String.valueOf(monthOfYear + 1);
-                    String dayStr = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
-                    String selectedDate = year1 + "-" + monthStr + "-" + dayStr;
+                (view, y, m, d) -> {
+                    String mStr = (m + 1) < 10 ? "0" + (m + 1) : String.valueOf(m + 1);
+                    String dStr = d < 10 ? "0" + d : String.valueOf(d);
+                    etBirthDate.setText(y + "-" + mStr + "-" + dStr);
+                }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
 
-                    etBirthDate.setText(selectedDate);
-                }, year, month, day);
-
-        // Limitamos la fecha máxima a hoy (no puedes nacer en el futuro) [cite: 2026-01-17]
         datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
         datePickerDialog.show();
     }
@@ -255,7 +264,7 @@ public class VolunteerRegisterFragment extends Fragment {
     private void updateGlobalSummary() {
         cgSummary.removeAllViews();
         List<String> combined = new ArrayList<>();
-        combined.addAll(selectedOds); combined.addAll(selectedSkills); combined.addAll(selectedInterests);
+        combined.addAll(selectedSkills); combined.addAll(selectedInterests);
         combined.addAll(selectedLanguages); combined.addAll(selectedAvailability);
 
         for (String s : combined) {
@@ -269,7 +278,7 @@ public class VolunteerRegisterFragment extends Fragment {
     }
 
     private void loadDynamicCategories() {
-        // Track 4 requests explicitly
+        if (loadingOverlay != null) loadingOverlay.setVisibility(View.VISIBLE);
         final int[] completedRequests = {0};
         final int TOTAL_REQUESTS = 4;
 
@@ -281,10 +290,9 @@ public class VolunteerRegisterFragment extends Fragment {
         };
 
         CategoryManager cm = new CategoryManager();
-        
         cm.fetchAllCategories(
                 new CategoryManager.CategoryCallback<Ods>() {
-                    @Override public void onSuccess(List<Ods> data) { masterOdsList.clear(); masterOdsList.addAll(data); checkDone.run(); }
+                    @Override public void onSuccess(List<Ods> data) { checkDone.run(); }
                     @Override public void onError(String e) { checkDone.run(); }
                 },
                 new CategoryManager.CategoryCallback<Skill>() {
@@ -303,21 +311,20 @@ public class VolunteerRegisterFragment extends Fragment {
     }
 
     private void loadStaticListData() {
-        GlobalData gd = GlobalData.getInstance();
-        fillDropdown(actvCycle, gd.CYCLE_LIST);
-        fillDropdown(actvExperience, gd.EXPERIENCE_LIST);
-        fillDropdown(actvCar, gd.CAR_LIST);
-        fillDropdown(actvZona, gd.ZONES_LIST);
-        fillDropdown(actvLanguages, gd.LANGUAGE_LIST);
-        fillDropdown(actvDays, gd.DAYS_LIST);
-        fillDropdown(actvTimeSlots, gd.TIME_SLOTS_LIST);
+        fillDropdown(actvCycle, CYCLE_LIST);
+        fillDropdown(actvExperience, EXPERIENCE_LIST);
+        fillDropdown(actvCar, CAR_LIST);
+        fillDropdown(actvZona, ZONES_LIST);
+        fillDropdown(actvLanguages, LANGUAGE_LIST);
+        fillDropdown(actvDays, DAYS_LIST);
+        fillDropdown(actvTimeSlots, TIME_SLOTS_LIST);
     }
 
     private void performFirebaseRegistration() {
         toggleLoading(true);
         mAuth.createUserWithEmailAndPassword(getText(etEmail), getText(etPassword)).addOnCompleteListener(task -> {
             if (task.isSuccessful() && mAuth.getCurrentUser() != null) syncWithBackend(mAuth.getCurrentUser());
-            else { toggleLoading(false); StatusHelper.showStatus(getContext(), "Error", "Fallo en Firebase", true); }
+            else { toggleLoading(false); StatusHelper.showStatus(getContext(), "Error", "No se pudo crear la cuenta en Firebase.", true); }
         });
     }
 
@@ -333,32 +340,19 @@ public class VolunteerRegisterFragment extends Fragment {
             public void onResponse(@NonNull Call<Void> c, @NonNull Response<Void> r) {
                 if (r.isSuccessful()) {
                     saveRoleToFirestore(fbUser.getUid(), fbUser.getEmail());
-                    StatusHelper.showStatus(getContext(), "Éxito", "Usuario registrado. Revisa tu correo.", false);
+                    StatusHelper.showStatus(getContext(), "Éxito", "Usuario registrado correctamente.", false);
                     fbUser.sendEmailVerification();
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragmentContainer, new LoginFragment())
-                            .commit();
+                    getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new LoginFragment()).commit();
                 } else {
-                    // Si falla el backend, borramos el usuario de Firebase y avisamos
                     fbUser.delete();
-                    String errorMsg = "Error en servidor: " + r.code();
-                    try {
-                        if (r.errorBody() != null) {
-                            errorMsg += "\n" + r.errorBody().string();
-                        }
-                    } catch (Exception e) { e.printStackTrace(); }
-                    
-                    StatusHelper.showStatus(getContext(), "Error de Registro", errorMsg, true);
+                    StatusHelper.showStatus(getContext(), "Error servidor", "Código: " + r.code(), true);
                 }
                 toggleLoading(false);
             }
-
             @Override
             public void onFailure(@NonNull Call<Void> c, @NonNull Throwable t) {
-                // Fallo de red
                 fbUser.delete();
-                StatusHelper.showStatus(getContext(), "Error de Conexión", 
-                    "No se pudo contactar con el servidor.\n" + t.getMessage(), true);
+                StatusHelper.showStatus(getContext(), "Error conexión", t.getMessage(), true);
                 toggleLoading(false);
             }
         });
@@ -371,88 +365,31 @@ public class VolunteerRegisterFragment extends Fragment {
     }
 
     private void fillDropdown(AutoCompleteTextView actv, String[] data) { actv.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, data)); }
-    /**
-     * Valida los campos obligatorios y muestra errores específicos en la UI [cite: 2026-01-16].
-     * Requeridos: nombreCompleto, dni, correo, password, zona, ciclo, fechaNacimiento.
-     */
+
     private boolean validateForm() {
         boolean isValid = true;
-
-        // 1. Limpiar errores previos [cite: 2026-01-16]
-        tilName.setError(null);
-        tilDni.setError(null);
-        tilEmail.setError(null);
-        tilPassword.setError(null);
-        tilBirthDate.setError(null);
-        // Para los dropdowns, asegúrate de tener sus TextInputLayouts identificados
-        TextInputLayout tilZona = getView().findViewById(R.id.tilZone);
-        TextInputLayout tilCycle = getView().findViewById(R.id.tilCycle);
-        if (tilZona != null) tilZona.setError(null);
+        tilName.setError(null); tilDni.setError(null); tilEmail.setError(null);
+        tilPassword.setError(null); tilBirthDate.setError(null);
         if (tilCycle != null) tilCycle.setError(null);
+        if (tilZona != null) tilZona.setError(null);
 
-        // 2. Validar Nombre [cite: 2026-01-16]
-        if (getText(etName).isEmpty()) {
-            tilName.setError("El nombre completo es obligatorio");
-            isValid = false;
-        }
+        if (getText(etName).isEmpty()) { tilName.setError("Campo obligatorio"); isValid = false; }
+        if (getText(etDni).isEmpty()) { tilDni.setError("Campo obligatorio"); isValid = false; }
 
-        // 3. Validar DNI [cite: 2026-01-16]
-        if (getText(etDni).isEmpty()) {
-            tilDni.setError("El DNI/NIE es obligatorio");
-            isValid = false;
-        }
-
-        // 4. Validar Correo [cite: 2026-01-16]
         String email = getText(etEmail);
-        if (email.isEmpty()) {
-            tilEmail.setError("El correo es obligatorio");
-            isValid = false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Formato de correo inválido");
-            isValid = false;
-        }
+        if (email.isEmpty()) { tilEmail.setError("Campo obligatorio"); isValid = false; }
+        else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) { tilEmail.setError("Email inválido"); isValid = false; }
 
-        // 5. Validar Password [cite: 2026-01-16]
-        if (getText(etPassword).length() < 6) {
-            tilPassword.setError("La contraseña debe tener al menos 6 caracteres");
-            isValid = false;
-        }
+        if (getText(etPassword).length() < 6) { tilPassword.setError("Mínimo 6 caracteres"); isValid = false; }
+        if (getText(etBirthDate).isEmpty()) { tilBirthDate.setError("Campo obligatorio"); isValid = false; }
 
-        // 6. Validar Zona y Ciclo (Dropdowns) [cite: 2026-01-16]
-        if (actvZona.getText().toString().isEmpty()) {
-            if (tilZona != null) tilZona.setError("Selecciona una zona");
-            isValid = false;
-        }
-        if (actvCycle.getText().toString().isEmpty()) {
-            if (tilCycle != null) tilCycle.setError("Selecciona tu ciclo formativo");
-            isValid = false;
-        }
+        if (actvZona.getText().toString().isEmpty()) { if (tilZona != null) tilZona.setError("Selecciona una zona"); isValid = false; }
+        if (actvCycle.getText().toString().isEmpty()) { if (tilCycle != null) tilCycle.setError("Selecciona tu ciclo"); isValid = false; }
 
-        // 7. Validar Fecha de Nacimiento [cite: 2026-01-16]
-        if (getText(etBirthDate).isEmpty()) {
-            tilBirthDate.setError("La fecha de nacimiento es obligatoria");
-            isValid = false;
-        }
-
-        // IMPROVED CICLO VALIDATION
-        if (actvCycle.getText().toString().isEmpty()) {
-            if (tilCycle != null) {
-                tilCycle.setErrorEnabled(true);
-                tilCycle.setError("Selecciona tu ciclo formativo");
-            }
-            isValid = false;
-        } else {
-             if (tilCycle != null) tilCycle.setError(null);
-        }
-
-        // Feedback general si algo falló [cite: 2026-01-16]
-        if (!isValid) {
-            StatusHelper.showStatus(getContext(), "Formulario incompleto",
-                    "Por favor, corrige los campos marcados en rojo.", true);
-        }
-
+        if (!isValid) StatusHelper.showStatus(getContext(), "Formulario incompleto", "Corrige los campos marcados en rojo.", true);
         return isValid;
     }
+
     private String getText(TextInputEditText et) { return Objects.requireNonNull(et.getText()).toString().trim(); }
     private void toggleLoading(boolean load) { btnRegister.setEnabled(!load); btnRegister.setText(load ? "Cargando..." : "FINALIZAR REGISTRO"); }
     private void setupToolbar(View v) {

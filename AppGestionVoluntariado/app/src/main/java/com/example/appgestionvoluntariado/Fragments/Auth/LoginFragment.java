@@ -106,13 +106,14 @@ public class LoginFragment extends Fragment {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            if (user.isEmailVerified()) {
+                            // TODO: Revertir esto cuando termines de probar
+                            // if (user.isEmailVerified()) {
                                 fetchUserProfile();
-                            } else {
+                            /* } else {
                                 StatusHelper.showStatus(getContext(), "Verificación pendiente", "Debes verificar tu correo antes de entrar", true);
                                 mAuth.signOut();
                                 toggleLoading(false);
-                            }
+                            } */
                         }
                     } else {
                         StatusHelper.showStatus(getContext(), "Error de acceso", "Credenciales incorrectas o fallo de red", true);

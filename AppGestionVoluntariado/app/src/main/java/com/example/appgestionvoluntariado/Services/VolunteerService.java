@@ -23,8 +23,8 @@ public interface VolunteerService {
             @Body StatusRequest request
     );
 
-    @GET("volunteer/profile")
-    Call<Volunteer> getProfile();
+    @PUT("auth/profile")
+    Call<Void> editProfile(@Body Volunteer volunteer);
 
     @PUT("volunteer/profile")
     Call<Void> updateProfile(@Body Volunteer volunteer);

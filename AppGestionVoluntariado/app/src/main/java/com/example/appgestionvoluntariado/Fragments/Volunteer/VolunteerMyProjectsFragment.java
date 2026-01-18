@@ -37,6 +37,8 @@ public class VolunteerMyProjectsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ProjectAdapter projectAdapter;
+    private com.google.android.material.button.MaterialButton btnTabAccepted, btnTabPending;
+    private String currentStatusFilter = "pendiente"; // Default filter
 
     // Listas para el filtrado
     private List<Project> allEnrolledProjects = new ArrayList<>();
@@ -60,7 +62,8 @@ public class VolunteerMyProjectsFragment extends Fragment {
 
         initViews(view);
         setupSearch();
-        loadEnrolledProjects();
+        setupFilterTabs();
+        loadEnrolledProjects(currentStatusFilter);
 
         return view;
     }
@@ -72,17 +75,61 @@ public class VolunteerMyProjectsFragment extends Fragment {
         loadingLayout = view.findViewById(R.id.layoutLoading);
         loadingText = view.findViewById(R.id.tvLoadingText);
         etSearch = view.findViewById(R.id.etSearchProject);
+        btnTabAccepted = view.findViewById(R.id.btnTabAccepted);
+        btnTabPending = view.findViewById(R.id.btnTabPending);
 
         // APIClient ya debe incluir el AuthInterceptor para el Token
         projectsService = APIClient.getProjectsService();
         animationHandler = new Handler(Looper.getMainLooper());
     }
 
-    private void loadEnrolledProjects() {
+    private void setupFilterTabs() {
+        btnTabAccepted.setOnClickListener(v -> switchTab("aceptado"));
+        btnTabPending.setOnClickListener(v -> switchTab("pendiente"));
+    }
+
+    private void switchTab(String status) {
+        if (currentStatusFilter.equals(status)) return;
+        currentStatusFilter = status;
+        updateTabStyles();
+        loadEnrolledProjects(currentStatusFilter);
+    }
+
+    private void updateTabStyles() {
+        boolean isAccepted = currentStatusFilter.equals("aceptado");
+        int blue = android.graphics.Color.parseColor("#1A3B85");
+        int white = android.graphics.Color.WHITE;
+
+        // Configure "Accepted" Button
+        if (isAccepted) {
+            btnTabAccepted.setBackgroundTintList(android.content.res.ColorStateList.valueOf(blue));
+            btnTabAccepted.setTextColor(white);
+            btnTabAccepted.setStrokeWidth(0);
+        } else {
+            btnTabAccepted.setBackgroundTintList(android.content.res.ColorStateList.valueOf(white));
+            btnTabAccepted.setTextColor(blue);
+            btnTabAccepted.setStrokeColor(android.content.res.ColorStateList.valueOf(blue));
+            btnTabAccepted.setStrokeWidth(4); // 2dp approx
+        }
+
+        // Configure "Pending" Button
+        if (!isAccepted) {
+            btnTabPending.setBackgroundTintList(android.content.res.ColorStateList.valueOf(blue));
+            btnTabPending.setTextColor(white);
+            btnTabPending.setStrokeWidth(0);
+        } else {
+            btnTabPending.setBackgroundTintList(android.content.res.ColorStateList.valueOf(white));
+            btnTabPending.setTextColor(blue);
+            btnTabPending.setStrokeColor(android.content.res.ColorStateList.valueOf(blue));
+            btnTabPending.setStrokeWidth(4); // 2dp approx
+        }
+    }
+
+    private void loadEnrolledProjects(String newStatus) {
         startLoadingAnimation("Cargando tus voluntariados");
 
         // IMPORTANTE: Ya no pasamos el DNI. El backend lo obtiene del Token Firebase
-        projectsService.getEnrolledProjects().enqueue(new Callback<List<Project>>() {
+        projectsService.getEnrolledProjects(newStatus).enqueue(new Callback<List<Project>>() {
             @Override
             public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
                 stopLoadingAnimation();
@@ -125,6 +172,10 @@ public class VolunteerMyProjectsFragment extends Fragment {
 
             }
         },ViewMode.VOLUNTEER_MY_PROJECTS);
+
+        // Mostrar etiqueta de estado SOLO si estamos en la pestaña TAB_ACCEPTED
+        projectAdapter.setShowStatusLabel(currentStatusFilter.equals("aceptado"));
+
         recyclerView.setAdapter(projectAdapter);
     }
 
@@ -132,6 +183,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
         startLoadingAnimation("Anulando inscripción");
 
         // Tampoco pasamos el DNI aquí; la seguridad la da el Token
+        // FIXED: Usamos getActivityId() porque el endpoint ahora es actividades/{id}/desinscribir [cite: 2026-01-18]
         projectsService.unenroll(item.getActivityId()).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -142,7 +194,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
                     // Actualizamos ambas listas
                     allEnrolledProjects.remove(item);
                     displayedProjects.remove(item);
-                    projectAdapter.notifyDataSetChanged();
+                    projectAdapter.notifyAdapter(displayedProjects);
                 } else {
                     Toast.makeText(getContext(), "No se pudo anular", Toast.LENGTH_SHORT).show();
                 }

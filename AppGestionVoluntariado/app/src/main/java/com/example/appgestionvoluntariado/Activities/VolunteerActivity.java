@@ -5,8 +5,10 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.Fragments.Admin.AdminProfileHubFragment;
 import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerExploreFragment;
 import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerMyProjectsFragment;
+import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerProfileHubFragment;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -23,9 +25,14 @@ public class VolunteerActivity extends AppCompatActivity {
         MaterialToolbar toolbar = findViewById(R.id.topAppBar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
-        // Logout en el menú superior
+
+
         toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_logout) {
+            int id = item.getItemId();
+            if (id == R.id.action_user) {
+                replaceFragment(new VolunteerProfileHubFragment());
+                return true;
+            } else if (id == R.id.action_logout) {
                 performLogout();
                 return true;
             }
@@ -62,5 +69,11 @@ public class VolunteerActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
     }
 }
