@@ -1,8 +1,11 @@
 package com.example.appgestionvoluntariado.Fragments.Auth;
 
+import android.app.DatePickerDialog;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +27,7 @@ import com.example.appgestionvoluntariado.Utils.CategoryManager;
 import com.example.appgestionvoluntariado.Utils.GlobalData;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
@@ -31,6 +37,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,20 +49,22 @@ import retrofit2.Response;
 
 public class VolunteerRegisterFragment extends Fragment {
 
-    // UI Components
-    private Button btnRegister, btnAddAvailability, btnAddLanguage;
+    private Button btnRegister, btnAddAvailability, btnAddLanguage, btnSelectOds, btnSelectSkills, btnSelectInterests;
     private TextInputEditText etName, etEmail, etDni, etPassword, etBirthDate;
-    private TextInputLayout tilName, tilEmail, tilDni, tilPassword, tilFechaNac;
+    private TextInputLayout tilName, tilEmail, tilDni, tilPassword,tilBirthDate;
     private AutoCompleteTextView actvLanguages, actvExperience, actvCar, actvCycle, actvZona, actvDays, actvTimeSlots;
-    private ChipGroup chipGroupSkills, chipGroupInterests, chipGroupOds, chipGroupSummary;
+    private ChipGroup cgSelectedOds, cgSelectedSkills, cgSelectedInterests, cgSummary;
+    private View loadingOverlay;
 
-    // Firebase & Data Lists
+    private final List<Ods> masterOdsList = new ArrayList<>();
+    private final List<Skill> masterSkillsList = new ArrayList<>();
+    private final List<Interest> masterInterestsList = new ArrayList<>();
+
+    private final List<String> selectedOds = new ArrayList<>(), selectedSkills = new ArrayList<>(),
+            selectedInterests = new ArrayList<>(), selectedAvailability = new ArrayList<>(),
+            selectedLanguages = new ArrayList<>();
+
     private FirebaseAuth mAuth;
-    private final List<String> selectedSkills = new ArrayList<>();
-    private final List<String> selectedInterests = new ArrayList<>();
-    private final List<String> selectedAvailability = new ArrayList<>();
-    private final List<String> selectedOds = new ArrayList<>();
-    private final List<String> selectedLanguages = new ArrayList<>();
 
     @Nullable
     @Override
@@ -64,265 +73,390 @@ public class VolunteerRegisterFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         initViews(view);
-        setupToolbar();
-        loadDynamicCategories();
+        setupToolbar(view);
         loadStaticListData();
+        loadDynamicCategories();
         setupListeners();
 
         return view;
     }
 
-    private void initViews(View view) {
-        // Buttons
-        btnRegister = view.findViewById(R.id.btnRegistrar);
-        btnAddAvailability = view.findViewById(R.id.btnAddAvailability);
-        btnAddLanguage = view.findViewById(R.id.btnAddLanguage);
+    private void initViews(View v) {
+        btnRegister = v.findViewById(R.id.btnRegister);
+        btnAddAvailability = v.findViewById(R.id.btnAddAvailability);
+        btnAddLanguage = v.findViewById(R.id.btnAddLanguage);
+        btnSelectOds = v.findViewById(R.id.btnSelectOds);
+        btnSelectSkills = v.findViewById(R.id.btnSelectSkills);
+        btnSelectInterests = v.findViewById(R.id.btnSelectInterests);
 
-        // EditTexts
-        etName = view.findViewById(R.id.etNombre);
-        etEmail = view.findViewById(R.id.etCorreo);
-        etDni = view.findViewById(R.id.etDni);
-        etPassword = view.findViewById(R.id.etPassword);
-        etBirthDate = view.findViewById(R.id.etFechaNac);
+        cgSelectedOds = v.findViewById(R.id.cgSelectedOds);
+        cgSelectedSkills = v.findViewById(R.id.cgSelectedSkills);
+        cgSelectedInterests = v.findViewById(R.id.cgSelectedInterests);
+        cgSummary = v.findViewById(R.id.cgSummary);
 
-        // Layouts for Errors
-        tilName = view.findViewById(R.id.tilNombre);
-        tilEmail = view.findViewById(R.id.tilCorreo);
-        tilDni = view.findViewById(R.id.tilDni);
-        tilPassword = view.findViewById(R.id.tilPassword);
-        tilFechaNac = view.findViewById(R.id.tilFechaNac);
+        etName = v.findViewById(R.id.etName);
+        etEmail = v.findViewById(R.id.etEmail);
+        etDni = v.findViewById(R.id.etDni);
+        etPassword = v.findViewById(R.id.etPassword);
+        etBirthDate = v.findViewById(R.id.etBirthDate);
+        tilName = v.findViewById(R.id.tilName);
+        tilEmail = v.findViewById(R.id.tilEmail);
+        tilDni = v.findViewById(R.id.tilDni);
+        tilPassword = v.findViewById(R.id.tilPassword);
+        tilBirthDate = v.findViewById(R.id.tilBirthDate);
 
-        // Dropdowns
-        actvLanguages = view.findViewById(R.id.actvIdiomas);
-        actvExperience = view.findViewById(R.id.actvExperiencia);
-        actvCar = view.findViewById(R.id.actvCoche);
-        actvCycle = view.findViewById(R.id.actvCiclo);
-        actvZona = view.findViewById(R.id.actvZona);
-        actvDays = view.findViewById(R.id.actvDays);
-        actvTimeSlots = view.findViewById(R.id.actvTimeSlots);
-
-        // ChipGroups
-        chipGroupSkills = view.findViewById(R.id.chipGroupHabilidades);
-        chipGroupInterests = view.findViewById(R.id.chipGroupIntereses);
-        chipGroupOds = view.findViewById(R.id.chipGroupOds);
-        chipGroupSummary = view.findViewById(R.id.chipGroupResumen);
+        actvLanguages = v.findViewById(R.id.actvIdiomas);
+        actvCycle = v.findViewById(R.id.actvCycle);
+        actvExperience = v.findViewById(R.id.actvExperiencia);
+        actvCar = v.findViewById(R.id.actvCoche);
+        actvZona = v.findViewById(R.id.actvZona);
+        actvDays = v.findViewById(R.id.actvDays);
+        actvTimeSlots = v.findViewById(R.id.actvTimeSlots);
+        loadingOverlay = v.findViewById(R.id.loadingOverlay);
     }
 
     private void setupListeners() {
-        // Add Language Logic
+
+        etBirthDate.setOnClickListener(v -> showDatePickerDialog());
+
+        
+        btnSelectOds.setOnClickListener(v -> openMultiSelectSheet("Seleccionar ODS", masterOdsList, selectedOds, cgSelectedOds));
+        btnSelectSkills.setOnClickListener(v -> openMultiSelectSheet("Seleccionar Habilidades", masterSkillsList, selectedSkills, cgSelectedSkills));
+        btnSelectInterests.setOnClickListener(v -> openMultiSelectSheet("Seleccionar Intereses", masterInterestsList, selectedInterests, cgSelectedInterests));
+
         btnAddLanguage.setOnClickListener(v -> {
-            String language = actvLanguages.getText().toString();
-            if (!language.isEmpty() && !selectedLanguages.contains(language)) {
-                selectedLanguages.add(language);
-                addSummaryChip(language, "LANGUAGE", selectedLanguages, null);
+            String lang = actvLanguages.getText().toString();
+            if (!lang.isEmpty() && !selectedLanguages.contains(lang)) {
+                selectedLanguages.add(lang);
+                updateGlobalSummary();
                 actvLanguages.setText("");
             }
         });
 
-        // Add Availability Logic
         btnAddAvailability.setOnClickListener(v -> {
-            String day = actvDays.getText().toString();
-            String slot = actvTimeSlots.getText().toString();
-
-            if (!day.isEmpty() && !slot.isEmpty()) {
-                String combined = day + " (" + slot + ")";
-                if (!selectedAvailability.contains(combined)) {
-                    selectedAvailability.add(combined);
-                    addSummaryChip(combined, "AVAILABILITY", selectedAvailability, null);
-                    actvDays.setText("");
-                    actvTimeSlots.setText("");
-                } else {
-                    StatusHelper.showStatus(getContext(), "Atención", "Esta disponibilidad ya ha sido añadida", true);
-                }
-            } else {
-                StatusHelper.showStatus(getContext(), "Faltan datos", "Selecciona día y franja horaria", true);
+            String combo = actvDays.getText().toString() + " (" + actvTimeSlots.getText().toString() + ")";
+            if (!combo.equals(" ()") && !selectedAvailability.contains(combo)) {
+                selectedAvailability.add(combo);
+                updateGlobalSummary();
+                actvDays.setText(""); actvTimeSlots.setText("");
             }
         });
 
-        btnRegister.setOnClickListener(v -> {
-            if (validateForm()) {
-                performFirebaseRegistration();
-            }
-        });
+        btnRegister.setOnClickListener(v -> { if (validateForm()) performFirebaseRegistration(); });
     }
 
-    private void loadDynamicCategories() {
-        CategoryManager manager = new CategoryManager();
-        manager.fetchAllCategories(
-                new CategoryManager.CategoryCallback<Ods>() {
-                    @Override public void onSuccess(List<Ods> data) { fillDynamicChips(chipGroupOds, data, selectedOds, "ODS"); }
-                    @Override public void onError(String error) { StatusHelper.showStatus(getContext(), "Error", "Fallo al cargar ODS", true); }
-                },
-                new CategoryManager.CategoryCallback<Skill>() {
-                    @Override public void onSuccess(List<Skill> data) { fillDynamicChips(chipGroupSkills, data, selectedSkills, "SKILL"); }
-                    @Override public void onError(String error) { }
-                },
-                new CategoryManager.CategoryCallback<Interest>() {
-                    @Override public void onSuccess(List<Interest> data) { fillDynamicChips(chipGroupInterests, data, selectedInterests, "INTEREST"); }
-                    @Override public void onError(String error) { }
-                },
-                new CategoryManager.CategoryCallback<Need>() {
-                    @Override public void onSuccess(List<Need> data) { }
-                    @Override public void onError(String error) { }
+    private void showDatePickerDialog() {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
+                (view, year1, monthOfYear, dayOfMonth) -> {
+                    // Formateamos a YYYY-MM-DD para la API [cite: 2026-01-16]
+                    String monthStr = (monthOfYear + 1) < 10 ? "0" + (monthOfYear + 1) : String.valueOf(monthOfYear + 1);
+                    String dayStr = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
+                    String selectedDate = year1 + "-" + monthStr + "-" + dayStr;
+
+                    etBirthDate.setText(selectedDate);
+                }, year, month, day);
+
+        // Limitamos la fecha máxima a hoy (no puedes nacer en el futuro) [cite: 2026-01-17]
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        datePickerDialog.show();
+    }
+
+    private <T> void openMultiSelectSheet(String title, List<T> data, List<String> selection, ChipGroup targetGroup) {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View sheet = getLayoutInflater().inflate(R.layout.layout_selector_sheet, null);
+
+        TextView tvTitle = sheet.findViewById(R.id.tvSheetTitle);
+        EditText etSearch = sheet.findViewById(R.id.etSearchSheet);
+        ChipGroup cgItems = sheet.findViewById(R.id.cgAllItems);
+        Button btnConfirm = sheet.findViewById(R.id.btnConfirmSelection);
+
+        tvTitle.setText(title);
+        populateSheetChips(cgItems, data, selection);
+
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                for (int i = 0; i < cgItems.getChildCount(); i++) {
+                    Chip c = (Chip) cgItems.getChildAt(i);
+                    c.setVisibility(c.getText().toString().toLowerCase().contains(s.toString().toLowerCase()) ? View.VISIBLE : View.GONE);
                 }
-        );
+            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        btnConfirm.setOnClickListener(v -> {
+            selection.clear();
+            targetGroup.removeAllViews();
+            for (int i = 0; i < cgItems.getChildCount(); i++) {
+                Chip c = (Chip) cgItems.getChildAt(i);
+                if (c.isChecked()) {
+                    selection.add(c.getText().toString());
+                    addVisibleChipToGroup(targetGroup, c.getText().toString(), selection);
+                }
+            }
+            updateGlobalSummary();
+            dialog.dismiss();
+        });
+        dialog.setContentView(sheet);
+        dialog.show();
     }
 
-    private <T> void fillDynamicChips(ChipGroup group, List<T> dataList, List<String> selectionList, String type) {
-        if (dataList == null) return;
-        for (T item : dataList) {
-            String name = "";
-            if (item instanceof Ods) name = ((Ods) item).getName();
-            else if (item instanceof Skill) name = ((Skill) item).getName();
-            else if (item instanceof Interest) name = ((Interest) item).getName();
-
-            final String finalName = name;
+    private <T> void populateSheetChips(ChipGroup group, List<T> data, List<String> selection) {
+        for (T item : data) {
+            String name = (item instanceof Ods) ? ((Ods) item).getName() :
+                    (item instanceof Skill) ? ((Skill) item).getName() : ((Interest) item).getName();
             Chip chip = new Chip(requireContext());
-            chip.setText(finalName);
+            chip.setText(name);
             chip.setCheckable(true);
-            chip.setOnCheckedChangeListener((v, isChecked) -> {
-                if (isChecked) {
-                    selectionList.add(finalName);
-                    group.removeView(chip);
-                    addSummaryChip(finalName, type, selectionList, group);
-                }
-            });
+            chip.setChecked(selection.contains(name));
+            applySelectionStyle(chip, chip.isChecked());
+            chip.setOnCheckedChangeListener((bv, isChecked) -> applySelectionStyle((Chip)bv, isChecked));
             group.addView(chip);
         }
     }
 
-    private void addSummaryChip(String text, String type, List<String> list, @Nullable ChipGroup originGroup) {
+    private void applySelectionStyle(Chip chip, boolean isSelected) {
+        if (isSelected) {
+            chip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#1A3B85")));
+            chip.setChipStrokeWidth(4f);
+            chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue_light);
+            chip.setTextColor(Color.parseColor("#1A3B85"));
+        } else {
+            chip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#E0E0E0")));
+            chip.setChipStrokeWidth(2f);
+            chip.setChipBackgroundColorResource(android.R.color.white);
+            chip.setTextColor(Color.parseColor("#757575"));
+        }
+    }
+
+    private void addVisibleChipToGroup(ChipGroup group, String text, List<String> list) {
         Chip chip = new Chip(requireContext());
         chip.setText(text);
         chip.setCloseIconVisible(true);
-        chip.setTextColor(Color.WHITE);
-        chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue);
+        chip.setCloseIconTint(ColorStateList.valueOf(Color.parseColor("#1A3B85")));
+        chip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#F0F4FF")));
+        chip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#1A3B85")));
+        chip.setChipStrokeWidth(2f);
+        chip.setTextColor(Color.parseColor("#1A3B85"));
 
         chip.setOnCloseIconClickListener(v -> {
-            chipGroupSummary.removeView(chip);
+            group.removeView(chip);
             list.remove(text);
-            if (originGroup != null) {
-                restoreChipToGroup(originGroup, text, list, type);
-            }
-        });
-        chipGroupSummary.addView(chip);
-    }
-
-    private void restoreChipToGroup(ChipGroup group, String text, List<String> list, String type) {
-        Chip chip = new Chip(requireContext());
-        chip.setText(text);
-        chip.setCheckable(true);
-        chip.setOnCheckedChangeListener((v, isChecked) -> {
-            if (isChecked) {
-                list.add(text);
-                group.removeView(chip);
-                addSummaryChip(text, type, list, group);
-            }
+            updateGlobalSummary();
         });
         group.addView(chip);
     }
 
+    private void updateGlobalSummary() {
+        cgSummary.removeAllViews();
+        List<String> combined = new ArrayList<>();
+        combined.addAll(selectedOds); combined.addAll(selectedSkills); combined.addAll(selectedInterests);
+        combined.addAll(selectedLanguages); combined.addAll(selectedAvailability);
+
+        for (String s : combined) {
+            Chip c = new Chip(requireContext());
+            c.setText(s);
+            c.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#EEEEEE")));
+            c.setChipStrokeWidth(0f);
+            c.setTextColor(Color.parseColor("#616161"));
+            cgSummary.addView(c);
+        }
+    }
+
+    private void loadDynamicCategories() {
+        // Track 4 requests explicitly
+        final int[] completedRequests = {0};
+        final int TOTAL_REQUESTS = 4;
+
+        Runnable checkDone = () -> {
+            completedRequests[0]++;
+            if (completedRequests[0] >= TOTAL_REQUESTS) {
+                if (loadingOverlay != null) loadingOverlay.setVisibility(View.GONE);
+            }
+        };
+
+        CategoryManager cm = new CategoryManager();
+        
+        cm.fetchAllCategories(
+                new CategoryManager.CategoryCallback<Ods>() {
+                    @Override public void onSuccess(List<Ods> data) { masterOdsList.clear(); masterOdsList.addAll(data); checkDone.run(); }
+                    @Override public void onError(String e) { checkDone.run(); }
+                },
+                new CategoryManager.CategoryCallback<Skill>() {
+                    @Override public void onSuccess(List<Skill> data) { masterSkillsList.clear(); masterSkillsList.addAll(data); checkDone.run(); }
+                    @Override public void onError(String e) { checkDone.run(); }
+                },
+                new CategoryManager.CategoryCallback<Interest>() {
+                    @Override public void onSuccess(List<Interest> data) { masterInterestsList.clear(); masterInterestsList.addAll(data); checkDone.run(); }
+                    @Override public void onError(String e) { checkDone.run(); }
+                },
+                new CategoryManager.CategoryCallback<Need>() {
+                    @Override public void onSuccess(List<Need> data) { checkDone.run(); }
+                    @Override public void onError(String e) { checkDone.run(); }
+                }
+        );
+    }
+
     private void loadStaticListData() {
         GlobalData gd = GlobalData.getInstance();
+        fillDropdown(actvCycle, gd.CYCLE_LIST);
         fillDropdown(actvExperience, gd.EXPERIENCE_LIST);
         fillDropdown(actvCar, gd.CAR_LIST);
-        fillDropdown(actvCycle, gd.CYCLE_LIST);
+        fillDropdown(actvZona, gd.ZONES_LIST);
         fillDropdown(actvLanguages, gd.LANGUAGE_LIST);
-        fillDropdown(actvZona, gd.ZONES_LIST); // Ensure this exists in GlobalData
         fillDropdown(actvDays, gd.DAYS_LIST);
         fillDropdown(actvTimeSlots, gd.TIME_SLOTS_LIST);
     }
 
-    private void fillDropdown(AutoCompleteTextView actv, String[] data) {
-        actv.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, data));
-    }
-
-    private boolean validateForm() {
-        boolean isValid = true;
-        if (TextUtils.isEmpty(getText(etName))) { tilName.setError("Nombre obligatorio"); isValid = false; } else tilName.setError(null);
-        if (TextUtils.isEmpty(getText(etDni))) { tilDni.setError("DNI/NIE obligatorio"); isValid = false; } else tilDni.setError(null);
-
-        String email = getText(etEmail);
-        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Correo electrónico inválido"); isValid = false;
-        } else tilEmail.setError(null);
-
-        if (getText(etPassword).length() < 6) {
-            tilPassword.setError("Mínimo 6 caracteres"); isValid = false;
-        } else tilPassword.setError(null);
-
-        if (selectedSkills.isEmpty() || selectedOds.isEmpty()) {
-            StatusHelper.showStatus(getContext(), "Faltan categorías", "Selecciona al menos una habilidad y un ODS", true);
-            isValid = false;
-        }
-        return isValid;
-    }
-
     private void performFirebaseRegistration() {
         toggleLoading(true);
-        mAuth.createUserWithEmailAndPassword(getText(etEmail), getText(etPassword))
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && mAuth.getCurrentUser() != null) {
-                        syncWithBackendSQL(mAuth.getCurrentUser());
-                    } else {
-                        toggleLoading(false);
-                        String error = task.getException() != null ? task.getException().getMessage() : "Error de autenticación";
-                        StatusHelper.showStatus(getContext(), "Error de Registro", error, true);
-                    }
-                });
+        mAuth.createUserWithEmailAndPassword(getText(etEmail), getText(etPassword)).addOnCompleteListener(task -> {
+            if (task.isSuccessful() && mAuth.getCurrentUser() != null) syncWithBackend(mAuth.getCurrentUser());
+            else { toggleLoading(false); StatusHelper.showStatus(getContext(), "Error", "Fallo en Firebase", true); }
+        });
     }
 
-    private void syncWithBackendSQL(FirebaseUser firebaseUser) {
-        VolunteerRegisterRequest request = new VolunteerRegisterRequest(
-                getText(etName), getText(etDni), firebaseUser.getEmail(), getText(etPassword),
-                actvZona.getText().toString(), actvCycle.getText().toString(), formatDate(getText(etBirthDate)),
+    private void syncWithBackend(FirebaseUser fbUser) {
+        VolunteerRegisterRequest req = new VolunteerRegisterRequest(
+                getText(etName), getText(etDni), fbUser.getEmail(), getText(etPassword),
+                actvZona.getText().toString(), actvCycle.getText().toString(), etBirthDate.getText().toString(),
                 actvExperience.getText().toString(), actvCar.getText().toString(), selectedLanguages,
                 selectedSkills, selectedInterests, selectedAvailability, "Pendiente"
         );
-
-        APIClient.getAuthAPIService().registerVolunteer(request).enqueue(new Callback<Void>() {
+        APIClient.getAuthAPIService().registerVolunteer(req).enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    saveUserRoleInFirestore(firebaseUser.getUid(), firebaseUser.getEmail());
-                    StatusHelper.showStatus(getContext(), "¡Bienvenido!", "Registro completado con éxito.", false);
-                    firebaseUser.sendEmailVerification();
-                    getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new LoginFragment()).commit();
+            public void onResponse(@NonNull Call<Void> c, @NonNull Response<Void> r) {
+                if (r.isSuccessful()) {
+                    saveRoleToFirestore(fbUser.getUid(), fbUser.getEmail());
+                    StatusHelper.showStatus(getContext(), "Éxito", "Usuario registrado. Revisa tu correo.", false);
+                    fbUser.sendEmailVerification();
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainer, new LoginFragment())
+                            .commit();
                 } else {
-                    cleanUpFailedUser(firebaseUser, "Error del servidor (" + response.code() + ")");
+                    // Si falla el backend, borramos el usuario de Firebase y avisamos
+                    fbUser.delete();
+                    String errorMsg = "Error en servidor: " + r.code();
+                    try {
+                        if (r.errorBody() != null) {
+                            errorMsg += "\n" + r.errorBody().string();
+                        }
+                    } catch (Exception e) { e.printStackTrace(); }
+                    
+                    StatusHelper.showStatus(getContext(), "Error de Registro", errorMsg, true);
                 }
+                toggleLoading(false);
             }
 
             @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                cleanUpFailedUser(firebaseUser, "Sin conexión con el servidor");
+            public void onFailure(@NonNull Call<Void> c, @NonNull Throwable t) {
+                // Fallo de red
+                fbUser.delete();
+                StatusHelper.showStatus(getContext(), "Error de Conexión", 
+                    "No se pudo contactar con el servidor.\n" + t.getMessage(), true);
+                toggleLoading(false);
             }
         });
     }
 
-    private void saveUserRoleInFirestore(String uid, String email) {
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("email", email);
-        userData.put("role", "volunteer");
-        FirebaseFirestore.getInstance().collection("users").document(uid).set(userData);
+    private void saveRoleToFirestore(String uid, String email) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("email", email); data.put("rol", "voluntario");
+        FirebaseFirestore.getInstance().collection("usuarios").document(uid).set(data);
     }
 
-    private void cleanUpFailedUser(FirebaseUser user, String msg) {
-        user.delete();
-        toggleLoading(false);
-        StatusHelper.showStatus(getContext(), "Registro Fallido", msg, true);
-    }
+    private void fillDropdown(AutoCompleteTextView actv, String[] data) { actv.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, data)); }
+    /**
+     * Valida los campos obligatorios y muestra errores específicos en la UI [cite: 2026-01-16].
+     * Requeridos: nombreCompleto, dni, correo, password, zona, ciclo, fechaNacimiento.
+     */
+    private boolean validateForm() {
+        boolean isValid = true;
 
-    private String getText(TextInputEditText et) { return Objects.requireNonNull(et.getText()).toString().trim(); }
-    private void toggleLoading(boolean isLoading) { btnRegister.setEnabled(!isLoading); btnRegister.setText(isLoading ? "Cargando..." : "FINALIZAR REGISTRO"); }
-    private String formatDate(String dateStr) { try { String[] p = dateStr.split("/"); return p[2]+"-"+p[1]+"-"+p[0]; } catch (Exception e) { return "1900-01-01"; } }
+        // 1. Limpiar errores previos [cite: 2026-01-16]
+        tilName.setError(null);
+        tilDni.setError(null);
+        tilEmail.setError(null);
+        tilPassword.setError(null);
+        tilBirthDate.setError(null);
+        // Para los dropdowns, asegúrate de tener sus TextInputLayouts identificados
+        TextInputLayout tilZona = getView().findViewById(R.id.tilZone);
+        TextInputLayout tilCycle = getView().findViewById(R.id.tilCycle);
+        if (tilZona != null) tilZona.setError(null);
+        if (tilCycle != null) tilCycle.setError(null);
 
-    private void setupToolbar() {
-        MaterialToolbar toolbar = getActivity().findViewById(R.id.topAppBarOrg);
-        if (toolbar != null) {
-            toolbar.setNavigationIcon(R.drawable.ic_back_arrow);
-            toolbar.setNavigationIconTint(Color.parseColor("#1A3B85"));
-            toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        // 2. Validar Nombre [cite: 2026-01-16]
+        if (getText(etName).isEmpty()) {
+            tilName.setError("El nombre completo es obligatorio");
+            isValid = false;
         }
+
+        // 3. Validar DNI [cite: 2026-01-16]
+        if (getText(etDni).isEmpty()) {
+            tilDni.setError("El DNI/NIE es obligatorio");
+            isValid = false;
+        }
+
+        // 4. Validar Correo [cite: 2026-01-16]
+        String email = getText(etEmail);
+        if (email.isEmpty()) {
+            tilEmail.setError("El correo es obligatorio");
+            isValid = false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError("Formato de correo inválido");
+            isValid = false;
+        }
+
+        // 5. Validar Password [cite: 2026-01-16]
+        if (getText(etPassword).length() < 6) {
+            tilPassword.setError("La contraseña debe tener al menos 6 caracteres");
+            isValid = false;
+        }
+
+        // 6. Validar Zona y Ciclo (Dropdowns) [cite: 2026-01-16]
+        if (actvZona.getText().toString().isEmpty()) {
+            if (tilZona != null) tilZona.setError("Selecciona una zona");
+            isValid = false;
+        }
+        if (actvCycle.getText().toString().isEmpty()) {
+            if (tilCycle != null) tilCycle.setError("Selecciona tu ciclo formativo");
+            isValid = false;
+        }
+
+        // 7. Validar Fecha de Nacimiento [cite: 2026-01-16]
+        if (getText(etBirthDate).isEmpty()) {
+            tilBirthDate.setError("La fecha de nacimiento es obligatoria");
+            isValid = false;
+        }
+
+        // IMPROVED CICLO VALIDATION
+        if (actvCycle.getText().toString().isEmpty()) {
+            if (tilCycle != null) {
+                tilCycle.setErrorEnabled(true);
+                tilCycle.setError("Selecciona tu ciclo formativo");
+            }
+            isValid = false;
+        } else {
+             if (tilCycle != null) tilCycle.setError(null);
+        }
+
+        // Feedback general si algo falló [cite: 2026-01-16]
+        if (!isValid) {
+            StatusHelper.showStatus(getContext(), "Formulario incompleto",
+                    "Por favor, corrige los campos marcados en rojo.", true);
+        }
+
+        return isValid;
+    }
+    private String getText(TextInputEditText et) { return Objects.requireNonNull(et.getText()).toString().trim(); }
+    private void toggleLoading(boolean load) { btnRegister.setEnabled(!load); btnRegister.setText(load ? "Cargando..." : "FINALIZAR REGISTRO"); }
+    private void setupToolbar(View v) {
+        MaterialToolbar toolbar = v.findViewById(R.id.topAppBarVol);
+        if (toolbar != null) toolbar.setNavigationOnClickListener(x -> getParentFragmentManager().popBackStack());
     }
 }

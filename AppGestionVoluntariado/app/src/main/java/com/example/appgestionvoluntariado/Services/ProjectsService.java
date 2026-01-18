@@ -23,7 +23,7 @@ public interface ProjectsService {
     // ==========================================
 
     // Obtener proyectos en los que el voluntario NO está inscrito todavía
-    @GET("projects/available")
+    @GET("actividades")
     Call<List<Project>> getAvailableProjects();
 
     // Obtener los proyectos donde el voluntario YA está inscrito
