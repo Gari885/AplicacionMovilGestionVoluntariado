@@ -11,7 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.Models.OrganizationRegisterRequest;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -23,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import com.example.appgestionvoluntariado.Fragments.Auth.LoginFragment;
 
 public class OrganizationRegisterFragment extends Fragment {
 
@@ -30,8 +33,8 @@ public class OrganizationRegisterFragment extends Fragment {
     private Button btnRegister;
 
     // UI References in English [cite: 2026-01-09]
-    private TextInputLayout tilName, tilEmail, tilPassword, tilCif, tilPhone, tilAddress, tilLocality, tilPostalCode, tilDescription;
-    private TextInputEditText etName, etEmail, etPassword, etCif, etPhone, etAddress, etLocality, etPostalCode, etDescription;
+    private TextInputLayout tilName, tilEmail, tilPassword, tilCif, tilPhone, tilAddress, tilLocality, tilPostalCode, tilDescription,tilSector;
+    private TextInputEditText etName, etEmail, etPassword, etCif, etPhone, etAddress, etLocality, etPostalCode, etDescription,etSector;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class OrganizationRegisterFragment extends Fragment {
         tilLocality = view.findViewById(R.id.tilLocality);
         tilPostalCode = view.findViewById(R.id.tilPostalCode);
         tilDescription = view.findViewById(R.id.tilDescription);
+        tilSector = view.findViewById(R.id.tilSector);
 
         // Inputs
         etName = view.findViewById(R.id.etName);
@@ -77,6 +81,7 @@ public class OrganizationRegisterFragment extends Fragment {
         etLocality = view.findViewById(R.id.etLocality);
         etPostalCode = view.findViewById(R.id.etPostalCode);
         etDescription = view.findViewById(R.id.etDescription);
+        etSector = view.findViewById(R.id.etSector);
 
         btnRegister = view.findViewById(R.id.btnRegister);
     }
@@ -113,13 +118,47 @@ public class OrganizationRegisterFragment extends Fragment {
             if (task.isSuccessful()) {
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) {
-                    user.sendEmailVerification();
-                    saveUserToFirestore(user.getUid());
-                    StatusHelper.showStatus(getContext(), "¡Éxito!", "Cuenta creada. Verifica tu email.", false);
-                    getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new LoginFragment()).commit();
+                    syncWithBackend(user);
                 }
             } else {
-                StatusHelper.showStatus(getContext(), "Error", "Fallo en el registro", true);
+                StatusHelper.showStatus(getContext(), "Error", "Fallo en el registro Firebase", true);
+            }
+        });
+    }
+
+    private void syncWithBackend(FirebaseUser fbUser) {
+        OrganizationRegisterRequest req =
+                new OrganizationRegisterRequest(
+                        getText(etCif), getText(etName), fbUser.getEmail(), getText(etPassword),
+                        getText(etPhone), getText(etAddress), getText(etLocality), getText(etPostalCode),
+                        getText(etDescription), getText(etSector)
+                );
+
+        APIClient.getAuthAPIService().registerOrganization(req).enqueue(new retrofit2.Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull retrofit2.Call<Void> call, @NonNull retrofit2.Response<Void> response) {
+                if (response.isSuccessful()) {
+                    saveUserToFirestore(fbUser.getUid());
+                    fbUser.sendEmailVerification();
+                    StatusHelper.showStatus(getContext(), "¡Éxito!", "Cuenta creada. Verifica tu email.", false);
+                    if (getParentFragmentManager() != null) {
+                        getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new LoginFragment()).commit();
+                    }
+                } else {
+                    fbUser.delete();
+                    try {
+                        String err = response.errorBody() != null ? response.errorBody().string() : "Error desconocido";
+                        StatusHelper.showStatus(getContext(), "Error servidor", err, true);
+                    } catch (Exception e) {
+                        StatusHelper.showStatus(getContext(), "Error servidor", "Código: " + response.code(), true);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull retrofit2.Call<Void> call, @NonNull Throwable t) {
+                fbUser.delete();
+                StatusHelper.showStatus(getContext(), "Error conexión", t.getMessage(), true);
             }
         });
     }

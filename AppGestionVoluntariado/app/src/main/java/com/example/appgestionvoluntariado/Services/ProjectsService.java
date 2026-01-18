@@ -49,26 +49,13 @@ public interface ProjectsService {
     @GET("actividades")
     Call<List<Project>> getProjects(@Query("estado")String estado);
 
-    @PATCH("/actividades/{id}/estado")
-    Call<Void> changeState(@Path("id") int id, StatusRequest status);
+    @PATCH("actividades/{id}/estado")
+    Call<Void> changeState(@Path("id") int id, @Body StatusRequest status);
 
 
-    // ==========================================
-    // --- SECCIÓN ORGANIZADOR ---
-    // ==========================================
-
-    // Listar solo los proyectos creados por esta organización
-    @GET("organizer/my-projects")
-    Call<List<Project>> getMyCreatedProjects();
-
-    // Crear una nueva oferta de voluntariado
-    @POST("projects")
+    @POST("actividades/crear")
     Call<Void> createProject(@Body ProjectCreationRequest request);
 
-    @PUT("projects/{id}")
-    Call<Void> updateProject(@Path("id") int id, @Body Project project);
 
-    @DELETE("projects/{id}")
-    Call<Void> deleteProject(@Path("id") int id);
 
 }

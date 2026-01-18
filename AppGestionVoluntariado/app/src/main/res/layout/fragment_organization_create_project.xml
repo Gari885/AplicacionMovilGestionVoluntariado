@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,7 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="100dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -418,26 +421,21 @@
             android:textColor="#1A3B85"
             android:textStyle="bold" />
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:background="@drawable/input_rounded_bg"
-            android:minHeight="60dp"
-            android:padding="10dp">
-
-            <com.google.android.material.chip.ChipGroup
+        <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipGroupAddedData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:minHeight="60dp"
+                android:padding="10dp"
                 app:singleSelection="false" />
-        </ScrollView>
 
         <Button
             android:id="@+id/btnCreateProject"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/background_button_pill"
             android:text="Crear Voluntariado"
             android:textAllCaps="false"
@@ -445,4 +443,4 @@
             android:textStyle="bold"
             app:backgroundTint="#1A3B85" />
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

@@ -5,7 +5,8 @@ import java.util.List;
 
 public class ProjectCreationRequest {
 
-    @SerializedName("cif_organizacion")
+    // CAMBIO IMPORTANTE: El backend espera 'cifOrganizacion' (sin guion bajo)
+    @SerializedName("cifOrganizacion")
     private String organizationCif;
 
     @SerializedName("nombre")
@@ -26,6 +27,7 @@ public class ProjectCreationRequest {
     @SerializedName("maxParticipantes")
     private int maxParticipants;
 
+    // Asegúrate de enviar IDs numéricos en estas listas (ej: ["1", "3"])
     @SerializedName("ods")
     private List<String> ods;
 
@@ -38,11 +40,6 @@ public class ProjectCreationRequest {
     public ProjectCreationRequest() {
     }
 
-    /**
-     * Full constructor for Administrators to specify the Organization CIF.
-     * If an Organization is creating its own project, the CIF can be null
-     * as the Firebase Token will identify the sender [cite: 2026-01-15].
-     */
     public ProjectCreationRequest(String organizationCif, String name, String description,
                                   String address, String startDate, String endDate,
                                   int maxParticipants, List<String> ods,
@@ -59,7 +56,7 @@ public class ProjectCreationRequest {
         this.needs = needs;
     }
 
-    // Getters and Setters in English
+    // Getters and Setters
     public String getOrganizationCif() { return organizationCif; }
     public void setOrganizationCif(String organizationCif) { this.organizationCif = organizationCif; }
 
