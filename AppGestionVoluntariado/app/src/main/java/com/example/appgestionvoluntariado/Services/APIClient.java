@@ -40,6 +40,10 @@ public class APIClient {
         return getClient().create(ProjectsService.class);
     }
 
+    public static InscriptionsService getInscriptionService(){
+        return getClient().create(InscriptionsService.class);
+    }
+
     public static OrganizationService getOrganizationService(){
         return getClient().create(OrganizationService.class);
     }
@@ -52,24 +56,18 @@ public class APIClient {
         return getClient().create(CategoryService.class);
     }
 
-    public static MatchesService getMatchesService(){
-        return getClient().create(MatchesService.class);
-    }
 
-    public static FindVolunteerService getFindVolunteerService(){
-        return getClient().create(FindVolunteerService.class);
-    }
 
     public static AuthAPIService getAuthAPIService(){
         return getClient().create(AuthAPIService.class);
     }
 
-    public static StatsService getStatsService(){
-        return getClient().create(StatsService.class);
+    public static AdminService getAdminService(){
+        return getClient().create(AdminService.class);
     }
 
-    public static Retrofit getRetrofitInstance() {
-        return retrofit;
+    public static StatsService getStatsService(){
+        return getClient().create(StatsService.class);
     }
 
 

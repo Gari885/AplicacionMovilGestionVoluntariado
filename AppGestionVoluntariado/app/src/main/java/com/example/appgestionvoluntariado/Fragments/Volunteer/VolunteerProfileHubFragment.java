@@ -89,7 +89,7 @@ public class VolunteerProfileHubFragment extends Fragment {
 
     private void updateUI() {
         if (volunteer != null) {
-            tvName.setText(volunteer.getFullName());
+            tvName.setText(volunteer.getFirstName());
         }
     }
 

@@ -1,6 +1,6 @@
 package com.example.appgestionvoluntariado.Services;
 
-import com.example.appgestionvoluntariado.Models.StatusRequest;
+import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 
 import java.util.List;
@@ -14,8 +14,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface VolunteerService {
-    @GET("voluntarios")
-    Call<List<Volunteer>> getVolunteers(@Query("estado") String estado);
 
     @PATCH("voluntarios/{dni}/estado")
     Call<Void> updateStatus(

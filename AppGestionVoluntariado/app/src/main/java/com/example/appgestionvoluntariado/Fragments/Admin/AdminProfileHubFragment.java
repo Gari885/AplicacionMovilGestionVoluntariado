@@ -22,7 +22,10 @@ public class AdminProfileHubFragment extends Fragment {
 
         // Botón Seguridad
         view.findViewById(R.id.btnAdminSecurity).setOnClickListener(v -> {
-            // Aquí navegarías a un fragmento de cambio de contraseña
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.admin_fragment_container, new AdminChangePasswordFragment())
+                    .addToBackStack(null) // Permite volver al Hub con el botón atrás
+                    .commit();
         });
 
         // Botón Logout

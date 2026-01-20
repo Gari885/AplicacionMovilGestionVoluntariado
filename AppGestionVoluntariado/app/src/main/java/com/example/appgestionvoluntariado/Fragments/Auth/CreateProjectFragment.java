@@ -19,7 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Models.ProjectCreationRequest;
+import com.example.appgestionvoluntariado.Models.Request.ProjectCreationRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.ProjectsService;

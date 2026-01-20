@@ -24,7 +24,8 @@ public class CategoryManager {
     public void fetchAllCategories(CategoryCallback<Ods> odsCb,
                                    CategoryCallback<Skill> skillCb,
                                    CategoryCallback<Interest> interestCb,
-                                   CategoryCallback<Need> needCb) {
+                                   CategoryCallback<Need> needCb,
+                                   CategoryCallback<Cycle> cycleCb) {
 
         // Fetch ODS [cite: 2026-01-09]
         service.getOds().enqueue(new Callback<List<Ods>>() {
@@ -70,14 +71,19 @@ public class CategoryManager {
             public void onFailure(Call<List<Need>> call, Throwable t) { needCb.onError(t.getMessage()); }
         });
 
-        service.getNeeds().enqueue(new Callback<List<Need>>() {
+        service.getCycles().enqueue(new Callback<List<Cycle>>() {
             @Override
-            public void onResponse(Call<List<Need>> call, Response<List<Need>> response) {
-                if (response.isSuccessful()) needCb.onSuccess(response.body());
-                else needCb.onError("Error loading Needs");
+            public void onResponse(Call<List<Cycle>> call, Response<List<Cycle>> response) {
+                if (response.isSuccessful()) cycleCb.onSuccess(response.body());
+                else cycleCb.onError("Error loading Cycles");
             }
+
             @Override
-            public void onFailure(Call<List<Need>> call, Throwable t) { needCb.onError(t.getMessage()); }
+            public void onFailure(Call<List<Cycle>> call, Throwable t) {
+                cycleCb.onError(t.getMessage());
+            }
         });
+
+
     }
 }

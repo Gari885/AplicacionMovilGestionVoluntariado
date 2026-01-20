@@ -35,9 +35,12 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
 
     private List<Project> projects;
     private final OnProjectActionListener actionListener;
-    private final ViewMode viewMode;
+    private ViewMode viewMode;
     private boolean showStatusLabel = false;
 
+    public void updateAdapter(List<Project> list, ViewMode view) {
+
+    }
 
 
     public interface OnProjectActionListener {
@@ -60,6 +63,14 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
     public void notifyAdapter(List<Project> projects) {
         this.projects.clear();
         this.projects = projects;
+        notifyDataSetChanged();
+
+    }
+
+    public void notifyAdapterAdmin(List<Project> projects, ViewMode v) {
+        this.projects.clear();
+        this.projects = projects;
+        viewMode = v;
         notifyDataSetChanged();
 
     }
@@ -135,41 +146,41 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
             btnSecondary.setVisibility(View.GONE);
 
             // Lógica de botones por modo de visualización [cite: 2026-01-16]
-            switch(mode) {
-                case ADMINISTRATOR:
+            switch(viewMode) {
+                case ADMINISTRATOR_PENDING:
                     btnPrimary.setVisibility(View.VISIBLE);
                     btnSecondary.setVisibility(View.VISIBLE);
-                    configureButton(btnPrimary, "ACEPTAR", Color.parseColor("#2E7D32"));
-                    configureButton(btnSecondary, "RECHAZAR", Color.parseColor("#D32F2F"));
+                    btnPrimary.setBackgroundResource(R.drawable.background_button_pill);
+                    btnPrimary.setOnClickListener(v -> listener.onAccept(project));
+                    btnSecondary.setOnClickListener(v -> listener.onReject(project));
+                    break;
+
+                case ADMINISTRATOR_ACCEPTED:
+                    btnPrimary.setVisibility(View.VISIBLE);
+                    btnPrimary.setText("BORRAR");
                     btnPrimary.setOnClickListener(v -> listener.onAccept(project));
                     btnSecondary.setOnClickListener(v -> listener.onReject(project));
                     break;
 
                 case ORGANIZATION:
                     btnPrimary.setVisibility(View.VISIBLE);
-                    configureButton(btnPrimary, "DAR DE BAJA", Color.parseColor("#D32F2F"));
+                    btnPrimary.setText("DAR DE BAJA");
                     btnPrimary.setOnClickListener(v -> listener.onDelete(project));
                     break;
 
                 case VOLUNTEER_AVAILABLE:
                     btnPrimary.setVisibility(View.VISIBLE);
-                    configureButton(btnPrimary, "APUNTARSE", ContextCompat.getColor(context, R.color.cuatrovientos_blue));
+                    btnPrimary.setText("APUNTARSE");
                     btnPrimary.setOnClickListener(v -> listener.onApply(project));
                     break;
 
                 case VOLUNTEER_MY_PROJECTS:
                     btnPrimary.setVisibility(View.VISIBLE);
-                    configureButton(btnPrimary, "DESAPUNTARSE", ContextCompat.getColor(context, R.color.cuatrovientos_blue));
+                    btnPrimary.setText("DESAPUNTARSE");
                     btnPrimary.setOnClickListener(v -> listener.onDelete(project));
                     break;
             }
             btnInfo.setOnClickListener(v -> showDetailsBottomSheet(project));
-        }
-
-        private void configureButton(AppCompatButton btn, String text, int colorInt) {
-            btn.setText(text);
-            btn.setBackgroundTintList(ColorStateList.valueOf(colorInt));
-            btn.setTextColor(Color.WHITE);
         }
 
         private void showDetailsBottomSheet(Project project) {

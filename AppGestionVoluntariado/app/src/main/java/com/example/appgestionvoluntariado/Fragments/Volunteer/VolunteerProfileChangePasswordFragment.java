@@ -24,7 +24,8 @@ public class VolunteerProfileChangePasswordFragment extends Fragment {
         etNew = view.findViewById(R.id.etNewPassword);
         etConfirm = view.findViewById(R.id.etConfirmNewPassword);
 
-        view.findViewById(R.id.btnBackSecurity).setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        com.google.android.material.appbar.MaterialToolbar toolbar = view.findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         view.findViewById(R.id.btnSubmitNewPassword).setOnClickListener(v -> validateAndChange());
 
         return view;

@@ -139,15 +139,15 @@
                     android:orientation="horizontal">
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                        android:id="@+id/tilCycle"
+                        android:id="@+id/tilExperiencia"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Ciclo"
+                        android:layout_height="wrap_content"
+                        android:hint="Experiencia previa"
                         app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
                         <AutoCompleteTextView
-                            android:id="@+id/actvCycle"
+                            android:id="@+id/actvExperiencia"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="none" />
@@ -174,15 +174,17 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:id="@+id/tilExperiencia"
+                    android:id="@+id/tilCycle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:hint="Experiencia previa"
-                    app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                    android:hint="Ciclo"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
                     <AutoCompleteTextView
-                        android:id="@+id/actvExperiencia"
+                        android:id="@+id/actvCycle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none" />

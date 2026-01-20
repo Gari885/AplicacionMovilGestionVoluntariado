@@ -3,10 +3,6 @@ package com.example.appgestionvoluntariado.Models;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-/**
- * Model representing an activity (Project) detail.
- * Variables are in English, API mapping in Spanish [cite: 2026-01-09, 2026-01-16].
- */
 public class Project {
 
     @SerializedName("codActividad")

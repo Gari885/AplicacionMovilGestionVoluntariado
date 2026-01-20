@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Models.*;
+import com.example.appgestionvoluntariado.Models.Request.VolunteerRegisterRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Utils.CategoryManager;
@@ -58,14 +59,18 @@ public class VolunteerRegisterFragment extends Fragment {
     private final List<Skill> masterSkillsList = new ArrayList<>();
     private final List<Interest> masterInterestsList = new ArrayList<>();
 
+    private final List<Cycle> masterCycleList = new ArrayList<>();
+
+
     // Selections initialized to avoid NullPointerExceptions [cite: 2026-01-18]
     private final List<String> selectedSkills = new ArrayList<>();
     private final List<String> selectedInterests = new ArrayList<>();
     private final List<String> selectedAvailability = new ArrayList<>();
     private final List<String> selectedLanguages = new ArrayList<>();
 
-    // Static Data Lists
-    private final String[] CYCLE_LIST = {"SMR", "ASIR", "DAM", "DAW", "Marketing", "Administración", "Otros"};
+    private List<String> cycleList = new ArrayList<>();
+
+
     private final String[] EXPERIENCE_LIST = {"Ninguna", "Menos de 1 año", "Entre 1 y 3 años", "Más de 3 años"};
     private final String[] CAR_LIST = {"Sí", "No"};
     private final String[] LANGUAGE_LIST = {"Castellano", "Inglés", "Francés", "Euskera", "Alemán", "Otros"};
@@ -292,26 +297,79 @@ public class VolunteerRegisterFragment extends Fragment {
         CategoryManager cm = new CategoryManager();
         cm.fetchAllCategories(
                 new CategoryManager.CategoryCallback<Ods>() {
-                    @Override public void onSuccess(List<Ods> data) { checkDone.run(); }
-                    @Override public void onError(String e) { checkDone.run(); }
+                    @Override
+                    public void onSuccess(List<Ods> data) {
+                        checkDone.run();
+                    }
+
+                    @Override
+                    public void onError(String e) {
+                        checkDone.run();
+                    }
                 },
                 new CategoryManager.CategoryCallback<Skill>() {
-                    @Override public void onSuccess(List<Skill> data) { masterSkillsList.clear(); masterSkillsList.addAll(data); checkDone.run(); }
-                    @Override public void onError(String e) { checkDone.run(); }
+                    @Override
+                    public void onSuccess(List<Skill> data) {
+                        masterSkillsList.clear();
+                        masterSkillsList.addAll(data);
+                        checkDone.run();
+                    }
+
+                    @Override
+                    public void onError(String e) {
+                        checkDone.run();
+                    }
                 },
                 new CategoryManager.CategoryCallback<Interest>() {
-                    @Override public void onSuccess(List<Interest> data) { masterInterestsList.clear(); masterInterestsList.addAll(data); checkDone.run(); }
-                    @Override public void onError(String e) { checkDone.run(); }
+                    @Override
+                    public void onSuccess(List<Interest> data) {
+                        masterInterestsList.clear();
+                        masterInterestsList.addAll(data);
+                        checkDone.run();
+                    }
+
+                    @Override
+                    public void onError(String e) {
+                        checkDone.run();
+                    }
                 },
                 new CategoryManager.CategoryCallback<Need>() {
-                    @Override public void onSuccess(List<Need> data) { checkDone.run(); }
-                    @Override public void onError(String e) { checkDone.run(); }
+                    @Override
+                    public void onSuccess(List<Need> data) {
+                        checkDone.run();
+                    }
+
+                    @Override
+                    public void onError(String e) {
+                        checkDone.run();
+                    }
+                },
+                new CategoryManager.CategoryCallback<Cycle>() {
+                    @Override
+                    public void onSuccess(List<Cycle> data) {
+                        masterCycleList.clear();
+                        masterCycleList.addAll(data);
+                        convertData();
+                        checkDone.run();
+                    }
+
+                    @Override
+                    public void onError(String error) {
+
+                        checkDone.run();
+                    }
                 }
         );
     }
 
+    private void convertData() {
+        for (Cycle c : masterCycleList){
+            cycleList.add(c.getFullCycle());
+        }
+    }
+
     private void loadStaticListData() {
-        fillDropdown(actvCycle, CYCLE_LIST);
+        actvCycle.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, cycleList));
         fillDropdown(actvExperience, EXPERIENCE_LIST);
         fillDropdown(actvCar, CAR_LIST);
         fillDropdown(actvZona, ZONES_LIST);
@@ -364,7 +422,10 @@ public class VolunteerRegisterFragment extends Fragment {
         FirebaseFirestore.getInstance().collection("usuarios").document(uid).set(data);
     }
 
-    private void fillDropdown(AutoCompleteTextView actv, String[] data) { actv.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, data)); }
+    private void fillDropdown(AutoCompleteTextView actv, String[] data) {
+        actv.setAdapter(new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_list_item_1, data));
+    }
 
     private boolean validateForm() {
         boolean isValid = true;

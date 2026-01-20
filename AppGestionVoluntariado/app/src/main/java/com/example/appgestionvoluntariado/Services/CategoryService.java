@@ -1,5 +1,6 @@
 package com.example.appgestionvoluntariado.Services;
 
+import com.example.appgestionvoluntariado.Models.Cycle;
 import com.example.appgestionvoluntariado.Models.Interest;
 import com.example.appgestionvoluntariado.Models.Need;
 import com.example.appgestionvoluntariado.Models.Ods;
@@ -22,4 +23,7 @@ public interface CategoryService {
 
     @GET("categories/necesidades")
     Call<List<Need>> getNeeds();
+
+    @GET("ciclos")
+    Call<List<Cycle>> getCycles();
 }

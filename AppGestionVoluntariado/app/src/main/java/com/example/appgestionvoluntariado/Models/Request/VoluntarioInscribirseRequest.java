@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Models;
+package com.example.appgestionvoluntariado.Models.Request;
 
 import com.google.gson.annotations.SerializedName;
 

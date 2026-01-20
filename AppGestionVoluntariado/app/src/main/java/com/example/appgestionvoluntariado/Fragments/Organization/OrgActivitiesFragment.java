@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.appgestionvoluntariado.Adapters.ProjectAdapter;
 import com.example.appgestionvoluntariado.Fragments.Auth.CreateProjectFragment;
 import com.example.appgestionvoluntariado.Models.Project;
-import com.example.appgestionvoluntariado.Models.StatusRequest;
+import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.ViewMode;
@@ -39,9 +39,10 @@ public class OrgActivitiesFragment extends Fragment {
     private TextView tabPending, tabAccepted;
     private EditText etSearch;
     private View loadingLayout;
-    private FloatingActionButton fabAdd;
+    private FloatingActionButton fabAddProject;
 
     private List<Project> allProjects = new ArrayList<>();
+
     private String currentStatus = "pendiente"; // PENDIENTE o APROBADO
 
     @Nullable
@@ -66,10 +67,10 @@ public class OrgActivitiesFragment extends Fragment {
         tabAccepted = view.findViewById(R.id.tabStatusAccepted);
         etSearch = view.findViewById(R.id.etSearchProject);
         loadingLayout = view.findViewById(R.id.layoutLoading);
-        fabAdd = view.findViewById(R.id.fabAddProject);
+        fabAddProject = view.findViewById(R.id.fabAddProject);
 
         // Botón para crear nuevo proyecto
-        fabAdd.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
+        fabAddProject.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
                 .replace(R.id.organization_fragment_container, new CreateProjectFragment())
                 .addToBackStack(null)
                 .commit());

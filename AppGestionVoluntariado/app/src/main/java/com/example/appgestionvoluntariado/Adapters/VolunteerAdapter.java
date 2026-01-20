@@ -81,7 +81,7 @@ public class VolunteerAdapter extends RecyclerView.Adapter<VolunteerAdapter.Volu
         }
 
         public void bind(Volunteer volunteer, OnVolunteerActionListener listener) {
-            tvName.setText(volunteer.getFullName());
+            tvName.setText(volunteer.getFirstName());
             tvIdentifier.setText("DNI: " + volunteer.getDni()); // Identificador para voluntarios
             tvEmail.setText(volunteer.getEmail());
 

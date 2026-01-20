@@ -8,22 +8,16 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <Button
-        android:id="@+id/btnBack"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/background_button_pill"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:text="← Volver"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:textSize="12sp"
-        app:backgroundTint="@null"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_back_arrow"
+        app:navigationIconTint="#1A3B85" />
 
     <TextView
         android:id="@+id/tvRegisterTitle"
@@ -36,7 +30,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack" />
+        app:layout_constraintTop_toBottomOf="@+id/topAppBar" />
 
     <Button
         android:id="@+id/btnVolunteer"

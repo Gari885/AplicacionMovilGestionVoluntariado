@@ -1,8 +1,8 @@
 package com.example.appgestionvoluntariado.Services;
 
 import com.example.appgestionvoluntariado.Models.Project;
-import com.example.appgestionvoluntariado.Models.ProjectCreationRequest;
-import com.example.appgestionvoluntariado.Models.StatusRequest;
+import com.example.appgestionvoluntariado.Models.Request.ProjectCreationRequest;
+import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 
 import java.util.List;
 
@@ -12,7 +12,6 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
-import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -46,8 +45,7 @@ public interface ProjectsService {
     // ==========================================
 
     // Listar todos los proyectos pendientes de aprobación
-    @GET("actividades")
-    Call<List<Project>> getProjects(@Query("estado")String estado);
+
 
     @PATCH("actividades/{id}/estado")
     Call<Void> changeState(@Path("id") int id, @Body StatusRequest status);

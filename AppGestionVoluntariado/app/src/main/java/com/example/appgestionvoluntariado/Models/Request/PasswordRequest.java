@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Models;
+package com.example.appgestionvoluntariado.Models.Request;
 
 public class PasswordRequest {
     private String oldPassword;

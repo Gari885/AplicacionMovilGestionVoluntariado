@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Models.OrganizationRegisterRequest;
+import com.example.appgestionvoluntariado.Models.Request.OrganizationRegisterRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
@@ -25,7 +25,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import com.example.appgestionvoluntariado.Fragments.Auth.LoginFragment;
 
 public class OrganizationRegisterFragment extends Fragment {
 

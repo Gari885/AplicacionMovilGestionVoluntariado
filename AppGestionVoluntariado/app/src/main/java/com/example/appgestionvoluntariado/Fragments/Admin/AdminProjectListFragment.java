@@ -16,11 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.ProjectAdapter;
+import com.example.appgestionvoluntariado.Fragments.Auth.CreateProjectFragment;
 import com.example.appgestionvoluntariado.Models.Project;
-import com.example.appgestionvoluntariado.Models.StatusRequest;
+import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.ViewMode;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +39,12 @@ public class AdminProjectListFragment extends Fragment {
     private TextView tabPending, tabAccepted;
     private EditText etSearch;
 
+    private ViewMode view;
+
     private List<Project> fullList = new ArrayList<>();
     private String currentStatus = "pendiente";
+
+    private FloatingActionButton fabAddProject;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,6 +57,9 @@ public class AdminProjectListFragment extends Fragment {
         tabPending = v.findViewById(R.id.tabStatusPending);
         tabAccepted = v.findViewById(R.id.tabStatusAccepted);
         etSearch = v.findViewById(R.id.etSearchProject);
+        fabAddProject = v.findViewById(R.id.fabAddProject);
+        fabAddProject.setVisibility(View.INVISIBLE);
+        view = ViewMode.ADMINISTRATOR_PENDING;
 
         setupTabs();
         setupSearch();
@@ -62,14 +71,25 @@ public class AdminProjectListFragment extends Fragment {
     private void setupTabs() {
         tabPending.setOnClickListener(v -> {
             currentStatus = "pendiente";
+            view = ViewMode.ADMINISTRATOR_PENDING;
             updateTabUI(tabPending, tabAccepted);
             loadProjects();
         });
 
         tabAccepted.setOnClickListener(v -> {
             currentStatus = "aprobado";
+            view = ViewMode.ADMINISTRATOR_ACCEPTED;
             updateTabUI(tabAccepted, tabPending);
             loadProjects();
+        });
+
+
+        fabAddProject.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new CreateProjectFragment()).commit();
+            }
         });
     }
 
@@ -82,13 +102,13 @@ public class AdminProjectListFragment extends Fragment {
 
     private void loadProjects() {
         loadingLayout.setVisibility(View.VISIBLE);
-        // Usamos el Query param ?estado=
-        APIClient.getProjectsService().getProjects(currentStatus)
+        APIClient.getAdminService().getProjects(currentStatus)
                 .enqueue(new Callback<List<Project>>() {
                     @Override
                     public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
                         loadingLayout.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
+                            fabAddProject.setVisibility(View.VISIBLE);
                             fullList = response.body();
                             updateAdapter(fullList);
                         }
@@ -123,17 +143,16 @@ public class AdminProjectListFragment extends Fragment {
                 public void onApply(Project project) {
 
                 }
-            }, ViewMode.ADMINISTRATOR);
+            }, view);
 
             rvProjects.setAdapter(adapter);
         } else {
-            adapter.updateList(list);
+            adapter.notifyAdapterAdmin(list,view);
         }
     }
 
     private void updateStatus(int projectId, String status) {
         loadingLayout.setVisibility(View.VISIBLE);
-        // Enviamos ID + StatusRequest. El Token de Firebase en Header valida al admin
         APIClient.getProjectsService().changeState(projectId, new StatusRequest(status))
                 .enqueue(new Callback<Void>() {
                     @Override

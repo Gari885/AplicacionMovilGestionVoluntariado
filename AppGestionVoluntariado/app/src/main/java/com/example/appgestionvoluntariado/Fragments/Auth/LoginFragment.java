@@ -37,11 +37,13 @@ public class LoginFragment extends Fragment {
 
     private EditText etEmail, etPassword;
     private Button btnLogin;
-    private TextView tvRegisterPrompt;
+    private TextView tvRegisterPrompt, tvForgotPassword;
     private android.widget.ProgressBar pbLoading;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+
+    private int contadorFallosLogin;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,12 +69,21 @@ public class LoginFragment extends Fragment {
         btnLogin = view.findViewById(R.id.btnLogin);
         tvRegisterPrompt = view.findViewById(R.id.tvSignupPrompt);
         pbLoading = view.findViewById(R.id.pbLoginLoading);
+        tvForgotPassword = view.findViewById(R.id.tvForgotPassword);
+        contadorFallosLogin = 0;
     }
 
     private void setupListeners() {
         tvRegisterPrompt.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new RegisterMenuFragment())
+                .replace(R.id.fragmentContainer, new RegisterMenuFragment())
+                .addToBackStack(null)
+                .commit();
+        });
+
+        tvForgotPassword.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, new AuthResetPasswordFragment())
                     .addToBackStack(null)
                     .commit();
         });
@@ -102,24 +113,24 @@ public class LoginFragment extends Fragment {
     private void performLogin(String email, String password) {
         toggleLoading(true);
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            // TODO: Revertir esto cuando termines de probar
-                            // if (user.isEmailVerified()) {
-                                fetchUserProfile();
-                            /* } else {
-                                StatusHelper.showStatus(getContext(), "Verificación pendiente", "Debes verificar tu correo antes de entrar", true);
-                                mAuth.signOut();
-                                toggleLoading(false);
-                            } */
-                        }
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null) {
+                        fetchUserProfile();
+                    }
+                } else {
+                    contadorFallosLogin++;
+                    if (contadorFallosLogin >= 3) {
+                        tvForgotPassword.setVisibility(View.VISIBLE);
+                        StatusHelper.showStatus(getContext(), "Intentos fallidos", 
+                            "Parece que tienes problemas. Puedes restablecer tu contraseña si lo necesitas.", true);
                     } else {
                         StatusHelper.showStatus(getContext(), "Error de acceso", "Credenciales incorrectas o fallo de red", true);
-                        toggleLoading(false);
                     }
-                });
+                    toggleLoading(false);
+                }
+            });
     }
 
     private void fetchUserProfile() {

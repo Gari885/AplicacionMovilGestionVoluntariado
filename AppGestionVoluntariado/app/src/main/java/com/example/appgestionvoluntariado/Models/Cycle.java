@@ -3,17 +3,19 @@ package com.example.appgestionvoluntariado.Models;
 import com.google.gson.annotations.SerializedName;
 
 public class Cycle {
+
     @SerializedName("nombre")
     private String name;
 
     @SerializedName("curso")
-    private String grade; // e.g., "1º", "2º"
+    private String course;
 
-    public String getName() { return name; }
-    public String getGrade() { return grade; }
+    public Cycle(String name, String course){
+        this.name = name;
+        this.course = course;
+    }
 
-    @Override
-    public String toString() {
-        return name + " (" + grade + ")";
+    public String getFullCycle(){
+        return name + " " + course;
     }
 }

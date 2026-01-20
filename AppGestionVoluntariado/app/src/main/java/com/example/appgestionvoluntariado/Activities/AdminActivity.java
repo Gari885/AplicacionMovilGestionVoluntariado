@@ -12,6 +12,7 @@ import com.example.appgestionvoluntariado.Fragments.Admin.AdminDashboardFragment
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminMatchesListFragment;
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminOrganizationListFragment;
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminProfileHubFragment;
+import com.example.appgestionvoluntariado.Fragments.Admin.AdminProjectListFragment;
 import com.example.appgestionvoluntariado.Fragments.Admin.AdminVolunteerListFragment;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
@@ -57,7 +58,7 @@ public class AdminActivity extends AppCompatActivity {
             } else if (id == R.id.nav_admin_vols) {
                 selectedFragment = new AdminVolunteerListFragment();
             } else if (id == R.id.nav_admin_projects) {
-                selectedFragment = new AdminOrganizationListFragment();
+                selectedFragment = new AdminProjectListFragment();
             } else if (id == R.id.nav_admin_orgs) {
                 selectedFragment = new AdminOrganizationListFragment();
             }

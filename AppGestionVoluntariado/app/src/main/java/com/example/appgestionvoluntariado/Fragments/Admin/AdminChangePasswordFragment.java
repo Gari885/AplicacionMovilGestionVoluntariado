@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.R;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -26,6 +27,8 @@ public class AdminChangePasswordFragment extends Fragment {
     private TextInputLayout tilCurrent, tilNew, tilConfirm;
     private MaterialButton btnUpdate, btnBack;
 
+    private MaterialToolbar back;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -33,7 +36,7 @@ public class AdminChangePasswordFragment extends Fragment {
 
         initViews(view);
 
-        btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        back.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         btnUpdate.setOnClickListener(v -> validateAndUpdate());
 
         return view;
@@ -47,7 +50,7 @@ public class AdminChangePasswordFragment extends Fragment {
         tilNew = v.findViewById(R.id.tilNewPass);
         tilConfirm = v.findViewById(R.id.tilConfirmPass);
         btnUpdate = v.findViewById(R.id.btnUpdatePassword);
-        btnBack = v.findViewById(R.id.btnBackPass);
+        back = v.findViewById(R.id.topAppBarAdmin);
     }
 
     private void validateAndUpdate() {

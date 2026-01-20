@@ -26,7 +26,7 @@ public class OrgChangePasswordFragment extends Fragment {
 
     private TextInputEditText etCurrent, etNew, etConfirm;
     private TextInputLayout tilCurrent, tilNew, tilConfirm;
-    private MaterialButton btnUpdate, btnBack;
+    private MaterialButton btnUpdate;
 
     @Nullable
     @Override
@@ -35,7 +35,8 @@ public class OrgChangePasswordFragment extends Fragment {
 
         initViews(view);
 
-        btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        com.google.android.material.appbar.MaterialToolbar toolbar = view.findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         btnUpdate.setOnClickListener(v -> validateAndUpdate());
 
         return view;
@@ -49,7 +50,7 @@ public class OrgChangePasswordFragment extends Fragment {
         tilNew = v.findViewById(R.id.tilNewPass);
         tilConfirm = v.findViewById(R.id.tilConfirmPass);
         btnUpdate = v.findViewById(R.id.btnUpdatePassword);
-        btnBack = v.findViewById(R.id.btnBackPass);
+
     }
 
     private void validateAndUpdate() {

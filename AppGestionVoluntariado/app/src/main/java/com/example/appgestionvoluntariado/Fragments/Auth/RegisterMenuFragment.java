@@ -12,7 +12,7 @@ public class RegisterMenuFragment extends Fragment {
 
     private Button btnOrganization;
     private Button btnVolunteer;
-    private Button btnBack;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -34,13 +34,8 @@ public class RegisterMenuFragment extends Fragment {
                     .commit();
         });
 
-        btnBack = view.findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new LoginFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+        com.google.android.material.appbar.MaterialToolbar toolbar = view.findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
 
         return view;
     }

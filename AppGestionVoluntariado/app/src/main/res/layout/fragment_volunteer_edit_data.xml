@@ -3,11 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF"
-        android:fillViewport="true">
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#FFFFFF"
+            app:navigationIcon="@drawable/ic_back_arrow"
+            app:navigationIconTint="#1A3B85" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFFFFF"
+            android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,15 +31,7 @@
         android:paddingEnd="24dp"
         android:paddingBottom="100dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnBack"
-            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="← Volver"
-            android:textAllCaps="false"
-            android:backgroundTint="#1A3B85"
-            app:cornerRadius="20dp" />
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -220,6 +225,7 @@
 
     </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
 
     <!-- Loading Overlay -->
     <FrameLayout

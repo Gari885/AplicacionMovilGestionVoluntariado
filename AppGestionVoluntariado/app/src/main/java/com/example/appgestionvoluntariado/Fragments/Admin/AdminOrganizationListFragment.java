@@ -2,15 +2,14 @@ package com.example.appgestionvoluntariado.Fragments.Admin;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,10 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.OrganizationAdapter;
+import com.example.appgestionvoluntariado.Fragments.Auth.OrganizationRegisterFragment;
 import com.example.appgestionvoluntariado.Models.Organization;
-import com.example.appgestionvoluntariado.Models.StatusRequest;
+import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Services.OrganizationService;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -38,16 +39,30 @@ public class AdminOrganizationListFragment extends Fragment {
     private EditText etSearch;
     private TextView tabPending, tabAccepted;
     private View loadingLayout;
-    private FloatingActionButton fabAdd;
+    private FloatingActionButton fabAddOrganization;
 
     private List<Organization> fullList = new ArrayList<>();
     private OrganizationAdapter adapter;
     private String currentFilter = "PENDIENTE";
 
+    private OrganizationService organizationService;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_admin_organization_list, container, false);
 
+
+
+        initViews(v);
+
+        setupTabs();
+        setupSearch();
+        loadData();
+
+        return v;
+    }
+
+    private void initViews(View v) {
         rvOrgs = v.findViewById(R.id.rvOrganizations);
         rvOrgs.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -55,13 +70,10 @@ public class AdminOrganizationListFragment extends Fragment {
         tabPending = v.findViewById(R.id.tabStatusPending);
         tabAccepted = v.findViewById(R.id.tabStatusAccepted);
         loadingLayout = v.findViewById(R.id.layoutLoading);
-        fabAdd = v.findViewById(R.id.fabAddOrganization);
+        fabAddOrganization = v.findViewById(R.id.fabAddOrganization);
+        organizationService = APIClient.getOrganizationService();
 
-        setupTabs();
-        setupSearch();
-        loadData();
-
-        return v;
+        fabAddOrganization.setVisibility(View.INVISIBLE);
     }
 
     private void setupTabs() {
@@ -72,9 +84,17 @@ public class AdminOrganizationListFragment extends Fragment {
         });
 
         tabAccepted.setOnClickListener(v -> {
-            currentFilter = "ACEPTADA";
+            currentFilter = "APROBADO";
             updateTabUI(tabAccepted, tabPending);
             loadData();
+        });
+
+        fabAddOrganization.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.admin_fragment_container, new OrganizationRegisterFragment()).commit();
+            }
         });
     }
 
@@ -87,22 +107,23 @@ public class AdminOrganizationListFragment extends Fragment {
 
     private void loadData() {
         loadingLayout.setVisibility(View.VISIBLE);
-        APIClient.getOrganizationService().getOrganizations(currentFilter)
-                .enqueue(new Callback<List<Organization>>() {
-                    @Override
-                    public void onResponse(Call<List<Organization>> call, Response<List<Organization>> response) {
-                        loadingLayout.setVisibility(View.GONE);
-                        if (response.isSuccessful() && response.body() != null) {
-                            fullList = response.body();
-                            updateAdapter(fullList);
-                        }
-                    }
-                    @Override
-                    public void onFailure(Call<List<Organization>> call, Throwable t) {
-                        loadingLayout.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        organizationService.getOrganizations(currentFilter).enqueue(new Callback<List<Organization>>() {
+            @Override
+            public void onResponse(Call<List<Organization>> call, Response<List<Organization>> response) {
+                loadingLayout.setVisibility(View.GONE);
+                if (response.isSuccessful() && response.body() != null) {
+                    fabAddOrganization.setVisibility(View.VISIBLE);
+                    fullList = response.body();
+                    updateAdapter(fullList);
+                }
+            }
+            @Override
+            public void onFailure(Call<List<Organization>> call, Throwable t) {
+                Log.e("API_ERROR", "Error al llamar a getOrganizations", t); // <--- Mira el Logcat
+                Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     private void updateAdapter(List<Organization> list) {

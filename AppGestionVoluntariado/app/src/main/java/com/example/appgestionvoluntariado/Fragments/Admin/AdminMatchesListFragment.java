@@ -14,11 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.MatchesAdapter;
 import com.example.appgestionvoluntariado.Models.Match;
-import com.example.appgestionvoluntariado.Models.StatusRequest;
+import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Services.InscriptionsService;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -32,18 +33,17 @@ public class AdminMatchesListFragment extends Fragment {
     private MatchesAdapter adapter;
     private View loadingLayout;
 
+    private InscriptionsService inscriptionsService;
+
+    private FloatingActionButton fabAddMatch;
+
     private String currentFilter = "PENDIENTE"; // PENDIENTE o EN CURSO / COMPLETADO
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_admin_matches_list, container, false);
 
-        loadingLayout = v.findViewById(R.id.layoutLoading);
-        tabInProgress = v.findViewById(R.id.tabStatusPending);
-        tabCompleted = v.findViewById(R.id.tabStatusCompleted);
-        recyclerView = v.findViewById(R.id.rvMatches);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        initViews(v);
         setupTabs();
         loadMatches(); // Carga inicial
 
@@ -51,6 +51,16 @@ public class AdminMatchesListFragment extends Fragment {
         return v;
     }
 
+    public void initViews(View v){
+        loadingLayout = v.findViewById(R.id.layoutLoading);
+        tabInProgress = v.findViewById(R.id.tabStatusPending);
+        tabCompleted = v.findViewById(R.id.tabStatusCompleted);
+        recyclerView = v.findViewById(R.id.rvMatches);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        inscriptionsService = APIClient.getInscriptionService();
+        fabAddMatch = v.findViewById(R.id.fabAddMatch);
+        fabAddMatch.bringToFront();
+    }
     private void setupTabs() {
         tabInProgress.setOnClickListener(v -> {
             currentFilter = "PENDIENTE"; // Mostramos primero los que hay que validar
@@ -59,15 +69,23 @@ public class AdminMatchesListFragment extends Fragment {
         });
 
         tabCompleted.setOnClickListener(v -> {
-            currentFilter = "EN CURSO"; // O "COMPLETADO" según prefieras
+            currentFilter = "CONFIRMADO"; // O "COMPLETADO" según prefieras
             updateTabsVisuals(false);
             loadMatches();
+        });
+
+        fabAddMatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.admin_fragment_container, new AdminCreateMatchFragment()).commit();
+            }
         });
     }
 
     private void loadMatches() {
         loadingLayout.setVisibility(View.VISIBLE);
-        APIClient.getMatchesService().getMatches(currentFilter.toUpperCase())
+        inscriptionsService.getMatches(currentFilter.toUpperCase())
                 .enqueue(new Callback<List<Match>>() {
                     @Override
                     public void onResponse(Call<List<Match>> call, Response<List<Match>> response) {
@@ -86,10 +104,10 @@ public class AdminMatchesListFragment extends Fragment {
 
     private void updateAdapter(List<Match> list) {
         adapter = new MatchesAdapter(list, new MatchesAdapter.OnMatchActionListener() {
-            @Override public void onAccept(Match m) { updateMatchStatus(m, "en curso"); }
+            @Override public void onAccept(Match m) { updateMatchStatus(m, "confirmado"); }
             @Override public void onReject(Match m) { updateMatchStatus(m, "rechazado"); }
-            @Override public void onFinish(Match m) { updateMatchStatus(m, "completado"); }
-            @Override public void onCancel(Match m) { updateMatchStatus(m, "cancelado"); }
+            @Override public void onFinish(Match m) { updateMatchStatus(m, "finalizado"); }
+            @Override public void onCancel(Match m) { updateMatchStatus(m, "rechazado"); }
         });
         recyclerView.setAdapter(adapter);
     }
@@ -97,7 +115,8 @@ public class AdminMatchesListFragment extends Fragment {
     private void updateMatchStatus(Match match, String newStatus) {
         loadingLayout.setVisibility(View.VISIBLE);
         // Usamos Token de Firebase. Se envía el ID del match en la URL o RequestBody
-        APIClient.getMatchesService().updateStatus(match.getRegistrationId(), new StatusRequest(newStatus))
+
+       inscriptionsService.updateStatus(match.getRegistrationId(), new StatusRequest(newStatus))
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
