@@ -30,17 +30,6 @@
                 android:textColor="#1A3B85"
                 android:textSize="22sp"
                 android:textStyle="bold" />
-
-            <ImageButton
-                android:id="@+id/btnClose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"
-                app:tint="#757575" />
         </RelativeLayout>
 
         <LinearLayout

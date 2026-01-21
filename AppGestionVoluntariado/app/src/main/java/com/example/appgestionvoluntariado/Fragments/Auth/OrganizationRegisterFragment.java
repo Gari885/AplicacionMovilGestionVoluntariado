@@ -5,15 +5,25 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.Models.Cycle;
+import com.example.appgestionvoluntariado.Models.Interest;
+import com.example.appgestionvoluntariado.Models.Need;
+import com.example.appgestionvoluntariado.Models.Ods;
 import com.example.appgestionvoluntariado.Models.Request.OrganizationRegisterRequest;
+import com.example.appgestionvoluntariado.Models.Skill;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Utils.CategoryManager;
+import com.example.appgestionvoluntariado.Utils.FormData;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -23,6 +33,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -33,7 +44,14 @@ public class OrganizationRegisterFragment extends Fragment {
 
     // UI References in English [cite: 2026-01-09]
     private TextInputLayout tilName, tilEmail, tilPassword, tilCif, tilPhone, tilAddress, tilLocality, tilPostalCode, tilDescription,tilSector;
-    private TextInputEditText etName, etEmail, etPassword, etCif, etPhone, etAddress, etLocality, etPostalCode, etDescription,etSector;
+    private TextInputEditText etName, etEmail, etPassword, etCif, etPhone, etAddress, etLocality, etPostalCode, etDescription;
+
+
+    AutoCompleteTextView actSector;
+    private View loadingOverlay;
+
+    private ProgressBar progressBar;
+    private String btnText;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,15 +65,20 @@ public class OrganizationRegisterFragment extends Fragment {
 
         initViews(view);
         setupToolbar(view);
+        setUpSectors();
 
         btnRegister.setOnClickListener(v -> {
             if (isFormValid()) {
+
                 performRegistration();
+
             }
         });
 
         return view;
     }
+
+
 
     private void initViews(View view) {
         // Layouts for error management [cite: 2026-01-09]
@@ -80,9 +103,13 @@ public class OrganizationRegisterFragment extends Fragment {
         etLocality = view.findViewById(R.id.etLocality);
         etPostalCode = view.findViewById(R.id.etPostalCode);
         etDescription = view.findViewById(R.id.etDescription);
-        etSector = view.findViewById(R.id.etSector);
 
+        actSector = view.findViewById(R.id.actvSector);
+        loadingOverlay = view.findViewById(R.id.loadingOverlay);
+        progressBar = view.findViewById(R.id.btnProgressBar);
         btnRegister = view.findViewById(R.id.btnRegister);
+        loadingOverlay.setVisibility(View.VISIBLE);
+        btnText = btnRegister.getText().toString();
     }
 
     private void setupToolbar(View view) {
@@ -90,6 +117,11 @@ public class OrganizationRegisterFragment extends Fragment {
         if (toolbar != null) {
             toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         }
+    }
+
+    private void setUpSectors() {
+        actSector.setAdapter(new ArrayAdapter<>(requireContext(),android.R.layout.simple_spinner_dropdown_item, FormData.SECTORS_LIST));
+        loadingOverlay.setVisibility(View.INVISIBLE);
     }
 
     private boolean isFormValid() {
@@ -108,10 +140,12 @@ public class OrganizationRegisterFragment extends Fragment {
 
         if (getText(etPassword).length() < 10) { tilPassword.setError("Mínimo 10 caracteres"); isValid = false; } else tilPassword.setError(null);
 
-        return isValid;
-    }
+        if (!isValid) StatusHelper.showStatus(getContext(), "Formulario incompleto", "Corrige los campos marcados en rojo.", true);
+        return isValid;    }
 
     private void performRegistration() {
+        btnRegister.setText("");
+        progressBar.setVisibility(View.VISIBLE);
         // Firebase Auth process [cite: 2026-01-15]
         mAuth.createUserWithEmailAndPassword(getText(etEmail), getText(etPassword)).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -120,6 +154,8 @@ public class OrganizationRegisterFragment extends Fragment {
                     syncWithBackend(user);
                 }
             } else {
+                btnRegister.setText(btnText);
+                progressBar.setVisibility(View.INVISIBLE);
                 StatusHelper.showStatus(getContext(), "Error", "Fallo en el registro Firebase", true);
             }
         });
@@ -130,7 +166,7 @@ public class OrganizationRegisterFragment extends Fragment {
                 new OrganizationRegisterRequest(
                         getText(etCif), getText(etName), fbUser.getEmail(), getText(etPassword),
                         getText(etPhone), getText(etAddress), getText(etLocality), getText(etPostalCode),
-                        getText(etDescription), getText(etSector)
+                        getText(etDescription), actSector.getText().toString()
                 );
 
         APIClient.getAuthAPIService().registerOrganization(req).enqueue(new retrofit2.Callback<Void>() {
@@ -142,14 +178,20 @@ public class OrganizationRegisterFragment extends Fragment {
                     StatusHelper.showStatus(getContext(), "¡Éxito!", "Cuenta creada. Verifica tu email.", false);
                     if (getParentFragmentManager() != null) {
                         getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new LoginFragment()).commit();
+                        btnRegister.setText(btnText);
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 } else {
                     fbUser.delete();
                     try {
                         String err = response.errorBody() != null ? response.errorBody().string() : "Error desconocido";
                         StatusHelper.showStatus(getContext(), "Error servidor", err, true);
+                        btnRegister.setText(btnText);
+                        progressBar.setVisibility(View.INVISIBLE);
                     } catch (Exception e) {
                         StatusHelper.showStatus(getContext(), "Error servidor", "Código: " + response.code(), true);
+                        btnRegister.setText(btnText);
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 }
             }
@@ -158,6 +200,8 @@ public class OrganizationRegisterFragment extends Fragment {
             public void onFailure(@NonNull retrofit2.Call<Void> call, @NonNull Throwable t) {
                 fbUser.delete();
                 StatusHelper.showStatus(getContext(), "Error conexión", t.getMessage(), true);
+                btnRegister.setText(btnText);
+                progressBar.setVisibility(View.INVISIBLE);
             }
         });
     }

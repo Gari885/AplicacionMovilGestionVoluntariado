@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.appgestionvoluntariado.R;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -28,6 +29,8 @@ public class OrgChangePasswordFragment extends Fragment {
     private TextInputLayout tilCurrent, tilNew, tilConfirm;
     private MaterialButton btnUpdate;
 
+    private MaterialToolbar back;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -35,9 +38,10 @@ public class OrgChangePasswordFragment extends Fragment {
 
         initViews(view);
 
-        com.google.android.material.appbar.MaterialToolbar toolbar = view.findViewById(R.id.topAppBar);
-        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        back = view.findViewById(R.id.topAppBarOrg);
+        back.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         btnUpdate.setOnClickListener(v -> validateAndUpdate());
+
 
         return view;
     }
@@ -50,6 +54,7 @@ public class OrgChangePasswordFragment extends Fragment {
         tilNew = v.findViewById(R.id.tilNewPass);
         tilConfirm = v.findViewById(R.id.tilConfirmPass);
         btnUpdate = v.findViewById(R.id.btnUpdatePassword);
+        back = v.findViewById(R.id.topAppBarOrg);
 
     }
 

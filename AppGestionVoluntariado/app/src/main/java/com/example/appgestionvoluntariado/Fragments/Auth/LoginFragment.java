@@ -18,6 +18,7 @@ import com.example.appgestionvoluntariado.Activities.AdminActivity;
 import com.example.appgestionvoluntariado.Activities.OrganizationActivity;
 ;
 import com.example.appgestionvoluntariado.Activities.VolunteerActivity;
+import com.example.appgestionvoluntariado.Models.ProfileResponse;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
@@ -157,7 +158,7 @@ public class LoginFragment extends Fragment {
         });
     }
 
-    private void processLogin(com.example.appgestionvoluntariado.Models.ProfileResponse profile) {
+    private void processLogin(ProfileResponse profile) {
         String type = profile.getType(); 
         if (type == null) type = "";
 

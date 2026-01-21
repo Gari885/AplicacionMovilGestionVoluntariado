@@ -1,5 +1,6 @@
 package com.example.appgestionvoluntariado.Models.Request;
 
+import com.example.appgestionvoluntariado.Models.Cycle;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class VolunteerRegisterRequest {
     private String zone;
 
     @SerializedName("ciclo")
-    private String cycle;
+    private Cycle cycle;
 
     @SerializedName("fechaNacimiento")
     private String birthDate;
@@ -48,10 +49,10 @@ public class VolunteerRegisterRequest {
     private List<String> availability;
 
     public VolunteerRegisterRequest(String fullName, String dni, String email, String password,
-                                     String zone, String cycle, String birthDate, String experience,
-                                     String hasCar, List<String> languages, List<String> skills,
-                                     List<String> interests, List<String> availability,
-                                     String status) {
+                                    String zone, Cycle cycle, String birthDate, String experience,
+                                    String hasCar, List<String> languages, List<String> skills,
+                                    List<String> interests, List<String> availability,
+                                    String status) {
         this.fullName = fullName;
         this.dni = dni;
         this.email = email;

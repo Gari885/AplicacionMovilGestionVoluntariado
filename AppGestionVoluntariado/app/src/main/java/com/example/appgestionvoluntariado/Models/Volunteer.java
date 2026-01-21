@@ -36,6 +36,9 @@ public class Volunteer {
 
     @SerializedName("intereses")
     private List<CategoryItem> interests;
+
+    @SerializedName("disponibilidad")
+    private List<String> disponibility;
     // -----------------------
 
     // 'idiomas' se mantiene como String si el backend manda array de textos
@@ -85,6 +88,12 @@ public class Volunteer {
     public String getExperience(){ return experience;}
 
     public Boolean getHasCar(){ return hasCar; }
+    public String getFirstLastName(){ return lastName1;}
+
+    public String getSecondLastName(){ return lastName2;}
+
+    public List<String> getDisponibility() { return disponibility; }
+
 
     public String getFullName(){
         return firstName + " " + lastName1 + " " + lastName2;

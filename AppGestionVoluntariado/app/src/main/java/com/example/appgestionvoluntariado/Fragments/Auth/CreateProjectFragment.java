@@ -23,6 +23,7 @@ import com.example.appgestionvoluntariado.Models.Request.ProjectCreationRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.ProjectsService;
+import com.example.appgestionvoluntariado.Utils.FormData;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -62,7 +63,6 @@ public class CreateProjectFragment extends Fragment {
         setupDropdowns();
         setupDateTimePickers();
         setupListeners();
-        setupToolbar();
 
         projectsAPIService = APIClient.getProjectsService();
         loadOrganizationData();
@@ -101,21 +101,11 @@ public class CreateProjectFragment extends Fragment {
         chipGroupData = v.findViewById(R.id.chipGroupAddedData);
     }
 
-    private void setupToolbar() {
-        MaterialToolbar toolbar = getActivity().findViewById(R.id.topAppBarOrg);
-        if (toolbar != null) {
-            toolbar.setNavigationIcon(R.drawable.ic_back_arrow);
-            toolbar.setNavigationIconTint(Color.parseColor("#1A3B85"));
-            toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
-        }
-    }
 
     private void setupDropdowns() {
-        String[] zones = {"Pamplona", "Comarca de Pamplona", "Ribera", "Zona Media", "Montaña"};
-        actvZone.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, zones));
+        actvZone.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, FormData.ZONES_LIST));
         
-        String[] sectors = {"Educación", "Salud", "Medio Ambiente", "Social", "Cultural", "Deportivo", "Tecnología", "Otros"};
-        actvSector.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, sectors));
+        actvSector.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, FormData.SECTORS_LIST));
     }
 
     private void loadOrganizationData() {

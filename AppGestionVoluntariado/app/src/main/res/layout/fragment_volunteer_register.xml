@@ -420,7 +420,7 @@
         android:focusable="true"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="invisible">
 
         <ProgressBar
             android:layout_width="60dp"

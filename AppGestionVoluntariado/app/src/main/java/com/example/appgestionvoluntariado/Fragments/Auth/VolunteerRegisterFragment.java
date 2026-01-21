@@ -1,5 +1,12 @@
 package com.example.appgestionvoluntariado.Fragments.Auth;
 
+import static com.example.appgestionvoluntariado.Utils.FormData.CAR_LIST;
+import static com.example.appgestionvoluntariado.Utils.FormData.DAYS_LIST;
+import static com.example.appgestionvoluntariado.Utils.FormData.EXPERIENCE_LIST;
+import static com.example.appgestionvoluntariado.Utils.FormData.LANGUAGE_LIST;
+import static com.example.appgestionvoluntariado.Utils.FormData.TIME_SLOTS_LIST;
+import static com.example.appgestionvoluntariado.Utils.FormData.ZONES_LIST;
+
 import android.app.DatePickerDialog;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -36,6 +43,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -70,19 +79,6 @@ public class VolunteerRegisterFragment extends Fragment {
 
     private List<String> cycleList = new ArrayList<>();
 
-
-    private final String[] EXPERIENCE_LIST = {"Ninguna", "Menos de 1 año", "Entre 1 y 3 años", "Más de 3 años"};
-    private final String[] CAR_LIST = {"Sí", "No"};
-    private final String[] LANGUAGE_LIST = {"Castellano", "Inglés", "Francés", "Euskera", "Alemán", "Otros"};
-    private final String[] DAYS_LIST = {"Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo", "Lunes a Viernes", "Fines de semana"};
-    private final String[] TIME_SLOTS_LIST = {"Mañana", "Tarde", "Noche"};
-    private final String[] ZONES_LIST = {
-            "Casco Viejo", "Ensanche", "Iturrama", "San Juan / Donibane", "Mendebaldea / Ermitagaña",
-            "Milagrosa / Arrosadia", "Azpilagaña", "Chantrea / Txantrea", "Rochapea / Arrotxapea",
-            "San Jorge / Sanduzelai", "Buztintxuri", "Mendillorri", "Lezkairu", "Erripagaña",
-            "Ansoáin / Antsoain", "Barañáin", "Burlada / Burlata", "Villava / Atarrabia",
-            "Zizur Mayor / Zizur Nagusia", "Mutilva / Mutiloa", "Sarriguren"
-    };
 
     private FirebaseAuth mAuth;
 
@@ -387,9 +383,10 @@ public class VolunteerRegisterFragment extends Fragment {
     }
 
     private void syncWithBackend(FirebaseUser fbUser) {
+
         VolunteerRegisterRequest req = new VolunteerRegisterRequest(
                 getText(etName), getText(etDni), fbUser.getEmail(), getText(etPassword),
-                actvZona.getText().toString(), actvCycle.getText().toString(), etBirthDate.getText().toString(),
+                actvZona.getText().toString(), getCleanCycle(), etBirthDate.getText().toString(),
                 actvExperience.getText().toString(), actvCar.getText().toString(), selectedLanguages,
                 selectedSkills, selectedInterests, selectedAvailability, "Pendiente"
         );
@@ -414,6 +411,28 @@ public class VolunteerRegisterFragment extends Fragment {
                 toggleLoading(false);
             }
         });
+    }
+
+    private Cycle getCleanCycle() {
+        String cleanCycle = actvCycle.getText().toString().trim();
+
+        String name;
+        String year;
+
+        int lastSpaceIndex = cleanCycle.lastIndexOf(" ");
+
+        if (lastSpaceIndex != -1) {
+            name = cleanCycle.substring(0,lastSpaceIndex);
+
+            year = cleanCycle.substring(lastSpaceIndex + 1);
+
+        }else {
+            name = cleanCycle;
+            year = "";
+        }
+
+        return new Cycle(name, year);
+
     }
 
     private void saveRoleToFirestore(String uid, String email) {

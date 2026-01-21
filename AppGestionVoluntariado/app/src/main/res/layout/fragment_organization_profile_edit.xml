@@ -78,6 +78,26 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilSector"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="354dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:errorEnabled="true">
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvSector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Sector"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -168,7 +188,7 @@
                 android:layout_marginTop="12dp"
                 app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp"
-                android:hint="Misión de la organización">
+                android:hint="Misión de la entidad">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etEditDescription"
                     android:layout_width="match_parent"
@@ -199,12 +219,22 @@
         android:background="#80FFFFFF"
         android:clickable="true"
         android:focusable="true"
-        android:visibility="gone">
+        android:visibility="visible">
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:indeterminateTint="#1A3B85" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Cargando datos..."
+            android:layout_gravity="center"
+            android:paddingTop="40dp"
+            android:textColor="#1A3B85"
+            android:textStyle="bold"
+            android:textSize="18sp" />
     </FrameLayout>
 
     </FrameLayout>

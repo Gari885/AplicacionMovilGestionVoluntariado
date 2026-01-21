@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Fragments.Auth.CreateProjectFragment;
 import com.example.appgestionvoluntariado.Fragments.Organization.OrgActivitiesFragment;
+import com.example.appgestionvoluntariado.Fragments.Organization.OrgProfileHubFragment;
 import com.example.appgestionvoluntariado.Fragments.Volunteer.VolunteerProfileHubFragment;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
@@ -46,7 +47,7 @@ public class OrganizationActivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.action_user) {
-                replaceFragment(new VolunteerProfileHubFragment());
+                replaceFragment(new OrgProfileHubFragment());
                 return true;
             } else if (id == R.id.action_logout) {
                 performLogout();

@@ -4,6 +4,7 @@ import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -21,10 +22,8 @@ public interface VolunteerService {
             @Body StatusRequest request
     );
 
-    @PUT("auth/profile")
-    Call<Void> editProfile(@Body Volunteer volunteer);
 
-    @PUT("volunteer/profile")
-    Call<Void> updateProfile(@Body Volunteer volunteer);
+    @PUT("auth/profile")
+    Call<Void> updateProfile(@Body Map<String, Object> data);
 
 }

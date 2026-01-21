@@ -5,6 +5,7 @@ import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.Models.Organization;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -34,7 +35,7 @@ public interface OrganizationService {
     );
 
     @PUT("auth/profile")
-    Call<Void> editProfile(@Body Organization organization);
+    Call<Void> updateProfile(@Body Map<String, Object> data);
 
 
 

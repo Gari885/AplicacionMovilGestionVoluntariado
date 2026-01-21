@@ -1,6 +1,7 @@
 package com.example.appgestionvoluntariado.Fragments.Volunteer;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +115,12 @@ public class VolunteerExploreFragment extends Fragment {
                     availableProjects.remove(item);
                     projectAdapter.notifyAdapter(availableProjects);
                 } else {
-                    Toast.makeText(getContext(), "Error: El servidor rechazó la inscripción", Toast.LENGTH_SHORT).show();
+                    String errorJson = response.errorBody().toString();
+                    Log.e("API_ERROR", "Error 409: " + errorJson);
+                    // Si quieres mostrarlo en un Toast:
+                    // JSONObject jObj = new JSONObject(errorJson);
+                    // String msg = jObj.getString("error");
+                    // Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
                 }
             }
 

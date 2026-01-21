@@ -157,7 +157,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
 
                 case ADMINISTRATOR_ACCEPTED:
                     btnPrimary.setVisibility(View.VISIBLE);
-                    btnPrimary.setText("BORRAR");
+                    btnPrimary.setText("DAR DE BAJA");
                     btnPrimary.setOnClickListener(v -> listener.onAccept(project));
                     btnSecondary.setOnClickListener(v -> listener.onReject(project));
                     break;
