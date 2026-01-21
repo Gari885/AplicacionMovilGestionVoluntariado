@@ -4,15 +4,19 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,6 +55,9 @@ public class CreateProjectFragment extends Fragment {
     private AutoCompleteTextView actvZone, actvOrganization, actvSector;
     private ChipGroup chipGroupData;
 
+    private MaterialToolbar topAppBar;
+
+
     private List<String> odsList = new ArrayList<>();
     private List<String> skillsList = new ArrayList<>();
     private ProjectsService projectsAPIService;
@@ -70,7 +77,6 @@ public class CreateProjectFragment extends Fragment {
     }
 
     private void initViews(View v) {
-        btnClose = v.findViewById(R.id.btnClose);
         btnCreate = v.findViewById(R.id.btnCreateProject);
         btnAddSkill = v.findViewById(R.id.btnAddSkill);
         btnAddODS = v.findViewById(R.id.btnAddODS);
@@ -97,8 +103,9 @@ public class CreateProjectFragment extends Fragment {
         actvZone = v.findViewById(R.id.actvZone);
         actvOrganization = v.findViewById(R.id.actvOrganization);
         actvSector = v.findViewById(R.id.actvSector);
-        
+        topAppBar = v.findViewById(R.id.topAppBar);
         chipGroupData = v.findViewById(R.id.chipGroupAddedData);
+
     }
 
 
@@ -132,7 +139,8 @@ public class CreateProjectFragment extends Fragment {
     }
 
     private void setupListeners() {
-        btnClose.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+
+        topAppBar.setOnClickListener(v -> getParentFragmentManager().popBackStack());
 
         btnAddSkill.setOnClickListener(v -> addChip(etNewSkill, skillsList, "SKILL"));
         btnAddODS.setOnClickListener(v -> addChip(etNewODS, odsList, "ODS"));

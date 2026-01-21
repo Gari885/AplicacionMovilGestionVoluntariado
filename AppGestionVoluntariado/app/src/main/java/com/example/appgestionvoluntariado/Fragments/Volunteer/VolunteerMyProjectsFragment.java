@@ -1,15 +1,12 @@
 package com.example.appgestionvoluntariado.Fragments.Volunteer;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,15 +41,14 @@ public class VolunteerMyProjectsFragment extends Fragment {
     private List<Project> allEnrolledProjects = new ArrayList<>();
     private List<Project> displayedProjects = new ArrayList<>();
 
-    private LinearLayout loadingLayout;
+    private View loadingLayout;
     private TextView loadingText;
+    private android.widget.ImageView logoSpinner;
+    private android.view.animation.Animation rotateAnimation;
+    
     private EditText etSearch;
 
     private ProjectsService projectsService;
-
-    private Handler animationHandler;
-    private Runnable animationRunnable;
-    private int dotCount = 0;
 
     @Nullable
     @Override
@@ -74,13 +70,19 @@ public class VolunteerMyProjectsFragment extends Fragment {
 
         loadingLayout = view.findViewById(R.id.layoutLoading);
         loadingText = view.findViewById(R.id.tvLoadingText);
+        logoSpinner = view.findViewById(R.id.ivLogoSpinner);
+        
+        rotateAnimation = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        if (logoSpinner != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
+
         etSearch = view.findViewById(R.id.etSearchProject);
         btnTabAccepted = view.findViewById(R.id.btnTabAccepted);
         btnTabPending = view.findViewById(R.id.btnTabPending);
 
         // APIClient ya debe incluir el AuthInterceptor para el Token
         projectsService = APIClient.getProjectsService();
-        animationHandler = new Handler(Looper.getMainLooper());
     }
 
     private void setupFilterTabs() {
@@ -243,29 +245,15 @@ public class VolunteerMyProjectsFragment extends Fragment {
 
     private void startLoadingAnimation(String message) {
         loadingLayout.setVisibility(View.VISIBLE);
-        animationRunnable = new Runnable() {
-            @Override
-            public void run() {
-                StringBuilder dots = new StringBuilder();
-                for (int i = 0; i < dotCount; i++) dots.append(".");
-                loadingText.setText(message + dots.toString());
-                dotCount = (dotCount + 1) % 4;
-                animationHandler.postDelayed(this, 500);
-            }
-        };
-        animationHandler.post(animationRunnable);
+        loadingText.setText(message);
     }
 
     private void stopLoadingAnimation() {
         loadingLayout.setVisibility(View.GONE);
-        if (animationHandler != null && animationRunnable != null) {
-            animationHandler.removeCallbacks(animationRunnable);
-        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        stopLoadingAnimation();
     }
 }

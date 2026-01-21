@@ -328,28 +328,39 @@
     </LinearLayout>
 
     <!-- Loading Overlay -->
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80FFFFFF"
+        android:background="#E6FFFFFF"
         android:clickable="true"
         android:focusable="true"
         android:visibility="gone">
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+
+        <ImageView
+            android:id="@+id/ivLogoSpinner"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:layout_gravity="center"
-            android:indeterminateTint="#1A3B85" />
+            android:src="@drawable/ic_logo_compass"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.4" />
 
         <TextView
+            android:id="@+id/tvLoadingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Cargando datos..."
             android:textColor="#1A3B85"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:textSize="18sp" />
-    </FrameLayout>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivLogoSpinner" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

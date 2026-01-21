@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Activities.MainActivity;
@@ -33,8 +36,11 @@ import retrofit2.Response;
 public class OrgProfileHubFragment extends Fragment {
 
     private TextView tvName, tvVat;
-    private ProgressBar pbLoading;
+    private View loadingLayout;
+    private ImageView logoSpinner;
+    private android.view.animation.Animation rotateAnimation;
     private Organization organization;
+
     private final Gson gson = new Gson();
 
     @Nullable
@@ -52,7 +58,13 @@ public class OrgProfileHubFragment extends Fragment {
     private void initViews(View v) {
         tvName = v.findViewById(R.id.tvHubOrgName);
         tvVat = v.findViewById(R.id.tvHubOrgCif);
-        pbLoading = v.findViewById(R.id.pbLoadingHub); // Asegúrate de añadirlo al XML
+        loadingLayout = v.findViewById(R.id.layoutLoading);
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+
+        rotateAnimation = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        if (logoSpinner != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
     }
 
     private void setupNavigation(View view) {
@@ -106,8 +118,8 @@ public class OrgProfileHubFragment extends Fragment {
     }
 
     private void toggleLoading(boolean isLoading) {
-        if (pbLoading != null) {
-            pbLoading.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        if (loadingLayout != null) {
+            loadingLayout.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         }
     }
 

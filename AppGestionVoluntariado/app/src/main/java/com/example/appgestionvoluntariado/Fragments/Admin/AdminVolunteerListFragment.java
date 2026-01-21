@@ -9,8 +9,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.VolunteerAdapter;
 import com.example.appgestionvoluntariado.Fragments.Auth.OrganizationRegisterFragment;
+import com.example.appgestionvoluntariado.Fragments.Auth.VolunteerRegisterFragment;
 import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
@@ -44,6 +48,9 @@ public class AdminVolunteerListFragment extends Fragment {
     private EditText etSearch;
     private TextView tabPending, tabAccepted;
     private View loadingLayout;
+
+    private ImageView logoSpinner;
+    private Animation rotateAnimation;
 
     private List<Volunteer> fullList = new ArrayList<>();
     private VolunteerAdapter adapter;
@@ -76,6 +83,9 @@ public class AdminVolunteerListFragment extends Fragment {
         fabAddVolunteer = v.findViewById(R.id.fabAddVolunteer);
         fabAddVolunteer.setVisibility(View.INVISIBLE);
         adminService = APIClient.getAdminService();
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        logoSpinner.startAnimation(rotateAnimation);
     }
 
     private void setupTabs() {
@@ -96,7 +106,8 @@ public class AdminVolunteerListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, new OrganizationRegisterFragment()).commit();
+                        .replace(R.id.admin_fragment_container, new VolunteerRegisterFragment())
+                        .addToBackStack(null).commit();
             }
         });
     }

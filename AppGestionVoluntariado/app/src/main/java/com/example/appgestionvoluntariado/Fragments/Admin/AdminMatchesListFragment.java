@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +36,9 @@ public class AdminMatchesListFragment extends Fragment {
     private MatchesAdapter adapter;
     private View loadingLayout;
 
+
+    private ImageView logoSpinner;
+    private Animation rotateAnimation;
     private InscriptionsService inscriptionsService;
 
     private FloatingActionButton fabAddMatch;
@@ -60,6 +66,9 @@ public class AdminMatchesListFragment extends Fragment {
         inscriptionsService = APIClient.getInscriptionService();
         fabAddMatch = v.findViewById(R.id.fabAddMatch);
         fabAddMatch.bringToFront();
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        logoSpinner.startAnimation(rotateAnimation);
     }
     private void setupTabs() {
         tabInProgress.setOnClickListener(v -> {

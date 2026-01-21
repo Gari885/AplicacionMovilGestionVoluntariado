@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.ProgressBar;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,6 +45,9 @@ public class OrgProfileEditFragment extends Fragment {
     private TextInputLayout tilName, tilEmail, tilPhone, tilAddress, tilLocality, tilPostalCode, tilDescription,tilSector;
     private MaterialButton btnSave;
     private View loadingOverlay;
+
+    private ImageView logoSpinner;
+    private android.view.animation.Animation rotateAnimation;
 
     private AutoCompleteTextView actSector;
 
@@ -100,6 +103,13 @@ public class OrgProfileEditFragment extends Fragment {
         actSector = v.findViewById(R.id.actvSector);
         btnSave = v.findViewById(R.id.btnSaveProfile);
         loadingOverlay = v.findViewById(R.id.loadingOverlay);
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        
+        rotateAnimation = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        if (logoSpinner != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
+
         loadingOverlay.setVisibility(View.VISIBLE);
     }
 

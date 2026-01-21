@@ -7,7 +7,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +41,8 @@ public class AdminProjectListFragment extends Fragment {
     private View loadingLayout;
     private TextView tabPending, tabAccepted;
     private EditText etSearch;
-
+    private ImageView logoSpinner;
+    private Animation rotateAnimation;
     private ViewMode view;
 
     private List<Project> fullList = new ArrayList<>();
@@ -60,6 +64,9 @@ public class AdminProjectListFragment extends Fragment {
         fabAddProject = v.findViewById(R.id.fabAddProject);
         fabAddProject.setVisibility(View.INVISIBLE);
         view = ViewMode.ADMINISTRATOR_PENDING;
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        logoSpinner.startAnimation(rotateAnimation);
 
         setupTabs();
         setupSearch();
@@ -88,7 +95,8 @@ public class AdminProjectListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new CreateProjectFragment()).commit();
+                        .replace(R.id.admin_fragment_container, new CreateProjectFragment())
+                        .addToBackStack(null).commit();
             }
         });
     }

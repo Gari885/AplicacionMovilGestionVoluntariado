@@ -9,7 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +43,9 @@ public class AdminOrganizationListFragment extends Fragment {
     private TextView tabPending, tabAccepted;
     private View loadingLayout;
     private FloatingActionButton fabAddOrganization;
+
+    private ImageView logoSpinner;
+    private Animation rotateAnimation;
 
     private List<Organization> fullList = new ArrayList<>();
     private OrganizationAdapter adapter;
@@ -72,6 +78,9 @@ public class AdminOrganizationListFragment extends Fragment {
         loadingLayout = v.findViewById(R.id.layoutLoading);
         fabAddOrganization = v.findViewById(R.id.fabAddOrganization);
         organizationService = APIClient.getOrganizationService();
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        logoSpinner.startAnimation(rotateAnimation);
 
         fabAddOrganization.setVisibility(View.INVISIBLE);
     }
@@ -93,7 +102,8 @@ public class AdminOrganizationListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, new OrganizationRegisterFragment()).commit();
+                        .replace(R.id.admin_fragment_container, new OrganizationRegisterFragment())
+                        .addToBackStack(null).commit();
             }
         });
     }

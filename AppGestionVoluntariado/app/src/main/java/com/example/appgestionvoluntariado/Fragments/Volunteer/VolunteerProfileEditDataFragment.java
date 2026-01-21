@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +54,9 @@ public class VolunteerProfileEditDataFragment extends Fragment {
     private AutoCompleteTextView acLanguages, acExperience, acCycle, acCar, acZone, acDay, acTimeZone;
     private MaterialButton btnSave, btnSelectSkills, btnSelectInterests, btnSelectDisponibility, btnSelectLanguage;
     private ChipGroup cgSummary;
-    private FrameLayout loadingOverlay;
+    private View loadingOverlay;
+    private android.widget.ImageView logoSpinner;
+    private android.view.animation.Animation rotateAnimation;
 
     // Servicios y Datos
     private VolunteerService volunteerService;
@@ -111,6 +112,13 @@ public class VolunteerProfileEditDataFragment extends Fragment {
 
         cgSummary = v.findViewById(R.id.cgSummary);
         loadingOverlay = v.findViewById(R.id.loadingOverlay);
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        
+        rotateAnimation = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        if (logoSpinner != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
+
         volunteerService = APIClient.getVolunteerService();
     }
 

@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +35,10 @@ public class AdminDashboardFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private DashboardAdapter dashboardAdapter;
+    private ImageView logoSpinner;
     private View loadingLayout;
     private TextView loadingText;
+    private Animation rotateAnimation;
     private List<Stat> statsList = new ArrayList<>();
 
     private Handler animationHandler = new Handler();
@@ -60,6 +65,9 @@ public class AdminDashboardFragment extends Fragment {
     private void initViews(View v) {
         recyclerView = v.findViewById(R.id.rvDashboard);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        logoSpinner.startAnimation(rotateAnimation);
 
         loadingLayout = v.findViewById(R.id.layoutLoading);
         loadingText = v.findViewById(R.id.tvLoadingText);

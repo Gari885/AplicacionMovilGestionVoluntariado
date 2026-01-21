@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,8 +35,10 @@ public class VolunteerExploreFragment extends Fragment {
     private ProjectsService projectsService;
     private RecyclerView recyclerView;
     private ProjectAdapter projectAdapter;
-    private LinearLayout loadingLayout;
+    private View loadingLayout;
     private TextView loadingText;
+    private android.widget.ImageView logoSpinner;
+    private android.view.animation.Animation rotateAnimation;
 
     @Nullable
     @Override
@@ -53,6 +55,13 @@ public class VolunteerExploreFragment extends Fragment {
     private void initViews(View view) {
         loadingLayout = view.findViewById(R.id.layoutLoading);
         loadingText = view.findViewById(R.id.tvLoadingText);
+        logoSpinner = view.findViewById(R.id.ivLogoSpinner);
+        
+        rotateAnimation = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        if (logoSpinner != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
+
         recyclerView = view.findViewById(R.id.rvProjects);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

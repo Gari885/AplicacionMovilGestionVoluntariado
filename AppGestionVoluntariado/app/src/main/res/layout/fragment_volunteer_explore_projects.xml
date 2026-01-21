@@ -39,40 +39,53 @@
             android:drawablePadding="10dp"
             android:drawableTint="#757575"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvProjects"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
-            android:nestedScrollingEnabled="false"/>
+            android:layout_marginTop="20dp">
 
-    </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvProjects"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:nestedScrollingEnabled="false"/>
 
-    <LinearLayout
-        android:id="@+id/layoutLoading"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="@android:color/white"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true">
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:indeterminateTint="#1A3B85"/>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutLoading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E6FFFFFF"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tvLoadingText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Cargando ofertas"
-            android:textColor="#1A3B85"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+                <ImageView
+                    android:id="@+id/ivLogoSpinner"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_logo_compass"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.4" />
+
+                <TextView
+                    android:id="@+id/tvLoadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Cargando ofertas"
+                    android:textColor="#1A3B85"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ivLogoSpinner" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
+
     </LinearLayout>
 
 </FrameLayout>

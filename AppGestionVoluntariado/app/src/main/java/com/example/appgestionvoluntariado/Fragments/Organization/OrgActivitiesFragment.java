@@ -39,6 +39,8 @@ public class OrgActivitiesFragment extends Fragment {
     private TextView tabPending, tabAccepted;
     private EditText etSearch;
     private View loadingLayout;
+    private android.widget.ImageView logoSpinner;
+    private android.view.animation.Animation rotateAnimation;
     private FloatingActionButton fabAddProject;
 
     private List<Project> allProjects = new ArrayList<>();
@@ -67,6 +69,13 @@ public class OrgActivitiesFragment extends Fragment {
         tabAccepted = view.findViewById(R.id.tabStatusAccepted);
         etSearch = view.findViewById(R.id.etSearchProject);
         loadingLayout = view.findViewById(R.id.layoutLoading);
+        logoSpinner = view.findViewById(R.id.ivLogoSpinner);
+        
+        rotateAnimation = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+        if (logoSpinner != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
+
         fabAddProject = view.findViewById(R.id.fabAddProject);
 
         // Botón para crear nuevo proyecto
