@@ -39,4 +39,28 @@ public class StatusHelper {
         dialog.setContentView(view);
         dialog.show();
     }
+    public static void showToast(Context context, String message, boolean isError) {
+        if (context == null) return;
+        
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View layout = inflater.inflate(R.layout.layout_custom_toast, null);
+
+        ImageView icon = layout.findViewById(R.id.imgToastIcon);
+        TextView text = layout.findViewById(R.id.tvToastMessage);
+
+        text.setText(message);
+
+        if (isError) {
+            icon.setImageResource(android.R.drawable.ic_delete); // Simple X icon or similar
+            icon.setColorFilter(Color.parseColor("#D32F2F")); // Red
+        } else {
+            icon.setImageResource(R.drawable.ic_check_circle); // We used this in bottom sheet too
+            icon.setColorFilter(Color.parseColor("#2E7D32")); // Green
+        }
+
+        android.widget.Toast toast = new android.widget.Toast(context);
+        toast.setDuration(android.widget.Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.show();
+    }
 }

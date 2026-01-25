@@ -82,7 +82,7 @@ public class OrganizationAdapter extends RecyclerView.Adapter<OrganizationAdapte
 
         public void bind(Organization org, OnOrgActionListener listener) {
             name.setText(org.getName());
-            cif.setText("CIF: " + org.getVat());
+            cif.setText("CIF: " + org.getCif());
             email.setText(org.getEmail());
 
             // Lógica visual basada en el estado del objeto

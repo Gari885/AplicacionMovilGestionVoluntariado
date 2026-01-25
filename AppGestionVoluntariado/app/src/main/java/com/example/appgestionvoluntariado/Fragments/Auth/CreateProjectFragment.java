@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,19 +14,25 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.Models.Ods;
+import com.example.appgestionvoluntariado.Models.Organization;
 import com.example.appgestionvoluntariado.Models.Request.ProjectCreationRequest;
+import com.example.appgestionvoluntariado.Models.Response.ProfileResponse;
+import com.example.appgestionvoluntariado.Models.Skill;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.ProjectsService;
+import com.example.appgestionvoluntariado.Utils.CategoryManager;
 import com.example.appgestionvoluntariado.Utils.FormData;
+import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -48,30 +53,50 @@ import retrofit2.Response;
 
 public class CreateProjectFragment extends Fragment {
 
-    private ImageButton btnClose;
     private Button btnCreate, btnAddSkill, btnAddODS;
     private TextInputEditText etName, etDescription, etStartDate, etEndDate, etMaxParticipants, etNewSkill, etNewODS;
     private TextInputLayout tilName, tilDescription, tilStartDate, tilEndDate, tilMaxParticipants, tilNewSkill, tilNewODS, tilZone, tilOrganization, tilSector;
-    private AutoCompleteTextView actvZone, actvOrganization, actvSector;
+    private AutoCompleteTextView actvZone, actvOrganization, actvSector, actvSkill, actvODS;
     private ChipGroup chipGroupData;
 
-    private MaterialToolbar topAppBar;
+    private TextView loadingText;
 
+    private ProgressBar pbLoading;
+    private final List<Skill> masterSkillsList = new ArrayList<>();
+    private final List<Ods> masterODSList = new ArrayList<>();
+
+    private int loadedCount = 0;
+
+    private String bottonText;
+
+
+    // Views de carga
+    private View loadingOverlay;
+    private ImageView ivLogoSpinner;
+    private Animation rotateAnim;
+
+    private MaterialToolbar topAppBar;
 
     private List<String> odsList = new ArrayList<>();
     private List<String> skillsList = new ArrayList<>();
     private ProjectsService projectsAPIService;
+
+    // NEW: Store selected organization for Admins
+    private Organization selectedOrganization = null;
+    private List<Organization> loadedOrganizations = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_organization_create_project, container, false);
         initViews(view);
-        setupDropdowns();
+        setupNavigation(); // Arreglamos el botón atrás [cite: 2026-01-20]
         setupDateTimePickers();
         setupListeners();
 
         projectsAPIService = APIClient.getProjectsService();
+
+        loadDynamicCategories(); // Carga ODS y Skills desde la API
         loadOrganizationData();
         return view;
     }
@@ -80,14 +105,13 @@ public class CreateProjectFragment extends Fragment {
         btnCreate = v.findViewById(R.id.btnCreateProject);
         btnAddSkill = v.findViewById(R.id.btnAddSkill);
         btnAddODS = v.findViewById(R.id.btnAddODS);
+        loadingText = v.findViewById(R.id.tvLoadingText);
 
         etName = v.findViewById(R.id.etName);
         etDescription = v.findViewById(R.id.etDescription);
         etStartDate = v.findViewById(R.id.etStartDate);
         etEndDate = v.findViewById(R.id.etEndDate);
         etMaxParticipants = v.findViewById(R.id.etMaxParticipants);
-        etNewSkill = v.findViewById(R.id.etNewSkill);
-        etNewODS = v.findViewById(R.id.etNewODS);
 
         tilName = v.findViewById(R.id.tilName);
         tilDescription = v.findViewById(R.id.tilDescription);
@@ -100,40 +124,97 @@ public class CreateProjectFragment extends Fragment {
         tilOrganization = v.findViewById(R.id.tilOrganization);
         tilSector = v.findViewById(R.id.tilSector);
 
+        actvODS = v.findViewById(R.id.actvODS);
+        actvSkill = v.findViewById(R.id.actvSkill);
         actvZone = v.findViewById(R.id.actvZone);
         actvOrganization = v.findViewById(R.id.actvOrganization);
         actvSector = v.findViewById(R.id.actvSector);
         topAppBar = v.findViewById(R.id.topAppBar);
         chipGroupData = v.findViewById(R.id.chipGroupAddedData);
+        pbLoading = v.findViewById(R.id.pbLoginLoading);
 
-    }
+        // Loading y Animación [cite: 2026-01-20]
+        loadingOverlay = v.findViewById(R.id.layoutLoading);
+        ivLogoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        rotateAnim = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
 
-
-    private void setupDropdowns() {
         actvZone.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, FormData.ZONES_LIST));
-        
         actvSector.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, FormData.SECTORS_LIST));
+
     }
+
+    private void setupNavigation() {
+        // Arreglo del botón atrás para que funcione en cualquier contexto [cite: 2026-01-20]
+        topAppBar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+    }
+
+    private void toggleLoading(boolean show) {
+        if (show) {
+            loadingOverlay.setVisibility(View.VISIBLE);
+            ivLogoSpinner.startAnimation(rotateAnim);
+        } else {
+            ivLogoSpinner.clearAnimation();
+            loadingOverlay.setVisibility(View.GONE);
+        }
+    }
+
 
     private void loadOrganizationData() {
-        APIClient.getAuthAPIService().getProfile().enqueue(new Callback<com.example.appgestionvoluntariado.Models.ProfileResponse>() {
+        APIClient.getAuthAPIService().getProfile().enqueue(new Callback<ProfileResponse>() {
             @Override
-            public void onResponse(@NonNull Call<com.example.appgestionvoluntariado.Models.ProfileResponse> call, @NonNull Response<com.example.appgestionvoluntariado.Models.ProfileResponse> response) {
+            public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    try {
-                        String orgName = response.body().getData().get("nombre").getAsString();
-                        actvOrganization.setText(orgName);
-                        actvOrganization.setEnabled(false); // Make it read-only
-                        tilOrganization.setEnabled(false); // Visual indication
-                    } catch (Exception e) {
-                        Log.e("CreateProject", "Error parsing profile data", e);
+                    if (response.body().getType().equalsIgnoreCase("admin")) {
+                        // ADMIN: Load organizations to select
+                        actvOrganization.setEnabled(true);
+                        tilOrganization.setEnabled(true);
+                        loadOrganizations();
+                    }else if (response.body().getType().equalsIgnoreCase("organizacion")) {
+                        try {
+                            // ORG: Pre-fill and disable
+                            String orgName = response.body().getData().get("nombre").getAsString();
+                            actvOrganization.setText(orgName);
+                            actvOrganization.setEnabled(false); // Make it read-only
+                            tilOrganization.setEnabled(false); // Visual indication
+                        } catch (Exception e) {
+                            Log.e("CreateProject", "Error parsing profile data", e);
+                        }
                     }
+                    checkAllLoaded();
+
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<com.example.appgestionvoluntariado.Models.ProfileResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<ProfileResponse> call, @NonNull Throwable t) {
                 Log.e("CreateProject", "Failed to fetch profile", t);
+                checkAllLoaded();
+            }
+        });
+    }
+
+    private void loadOrganizations() {
+        APIClient.getOrganizationService().getOrganizations("aprobado").enqueue(new Callback<List<Organization>>() {
+            @Override
+            public void onResponse(Call<List<Organization>> call, Response<List<Organization>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    loadedOrganizations = response.body();
+                    // NEW: Use custom layout or toString() override in Organization model
+                    ArrayAdapter<Organization> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, loadedOrganizations);
+                    actvOrganization.setAdapter(adapter);
+
+                    // Handle selection event
+                    actvOrganization.setOnItemClickListener((parent, view, position, id) -> {
+                        selectedOrganization = (Organization) parent.getItemAtPosition(position);
+                    });
+
+                    checkAllLoaded();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Organization>> call, Throwable t) {
+                checkAllLoaded();
             }
         });
     }
@@ -142,11 +223,12 @@ public class CreateProjectFragment extends Fragment {
 
         topAppBar.setOnClickListener(v -> getParentFragmentManager().popBackStack());
 
-        btnAddSkill.setOnClickListener(v -> addChip(etNewSkill, skillsList, "SKILL"));
-        btnAddODS.setOnClickListener(v -> addChip(etNewODS, odsList, "ODS"));
+        btnAddSkill.setOnClickListener(v -> addChipFromAutoComplete(actvSkill, skillsList, "SKILL"));
+        btnAddODS.setOnClickListener(v -> addChipFromAutoComplete(actvODS, odsList, "ODS"));
 
         btnCreate.setOnClickListener(v -> {
             if (validateForm()) {
+                toggleLoading(true);
                 sendProjectToBackend();
             }
         });
@@ -161,24 +243,31 @@ public class CreateProjectFragment extends Fragment {
         tilEndDate.setError(null);
         tilMaxParticipants.setError(null);
         tilZone.setError(null);
+        tilOrganization.setError(null);
 
-        if (TextUtils.isEmpty(etName.getText())) { tilName.setError("Project name required"); isValid = false; }
-        if (TextUtils.isEmpty(etDescription.getText())) { tilDescription.setError("Description required"); isValid = false; }
-        if (TextUtils.isEmpty(actvZone.getText())) { tilZone.setError("Zone selection required"); isValid = false; }
-        if (TextUtils.isEmpty(etStartDate.getText())) { tilStartDate.setError("Start date required"); isValid = false; }
-        if (TextUtils.isEmpty(etEndDate.getText())) { tilEndDate.setError("End date required"); isValid = false; }
+        if (TextUtils.isEmpty(etName.getText())) { tilName.setError("Campo requerido"); isValid = false; }
+        if (TextUtils.isEmpty(etDescription.getText())) { tilDescription.setError("Campo requerido"); isValid = false; }
+        if (TextUtils.isEmpty(actvZone.getText())) { tilZone.setError("Campo requerido"); isValid = false; }
+        if (TextUtils.isEmpty(etStartDate.getText())) { tilStartDate.setError("Campo requerido"); isValid = false; }
+        if (TextUtils.isEmpty(etEndDate.getText())) { tilEndDate.setError("Campo requerido"); isValid = false; }
+
+        // Validate Organization for Admin
+        if (actvOrganization.isEnabled() && selectedOrganization == null) {
+            tilOrganization.setError("Selecciona una organización");
+            isValid = false;
+        }
 
         if (TextUtils.isEmpty(etMaxParticipants.getText())) {
-            tilMaxParticipants.setError("Participant limit required");
+            tilMaxParticipants.setError("Campo requerido");
             isValid = false;
         }
 
         if (odsList.isEmpty()) {
-            Toast.makeText(getContext(), "Add at least one ODS", Toast.LENGTH_SHORT).show();
+            StatusHelper.showToast(getContext(), "Añade almenos un ODS", true);
             isValid = false;
         }
         if (skillsList.isEmpty()) {
-            Toast.makeText(getContext(), "Add at least one required skill", Toast.LENGTH_SHORT).show();
+            StatusHelper.showToast(getContext(), "Añade almenos una habilidad", true);
             isValid = false;
         }
 
@@ -186,75 +275,94 @@ public class CreateProjectFragment extends Fragment {
     }
 
     private void sendProjectToBackend() {
+        toggleLoading(true);
         ProjectCreationRequest request = new ProjectCreationRequest();
-
-        // **IMPORTANTE**: Enviamos null como CIF.
-        // El backend detectará automáticamente que soy una Organización por mi Token
-        request.setOrganizationCif(null);
 
         request.setName(etName.getText().toString().trim());
         request.setDescription(etDescription.getText().toString().trim());
         request.setAddress(actvZone.getText().toString().trim());
-
-        // Formatear fechas como YYYY-MM-DD
         request.setStartDate(formatDateForBackend(etStartDate.getText().toString()));
         request.setEndDate(formatDateForBackend(etEndDate.getText().toString()));
-
-        try {
-            request.setMaxParticipants(Integer.parseInt(etMaxParticipants.getText().toString()));
-        } catch (NumberFormatException e) {
-            request.setMaxParticipants(10);
-        }
-
         request.setOds(odsList);
+        request.setMaxParticipants(Integer.parseInt(etMaxParticipants.getText().toString()));
         request.setSkills(skillsList);
-        request.setNeeds(new ArrayList<>());
-        
-        // Add sector if logical to do so, though not explicitly requested in API call yet, it might be part of the request model?
-        // Checking ProjectCreationRequest model below would be prudent, but for now user just asked for visual blocking.
-        // Assuming Address maps to Zone as per previous edits.
+
+        // NEW: Add Organization CIF if Admin selected one
+        if (selectedOrganization != null) {
+            request.setOrganizationCif(selectedOrganization.getCif());
+        }
 
         projectsAPIService.createProject(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                toggleLoading(false);
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Project created successfully!", Toast.LENGTH_LONG).show();
+                    loadingText.setText("Creando proyecto...");
+                    StatusHelper.showToast(getContext(), "Actividad creada con éxito", false);
+                    
+                    // Notify listeners to refresh
+                    Bundle result = new Bundle();
+                    result.putBoolean("refresh", true);
+                    getParentFragmentManager().setFragmentResult("project_created", result);
+
                     getParentFragmentManager().popBackStack();
-                } else {
+                }else {
                     try {
-                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
-                        Log.e("API_ERROR", "Error: " + response.code() + " - " + errorBody);
-                        Toast.makeText(getContext(), "Error: " + response.code() + " " + errorBody, Toast.LENGTH_LONG).show();
+                        String errorBody = response.errorBody().string();
+                        Log.e("CreateProject", "Error: " + errorBody);
+                        StatusHelper.showToast(getContext(), "Error: " + response.message(), true);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        StatusHelper.showToast(getContext(), "No se ha podido crear la actividad", true);
                     }
                 }
-            }
 
+
+            }
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Connection error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                toggleLoading(false);
             }
         });
     }
 
-    private void addChip(TextInputEditText input, List<String> list, String type) {
-        String text = input.getText().toString().trim();
-        if (!text.isEmpty()) {
-            list.add(text);
-            Chip chip = new Chip(requireContext());
-            chip.setText(text);
-            chip.setCloseIconVisible(true);
-            chip.setChipBackgroundColorResource(type.equals("ODS") ? R.color.cuatrovientos_blue_light : R.color.cuatrovientos_blue);
-            chip.setTextColor(Color.WHITE);
-            chip.setOnCloseIconClickListener(v -> {
-                chipGroupData.removeView(chip);
-                list.remove(text);
-            });
-            chipGroupData.addView(chip);
-            input.setText("");
-        }
+    private void loadDynamicCategories() {
+        toggleLoading(true);
+        CategoryManager cm = new CategoryManager();
+
+        cm.fetchAllCategories(
+                new CategoryManager.CategoryCallback<Ods>() {
+                    @Override
+                    public void onSuccess(List<Ods> data) {
+                        masterODSList.addAll(data);
+                        // IMPORTANTE: El objeto Ods debe tener un toString() que devuelva el nombre
+                        ArrayAdapter<Ods> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, masterODSList);
+                        actvODS.setAdapter(adapter);
+                        checkAllLoaded();
+                    }
+                    @Override public void onError(String e) { checkAllLoaded(); }
+                },
+                new CategoryManager.CategoryCallback<Skill>() {
+                    @Override
+                    public void onSuccess(List<Skill> data) {
+                        masterSkillsList.addAll(data);
+                        ArrayAdapter<Skill> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, masterSkillsList);
+                        actvSkill.setAdapter(adapter);
+                        checkAllLoaded();
+                    }
+                    @Override public void onError(String e) { checkAllLoaded(); }
+                },
+                // ... (resto de callbacks vacíos o necesarios)
+                null, null, null
+        );
     }
+
+
+    private void checkAllLoaded() {
+        loadedCount++;
+        if (loadedCount >= 4) toggleLoading(false);
+    }
+
+
 
     private void setupDateTimePickers() {
         etStartDate.setOnClickListener(v -> showDateTimePicker(etStartDate));
@@ -279,5 +387,47 @@ public class CreateProjectFragment extends Fragment {
             SimpleDateFormat out = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             return out.format(in.parse(dateStr));
         } catch (ParseException e) { return dateStr; }
+    }
+
+    private void addChipFromAutoComplete(AutoCompleteTextView actv, List<String> list, String type) {
+        // 1. Obtenemos el texto del AutoComplete [cite: 2026-01-20]
+        String text = actv.getText().toString().trim();
+
+        // 2. Validamos que no esté vacío y que no se haya añadido ya [cite: 2026-01-20]
+        if (!text.isEmpty() && !list.contains(text)) {
+
+            // Añadimos a la lista que se enviará a la API [cite: 2026-01-20]
+            list.add(text);
+
+            // 3. Creamos el Chip visualmente [cite: 2026-01-20]
+            Chip chip = new Chip(requireContext());
+            chip.setText(text);
+            chip.setCloseIconVisible(true);
+            chip.setCheckable(false);
+            chip.setClickable(false);
+
+            // Estilo basado en el tipo (Azul oscuro para Skills, Azul claro para ODS) [cite: 2026-01-16]
+            if (type.equals("ODS")) {
+                chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue_light);
+                chip.setTextColor(Color.BLACK);
+            } else {
+                chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue);
+                chip.setTextColor(Color.WHITE);
+                chip.setCloseIconTintResource(android.R.color.white);
+            }
+
+            // 4. Lógica para eliminar el Chip y el dato de la lista [cite: 2026-01-20]
+            chip.setOnCloseIconClickListener(v -> {
+                chipGroupData.removeView(chip);
+                list.remove(text);
+            });
+
+            // 5. Lo añadimos al contenedor y limpiamos el selector [cite: 2026-01-20]
+            chipGroupData.addView(chip);
+            actv.setText("");
+        } else if (list.contains(text)) {
+            StatusHelper.showToast(getContext(), "Este elemento ya ha sido añadido", true);
+            actv.setText("");
+        }
     }
 }

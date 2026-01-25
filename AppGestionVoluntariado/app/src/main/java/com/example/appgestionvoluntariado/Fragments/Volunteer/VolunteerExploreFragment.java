@@ -20,6 +20,7 @@ import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.ProjectsService;
+import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.example.appgestionvoluntariado.ViewMode;
 
 import java.util.ArrayList;
@@ -118,25 +119,27 @@ public class VolunteerExploreFragment extends Fragment {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 hideLoading();
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "¡Inscrito correctamente!", Toast.LENGTH_SHORT).show();
+                    StatusHelper.showToast(getContext(), "¡Inscrito correctamente!", false);
 
                     // Quitamos el proyecto de la lista de disponibles para que no aparezca dos veces
                     availableProjects.remove(item);
                     projectAdapter.notifyAdapter(availableProjects);
                 } else {
-                    String errorJson = response.errorBody().toString();
-                    Log.e("API_ERROR", "Error 409: " + errorJson);
-                    // Si quieres mostrarlo en un Toast:
-                    // JSONObject jObj = new JSONObject(errorJson);
-                    // String msg = jObj.getString("error");
-                    // Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                    try {
+                        String errorJson = response.errorBody().string();
+                        org.json.JSONObject jObj = new org.json.JSONObject(errorJson);
+                        String msg = jObj.optString("error", "No se pudo inscribir");
+                        StatusHelper.showToast(getContext(), msg, true);
+                    } catch (Exception e) {
+                        StatusHelper.showToast(getContext(), "Error al procesar la solicitud", true);
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 hideLoading();
-                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                StatusHelper.showToast(getContext(), "Error de conexión", true);
             }
         });
     }

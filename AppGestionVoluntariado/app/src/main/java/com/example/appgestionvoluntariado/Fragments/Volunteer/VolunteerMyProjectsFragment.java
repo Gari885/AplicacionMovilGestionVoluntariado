@@ -21,6 +21,7 @@ import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.ProjectsService;
+import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.example.appgestionvoluntariado.ViewMode;
 
 import java.util.ArrayList;
@@ -146,7 +147,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
             @Override
             public void onFailure(Call<List<Project>> call, Throwable t) {
                 stopLoadingAnimation();
-                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                StatusHelper.showToast(getContext(), "Error de conexión", true);
             }
         });
     }
@@ -191,21 +192,21 @@ public class VolunteerMyProjectsFragment extends Fragment {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 stopLoadingAnimation();
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Inscripción anulada", Toast.LENGTH_SHORT).show();
+                    StatusHelper.showToast(getContext(), "Inscripción anulada", false);
 
                     // Actualizamos ambas listas
                     allEnrolledProjects.remove(item);
                     displayedProjects.remove(item);
                     projectAdapter.notifyAdapter(displayedProjects);
                 } else {
-                    Toast.makeText(getContext(), "No se pudo anular", Toast.LENGTH_SHORT).show();
+                    StatusHelper.showToast(getContext(), "No se pudo anular", true);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 stopLoadingAnimation();
-                Toast.makeText(getContext(), "Error al comunicar con el servidor", Toast.LENGTH_SHORT).show();
+                StatusHelper.showToast(getContext(), "Error al comunicar con el servidor", true);
             }
         });
     }

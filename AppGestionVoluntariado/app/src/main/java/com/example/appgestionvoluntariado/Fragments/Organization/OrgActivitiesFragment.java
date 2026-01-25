@@ -3,6 +3,7 @@ package com.example.appgestionvoluntariado.Fragments.Organization;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +23,15 @@ import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.example.appgestionvoluntariado.ViewMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -46,6 +50,14 @@ public class OrgActivitiesFragment extends Fragment {
     private List<Project> allProjects = new ArrayList<>();
 
     private String currentStatus = "pendiente"; // PENDIENTE o APROBADO
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getParentFragmentManager().setFragmentResultListener("project_created", this, (requestKey, result) -> {
+            loadMyProjects();
+        });
+    }
 
     @Nullable
     @Override
@@ -108,6 +120,7 @@ public class OrgActivitiesFragment extends Fragment {
 
     private void loadMyProjects() {
         loadingLayout.setVisibility(View.VISIBLE);
+        // Toast.makeText(getContext(), "Cargando proyectos...", Toast.LENGTH_SHORT).show(); // Removed prompt to avoid noise, user sees spinner
         // El servidor filtra por el Token de Firebase de la organización
         // Enviamos el estado como Query Param ?estado=
         APIClient.getOrganizationService().getMyProjects(currentStatus)
@@ -117,14 +130,17 @@ public class OrgActivitiesFragment extends Fragment {
                         loadingLayout.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
                             allProjects = response.body();
+                            StatusHelper.showToast(getContext(), "Cargados: " + allProjects.size(), false); // Debug
                             updateRecyclerView(allProjects);
+                        } else {
+                            StatusHelper.showToast(getContext(), "Error: " + response.code(), true);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<List<Project>> call, Throwable t) {
                         loadingLayout.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Error al cargar tus proyectos", Toast.LENGTH_SHORT).show();
+                        StatusHelper.showToast(getContext(), "Error al cargar: " + t.getMessage(), true);
                     }
                 });
     }
@@ -146,22 +162,58 @@ public class OrgActivitiesFragment extends Fragment {
 
     private void cancelProject(Project project) {
         loadingLayout.setVisibility(View.VISIBLE);
-        // No enviamos CIF, el token identifica que es tu proyecto
+
+        // Log para ver qué enviamos (útil si hay dudas)
+        Log.d("DEBUG_CANCEL", "Cancelando Proyecto ID: " + project.getActivityId());
+
+        // Asegúrate de que tu interfaz ahora devuelve Call<ResponseBody>
         APIClient.getProjectsService().changeState(project.getActivityId(), new StatusRequest("cancelado"))
-                .enqueue(new Callback<Void>() {
+                .enqueue(new Callback<ResponseBody>() {
                     @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        // Ocultamos el loading SIEMPRE al recibir respuesta, sea buena o mala
+                        loadingLayout.setVisibility(View.GONE);
+
                         if (response.isSuccessful()) {
-                            loadMyProjects();
+                            try {
+                                // Leemos la respuesta del servidor para verificar
+                                String serverResponse = response.body() != null ? response.body().string() : "null";
+                                Log.d("DEBUG_CANCEL", "Éxito (200 OK): " + serverResponse);
+
+                                StatusHelper.showToast(getContext(), "Proyecto cancelado correctamente", false);
+                                loadMyProjects(); // Recargar lista
+
+                            } catch (IOException e) {
+                                Log.e("DEBUG_CANCEL", "Error leyendo respuesta OK", e);
+                                // Aún así asumimos éxito visual
+                                StatusHelper.showToast(getContext(), "Proyecto cancelado", false);
+                                loadMyProjects();
+                            }
                         } else {
-                            loadingLayout.setVisibility(View.GONE);
-                            Toast.makeText(getContext(), "Error al cancelar proyecto", Toast.LENGTH_SHORT).show();
+                            // Error del servidor (404, 403, 500...)
+                            try {
+                                String errorBody = response.errorBody() != null ? response.errorBody().string() : "null";
+                                Log.e("DEBUG_CANCEL", "Fallo " + response.code() + ": " + errorBody);
+
+                                // Mensaje más amigable según el código
+                                if (response.code() == 404) {
+                                    StatusHelper.showToast(getContext(), "Error: Proyecto no encontrado", true);
+                                } else if (response.code() == 403) {
+                                    StatusHelper.showToast(getContext(), "No tienes permiso para cancelar este proyecto", true);
+                                } else {
+                                    StatusHelper.showToast(getContext(), "Error al cancelar (" + response.code() + ")", true);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
                         loadingLayout.setVisibility(View.GONE);
+                        Log.e("DEBUG_CANCEL", "Error de red/conexión", t);
+                        StatusHelper.showToast(getContext(), "Error de conexión", true);
                     }
                 });
     }

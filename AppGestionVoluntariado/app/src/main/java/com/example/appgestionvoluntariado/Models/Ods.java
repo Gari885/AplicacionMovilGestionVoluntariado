@@ -1,5 +1,7 @@
 package com.example.appgestionvoluntariado.Models;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Ods {
@@ -16,4 +18,10 @@ public class Ods {
     public String getName() { return name; }
     public String getDescription() { return description; }
     public String getColorHex() { return colorHex; }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name;
+    }
 }

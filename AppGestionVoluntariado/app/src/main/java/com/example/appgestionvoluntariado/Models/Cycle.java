@@ -18,4 +18,9 @@ public class Cycle {
     public String getFullCycle(){
         return name + " " + course;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -18,8 +18,7 @@ import com.example.appgestionvoluntariado.Activities.AdminActivity;
 import com.example.appgestionvoluntariado.Activities.OrganizationActivity;
 ;
 import com.example.appgestionvoluntariado.Activities.VolunteerActivity;
-import com.example.appgestionvoluntariado.Models.ProfileResponse;
-import com.example.appgestionvoluntariado.Models.Volunteer;
+import com.example.appgestionvoluntariado.Models.Response.ProfileResponse;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
@@ -135,9 +134,9 @@ public class LoginFragment extends Fragment {
     }
 
     private void fetchUserProfile() {
-        APIClient.getAuthAPIService().getProfile().enqueue(new Callback<com.example.appgestionvoluntariado.Models.ProfileResponse>() {
+        APIClient.getAuthAPIService().getProfile().enqueue(new Callback<ProfileResponse>() {
             @Override
-            public void onResponse(@NonNull Call<com.example.appgestionvoluntariado.Models.ProfileResponse> call, @NonNull Response<com.example.appgestionvoluntariado.Models.ProfileResponse> response) {
+            public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     processLogin(response.body());
                 } else {
@@ -150,7 +149,7 @@ public class LoginFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<com.example.appgestionvoluntariado.Models.ProfileResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<ProfileResponse> call, @NonNull Throwable t) {
                 mAuth.signOut();
                 StatusHelper.showStatus(getContext(), "Error de Conexión", "No se pudo obtener tu perfil.\n" + t.getMessage(), true);
                 toggleLoading(false);

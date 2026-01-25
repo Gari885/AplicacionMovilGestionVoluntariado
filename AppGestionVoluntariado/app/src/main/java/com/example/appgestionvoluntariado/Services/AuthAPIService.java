@@ -2,7 +2,7 @@ package com.example.appgestionvoluntariado.Services;
 
 import com.example.appgestionvoluntariado.Models.Request.OrganizationRegisterRequest;
 import com.example.appgestionvoluntariado.Models.Request.PasswordRequest;
-import com.example.appgestionvoluntariado.Models.ProfileResponse;
+import com.example.appgestionvoluntariado.Models.Response.ProfileResponse;
 import com.example.appgestionvoluntariado.Models.Request.VolunteerRegisterRequest;
 
 import retrofit2.Call;

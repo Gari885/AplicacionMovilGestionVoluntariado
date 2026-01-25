@@ -1,5 +1,7 @@
 package com.example.appgestionvoluntariado.Models;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
@@ -10,7 +12,7 @@ import java.util.List;
 public class Organization {
 
     @SerializedName("cif")
-    private String vat;
+    private String cif;
 
     @SerializedName("nombre")
     private String name;
@@ -61,8 +63,8 @@ public class Organization {
     }
 
     // Getters and Setters (Matching Fragment logic)
-    public String getVat() { return vat; }
-    public void setVat(String vat) { this.vat = vat; }
+    public String getCif() { return cif; }
+    public void setCif(String cif) { this.cif = cif; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -92,5 +94,12 @@ public class Organization {
     public void setStatus(String status) { this.status = status; }
 
     public List<Project> getProjects() { return projects; }
+
     public void setProjects(List<Project> projects) { this.projects = projects; }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name;
+    }
 }

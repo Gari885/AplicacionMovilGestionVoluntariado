@@ -12,16 +12,16 @@ import android.widget.Spinner;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Models.Organization;
 import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.Models.Request.VolunteerEnrollmentRequest;
-import com.example.appgestionvoluntariado.Models.SpinnerProjectItem;
-import com.example.appgestionvoluntariado.Models.SpinnerVolunteerItem;
+import com.example.appgestionvoluntariado.Models.UI.SpinnerProjectItem;
+import com.example.appgestionvoluntariado.Models.UI.SpinnerVolunteerItem;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.AdminService;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +38,8 @@ public class AdminCreateMatchFragment extends Fragment {
     private List<Volunteer> volunteers = new ArrayList<>();
     private List<Project> projects = new ArrayList<>();
     private FrameLayout loadingBar;
+
+    private MaterialToolbar topAppBar;
 
     private ProgressBar progressBar;
     private final int TOTAL_CALLS = 2;
@@ -68,6 +70,7 @@ public class AdminCreateMatchFragment extends Fragment {
 
         btnCreateMatch = v.findViewById(R.id.btnCreateMatch);
         textMatchButton = (String) btnCreateMatch.getText();
+        topAppBar = v.findViewById(R.id.topAppBar);
         btnCreateMatch.setEnabled(false);
     }
     private void setUpListeners(View v) {
@@ -80,6 +83,12 @@ public class AdminCreateMatchFragment extends Fragment {
                 btnCreateMatch.setText("");
                 progressBar.setVisibility(View.VISIBLE);
                 saveMatch();
+            }
+        });
+        topAppBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().popBackStack();
             }
         });
     }

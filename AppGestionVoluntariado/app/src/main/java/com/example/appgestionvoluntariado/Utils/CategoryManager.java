@@ -31,8 +31,11 @@ public class CategoryManager {
         service.getOds().enqueue(new Callback<List<Ods>>() {
             @Override
             public void onResponse(Call<List<Ods>> call, Response<List<Ods>> response) {
-                if (response.isSuccessful()) odsCb.onSuccess(response.body());
-                else odsCb.onError("Error loading ODS");
+                if (response.isSuccessful() && odsCb != null){
+                    odsCb.onSuccess(response.body());
+                } else if( odsCb != null){
+                    odsCb.onError("Error loading ODS");
+                }
             }
             @Override
             public void onFailure(Call<List<Ods>> call, Throwable t) { odsCb.onError(t.getMessage()); }
@@ -42,8 +45,11 @@ public class CategoryManager {
         service.getSkills().enqueue(new Callback<List<Skill>>() {
             @Override
             public void onResponse(Call<List<Skill>> call, Response<List<Skill>> response) {
-                if (response.isSuccessful()) skillCb.onSuccess(response.body());
-                else skillCb.onError("Error loading Skills");
+                if (response.isSuccessful() && skillCb != null){
+                    skillCb.onSuccess(response.body());
+                } else if( skillCb != null){
+                    skillCb.onError("Error loading Skills");
+                }
             }
             @Override
             public void onFailure(Call<List<Skill>> call, Throwable t) { skillCb.onError(t.getMessage()); }
@@ -53,8 +59,12 @@ public class CategoryManager {
         service.getInterests().enqueue(new Callback<List<Interest>>() {
             @Override
             public void onResponse(Call<List<Interest>> call, Response<List<Interest>> response) {
-                if (response.isSuccessful()) interestCb.onSuccess(response.body());
-                else interestCb.onError("Error loading Interests");
+                if (response.isSuccessful() && interestCb != null){
+                    interestCb.onSuccess(response.body());
+                } else if( interestCb != null){
+                    interestCb.onError("Error loading Interests");
+                }
+
             }
             @Override
             public void onFailure(Call<List<Interest>> call, Throwable t) { interestCb.onError(t.getMessage()); }
@@ -64,8 +74,12 @@ public class CategoryManager {
         service.getNeeds().enqueue(new Callback<List<Need>>() {
             @Override
             public void onResponse(Call<List<Need>> call, Response<List<Need>> response) {
-                if (response.isSuccessful()) needCb.onSuccess(response.body());
-                else needCb.onError("Error loading Needs");
+                if (response.isSuccessful() && needCb != null){
+                    needCb.onSuccess(response.body());
+                } else if( needCb != null){
+                    needCb.onError("Error loading Needs");
+                }
+
             }
             @Override
             public void onFailure(Call<List<Need>> call, Throwable t) { needCb.onError(t.getMessage()); }
@@ -74,8 +88,11 @@ public class CategoryManager {
         service.getCycles().enqueue(new Callback<List<Cycle>>() {
             @Override
             public void onResponse(Call<List<Cycle>> call, Response<List<Cycle>> response) {
-                if (response.isSuccessful()) cycleCb.onSuccess(response.body());
-                else cycleCb.onError("Error loading Cycles");
+                if (response.isSuccessful() && cycleCb != null){
+                    cycleCb.onSuccess(response.body());
+                } else if( cycleCb != null){
+                    cycleCb.onError("Error loading Cycles");
+                }
             }
 
             @Override

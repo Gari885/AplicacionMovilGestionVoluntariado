@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,12 +26,15 @@ import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.example.appgestionvoluntariado.ViewMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -51,6 +56,21 @@ public class AdminProjectListFragment extends Fragment {
     private FloatingActionButton fabAddProject;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (currentStatus.equalsIgnoreCase("aceptada")){
+            view = ViewMode.ADMINISTRATOR_ACCEPTED;
+            updateTabUI(tabAccepted,tabPending);
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_admin_project_list, container, false);
 
@@ -70,7 +90,9 @@ public class AdminProjectListFragment extends Fragment {
 
         setupTabs();
         setupSearch();
-        loadProjects();
+        setupSearch();
+
+        loadProjects(); // Initial load
 
         return v;
     }
@@ -84,7 +106,7 @@ public class AdminProjectListFragment extends Fragment {
         });
 
         tabAccepted.setOnClickListener(v -> {
-            currentStatus = "aprobado";
+            currentStatus = "aceptada";
             view = ViewMode.ADMINISTRATOR_ACCEPTED;
             updateTabUI(tabAccepted, tabPending);
             loadProjects();
@@ -118,13 +140,16 @@ public class AdminProjectListFragment extends Fragment {
                         if (response.isSuccessful() && response.body() != null) {
                             fabAddProject.setVisibility(View.VISIBLE);
                             fullList = response.body();
+                            StatusHelper.showToast(getContext(), "Admin proyectos: " + fullList.size(), false); // Debug
                             updateAdapter(fullList);
+                        } else {
+                            StatusHelper.showToast(getContext(), "Error Admin: " + response.code(), true);
                         }
                     }
                     @Override
                     public void onFailure(Call<List<Project>> call, Throwable t) {
                         loadingLayout.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -134,17 +159,17 @@ public class AdminProjectListFragment extends Fragment {
             adapter = new ProjectAdapter(list, new ProjectAdapter.OnProjectActionListener() {
                 @Override
                 public void onAccept(Project p) {
-                    updateStatus(p.getActivityId(), "aprobado");
+                    updateStatus(p.getActivityId(), "aceptada");
                 }
 
                 @Override
                 public void onReject(Project p) {
-                    updateStatus(p.getActivityId(), "rechazado");
+                    updateStatus(p.getActivityId(), "rechazada");
                 }
 
                 @Override
                 public void onDelete(Project p) {
-                    updateStatus(p.getActivityId(), "rechazado");
+                    updateStatus(p.getActivityId(), "cancelado");
                 }
 
                 @Override
@@ -155,21 +180,55 @@ public class AdminProjectListFragment extends Fragment {
 
             rvProjects.setAdapter(adapter);
         } else {
-            adapter.notifyAdapterAdmin(list,view);
+            rvProjects.setAdapter(adapter);
+            adapter.notifyAdapterAdmin(list, view);
         }
     }
 
     private void updateStatus(int projectId, String status) {
         loadingLayout.setVisibility(View.VISIBLE);
+
+        // Loguea qué estás enviando
+        Log.d("DEBUG_STATE", "Enviando -> ID: " + projectId + ", Status: " + status);
+
         APIClient.getProjectsService().changeState(projectId, new StatusRequest(status))
-                .enqueue(new Callback<Void>() {
+                .enqueue(new Callback<ResponseBody>() {
                     @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        if (response.isSuccessful()) loadProjects();
-                        else loadingLayout.setVisibility(View.GONE);
-                    }
-                    @Override public void onFailure(Call<Void> call, Throwable t) {
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         loadingLayout.setVisibility(View.GONE);
+
+                        if (response.isSuccessful() && response.body() != null) {
+                            try {
+                                // Leemos el JSON crudo del backend
+                                String rawJson = response.body().string();
+                                Log.d("DEBUG_STATE", "Respuesta Servidor (200 OK): " + rawJson);
+
+                                // Aquí verás algo como: {"campo_actualizado": "estado", "valor_nuevo": "CANCELADO"}
+                                // Si dice "valor_nuevo": "PENDIENTE", ¡ahí está tu problema!
+
+                                StatusHelper.showToast(getContext(), "Estado actualizado", false);
+                                loadProjects();
+
+                            } catch (IOException e) {
+                                Log.e("DEBUG_STATE", "Error al leer respuesta", e);
+                            }
+                        } else {
+                            // Error del servidor (400, 404, 500...)
+                            try {
+                                String errorBody = response.errorBody() != null ? response.errorBody().string() : "null";
+                                Log.e("DEBUG_STATE", "Error " + response.code() + ": " + errorBody);
+                                StatusHelper.showToast(getContext(), "Error: " + response.code(), true);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        loadingLayout.setVisibility(View.GONE);
+                        Log.e("DEBUG_STATE", "Fallo de conexión", t);
+                        StatusHelper.showToast(getContext(), "Error de conexión", true);
                     }
                 });
     }

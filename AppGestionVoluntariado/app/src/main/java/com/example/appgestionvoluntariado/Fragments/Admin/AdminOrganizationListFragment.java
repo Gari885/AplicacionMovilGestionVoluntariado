@@ -93,7 +93,7 @@ public class AdminOrganizationListFragment extends Fragment {
         });
 
         tabAccepted.setOnClickListener(v -> {
-            currentFilter = "APROBADO";
+            currentFilter = "ACEPTADA";
             updateTabUI(tabAccepted, tabPending);
             loadData();
         });
@@ -142,7 +142,7 @@ public class AdminOrganizationListFragment extends Fragment {
                 @Override
                 public void onAccept(Organization org) {
                     // Solo enviamos el estado, el token identifica a la entidad
-                    processStatusChange(org, new StatusRequest("aprobado"));
+                    processStatusChange(org, new StatusRequest("Aceptada"));
                 }
 
                 @Override
@@ -162,6 +162,7 @@ public class AdminOrganizationListFragment extends Fragment {
             });
             rvOrgs.setAdapter(adapter);
         } else {
+            rvOrgs.setAdapter(adapter);
             adapter.updateList(list);
         }
     }
@@ -197,7 +198,7 @@ public class AdminOrganizationListFragment extends Fragment {
         View btnClose = view.findViewById(R.id.btnCerrarPopup);
 
         // Datos Obligatorios (Nombre ya sale en la tarjeta, aquí ponemos el resto)
-        tvCif.setText(org.getVat());
+        tvCif.setText(org.getCif());
         tvCorreo.setText(org.getEmail());
 
         // Datos Opcionales con validación de "Sin datos"
@@ -228,7 +229,7 @@ public class AdminOrganizationListFragment extends Fragment {
 
     public void processStatusChange( Organization org,StatusRequest request) {
         loadingLayout.setVisibility(View.VISIBLE);
-        APIClient.getOrganizationService().updateStatus(org.getVat() , request)
+        APIClient.getOrganizationService().updateStatus(org.getCif() , request)
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
@@ -264,7 +265,7 @@ public class AdminOrganizationListFragment extends Fragment {
 
         for (Organization org : fullList) {
             if (org.getName().toLowerCase().contains(query) ||
-                    org.getVat().toLowerCase().contains(query)) {
+                    org.getCif().toLowerCase().contains(query)) {
                 filtered.add(org);
             }
         }

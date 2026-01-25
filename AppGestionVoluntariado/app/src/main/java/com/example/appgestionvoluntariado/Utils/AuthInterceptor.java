@@ -21,11 +21,9 @@ public class AuthInterceptor implements Interceptor {
         Request originalRequest = chain.request();
         String url = originalRequest.url().toString();
 
-        // LIST OF PUBLIC ENDPOINTS TO IGNORE
-        if (url.contains("/categories/") || url.contains("/login") || url.contains("/register")) {
-             return chain.proceed(originalRequest);
+        if (url.contains("/categories/") || url.contains("/login")) {
+            return chain.proceed(originalRequest);
         }
-
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (mUser != null) {

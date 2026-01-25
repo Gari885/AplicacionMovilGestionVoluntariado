@@ -13,16 +13,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Activities.MainActivity;
-import com.example.appgestionvoluntariado.Models.ProfileResponse;
+import com.example.appgestionvoluntariado.Models.Response.ProfileResponse;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.AuthAPIService;
-import com.example.appgestionvoluntariado.Services.VolunteerService;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;

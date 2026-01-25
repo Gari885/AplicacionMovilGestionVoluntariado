@@ -15,19 +15,6 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvMatchStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="En Curso"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            android:textColor="#1A3B85"
-            android:background="@drawable/tag_bg_blue"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageView
             android:id="@+id/ivVolunteerAvatar"

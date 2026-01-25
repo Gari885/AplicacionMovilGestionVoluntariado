@@ -14,38 +14,33 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.appgestionvoluntariado.Models.Cycle;
-import com.example.appgestionvoluntariado.Models.Interest;
-import com.example.appgestionvoluntariado.Models.Need;
-import com.example.appgestionvoluntariado.Models.Ods;
 import com.example.appgestionvoluntariado.Models.Request.OrganizationRegisterRequest;
-import com.example.appgestionvoluntariado.Models.Skill;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
-import com.example.appgestionvoluntariado.Utils.CategoryManager;
 import com.example.appgestionvoluntariado.Utils.FormData;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+// import com.google.firebase.auth.FirebaseAuth; // ELIMINADO
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.json.JSONObject; // Importante para leer el error JSON
+
+import java.io.IOException;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class OrganizationRegisterFragment extends Fragment {
 
-    private FirebaseAuth mAuth;
+    // private FirebaseAuth mAuth; // ELIMINADO
     private Button btnRegister;
 
-    // UI References in English [cite: 2026-01-09]
+    // UI References
     private TextInputLayout tilName, tilEmail, tilPassword, tilCif, tilPhone, tilAddress, tilLocality, tilPostalCode, tilDescription,tilSector;
     private TextInputEditText etName, etEmail, etPassword, etCif, etPhone, etAddress, etLocality, etPostalCode, etDescription;
-
 
     AutoCompleteTextView actSector;
     private View loadingOverlay;
@@ -56,7 +51,7 @@ public class OrganizationRegisterFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
+        // mAuth = FirebaseAuth.getInstance(); // ELIMINADO
     }
 
     @Override
@@ -69,19 +64,16 @@ public class OrganizationRegisterFragment extends Fragment {
 
         btnRegister.setOnClickListener(v -> {
             if (isFormValid()) {
-
-                performRegistration();
-
+                // CAMBIO: Llamada directa al backend
+                registerWithBackend();
             }
         });
 
         return view;
     }
 
-
-
     private void initViews(View view) {
-        // Layouts for error management [cite: 2026-01-09]
+        // Layouts for error management
         tilName = view.findViewById(R.id.tilName);
         tilEmail = view.findViewById(R.id.tilEmail);
         tilPassword = view.findViewById(R.id.tilPassword);
@@ -126,7 +118,7 @@ public class OrganizationRegisterFragment extends Fragment {
 
     private boolean isFormValid() {
         boolean isValid = true;
-        // Validation for the 9 API required fields [cite: 2026-01-16]
+
         if (getText(etName).isEmpty()) { tilName.setError("Nombre obligatorio"); isValid = false; } else tilName.setError(null);
         if (getText(etCif).isEmpty()) { tilCif.setError("CIF obligatorio"); isValid = false; } else tilCif.setError(null);
         if (getText(etPhone).isEmpty()) { tilPhone.setError("Contacto obligatorio"); isValid = false; } else tilPhone.setError(null);
@@ -141,30 +133,17 @@ public class OrganizationRegisterFragment extends Fragment {
         if (getText(etPassword).length() < 10) { tilPassword.setError("Mínimo 10 caracteres"); isValid = false; } else tilPassword.setError(null);
 
         if (!isValid) StatusHelper.showStatus(getContext(), "Formulario incompleto", "Corrige los campos marcados en rojo.", true);
-        return isValid;    }
-
-    private void performRegistration() {
-        btnRegister.setText("");
-        progressBar.setVisibility(View.VISIBLE);
-        // Firebase Auth process [cite: 2026-01-15]
-        mAuth.createUserWithEmailAndPassword(getText(etEmail), getText(etPassword)).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                FirebaseUser user = mAuth.getCurrentUser();
-                if (user != null) {
-                    syncWithBackend(user);
-                }
-            } else {
-                btnRegister.setText(btnText);
-                progressBar.setVisibility(View.INVISIBLE);
-                StatusHelper.showStatus(getContext(), "Error", "Fallo en el registro Firebase", true);
-            }
-        });
+        return isValid;
     }
 
-    private void syncWithBackend(FirebaseUser fbUser) {
+    // MÉTODO MODIFICADO: Registro directo en backend
+    private void registerWithBackend() {
+        btnRegister.setText("");
+        progressBar.setVisibility(View.VISIBLE);
+
         OrganizationRegisterRequest req =
                 new OrganizationRegisterRequest(
-                        getText(etCif), getText(etName), fbUser.getEmail(), getText(etPassword),
+                        getText(etCif), getText(etName), getText(etEmail), getText(etPassword),
                         getText(etPhone), getText(etAddress), getText(etLocality), getText(etPostalCode),
                         getText(etDescription), actSector.getText().toString()
                 );
@@ -173,45 +152,41 @@ public class OrganizationRegisterFragment extends Fragment {
             @Override
             public void onResponse(@NonNull retrofit2.Call<Void> call, @NonNull retrofit2.Response<Void> response) {
                 if (response.isSuccessful()) {
-                    saveUserToFirestore(fbUser.getUid());
-                    fbUser.sendEmailVerification();
-                    StatusHelper.showStatus(getContext(), "¡Éxito!", "Cuenta creada. Verifica tu email.", false);
+                    StatusHelper.showStatus(getContext(), "¡Éxito!", "Organización creada y ACEPTADA.", false);
                     if (getParentFragmentManager() != null) {
-                        getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new LoginFragment()).commit();
-                        btnRegister.setText(btnText);
+                        getParentFragmentManager().popBackStack();
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 } else {
-                    fbUser.delete();
+                    // MANEJO DE ERRORES INTELIGENTE
+                    String errorMessage = "Error en el registro";
                     try {
-                        String err = response.errorBody() != null ? response.errorBody().string() : "Error desconocido";
-                        StatusHelper.showStatus(getContext(), "Error servidor", err, true);
-                        btnRegister.setText(btnText);
-                        progressBar.setVisibility(View.INVISIBLE);
+                        String errorBody = response.errorBody().string();
+                        JSONObject jsonError = new JSONObject(errorBody);
+                        if (jsonError.has("error")) {
+                            errorMessage = jsonError.getString("error");
+                        }
                     } catch (Exception e) {
-                        StatusHelper.showStatus(getContext(), "Error servidor", "Código: " + response.code(), true);
-                        btnRegister.setText(btnText);
-                        progressBar.setVisibility(View.INVISIBLE);
+                        e.printStackTrace();
                     }
+
+                    if (response.code() == 409) {
+                        StatusHelper.showStatus(getContext(), "Error", errorMessage, true);
+                    } else {
+                        StatusHelper.showStatus(getContext(), "Error servidor", errorMessage, true);
+                    }
+                    btnRegister.setText(btnText);
+                    progressBar.setVisibility(View.INVISIBLE);
                 }
             }
 
             @Override
             public void onFailure(@NonNull retrofit2.Call<Void> call, @NonNull Throwable t) {
-                fbUser.delete();
                 StatusHelper.showStatus(getContext(), "Error conexión", t.getMessage(), true);
                 btnRegister.setText(btnText);
                 progressBar.setVisibility(View.INVISIBLE);
             }
         });
-    }
-
-    private void saveUserToFirestore(String uid) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("email", getText(etEmail));
-        data.put("rol", "organizacion");
-        // Add additional API fields to Firestore if needed [cite: 2026-01-16]
-        FirebaseFirestore.getInstance().collection("usuarios").document(uid).set(data);
     }
 
     private String getText(TextInputEditText et) { return Objects.requireNonNull(et.getText()).toString().trim(); }

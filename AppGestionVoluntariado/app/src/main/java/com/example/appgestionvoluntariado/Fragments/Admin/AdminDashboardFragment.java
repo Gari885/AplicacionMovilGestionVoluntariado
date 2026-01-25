@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgestionvoluntariado.Adapters.DashboardAdapter;
-import com.example.appgestionvoluntariado.Models.AdminStatsResponse;
+import com.example.appgestionvoluntariado.Models.Response.AdminStatsResponse;
 import com.example.appgestionvoluntariado.Models.Stat;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;

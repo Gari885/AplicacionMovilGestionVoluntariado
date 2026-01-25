@@ -36,7 +36,7 @@ public interface AdminService {
     Call<List<Volunteer>> getVolunteers(@Query("estado") String estado);
 
     @GET("actividades")
-    Call<List<Project>> getProjects(@Query("estado")String estado);
+    Call<List<Project>> getProjects(@Query("estadoAprobacion")String estado);
 
 
 }

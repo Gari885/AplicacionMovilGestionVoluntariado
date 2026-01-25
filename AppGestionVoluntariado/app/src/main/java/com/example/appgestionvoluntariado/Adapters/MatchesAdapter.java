@@ -93,9 +93,6 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchHol
                 tvOrgEmail.setText("Org: " + match.getOrganizationEmail());
             }
 
-            if (tvStatus != null) {
-                tvStatus.setText("Estado: " + match.getStatus().toUpperCase());
-            }
 
             // Button logic for PENDIENTE vs OTHER states [cite: 2026-01-16]
             if (match.getStatus().equalsIgnoreCase("pendiente")) {

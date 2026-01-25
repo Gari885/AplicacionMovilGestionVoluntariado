@@ -18,12 +18,6 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_welcome);
 
-        btnLogin = findViewById(R.id.btnLogin);
-        btnLogin.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new LoginFragment())
-                    .commit();
-        });
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

@@ -126,6 +126,10 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
                 tvOrgName.setText("🏢 " + project.getOrganizationName());
             }
 
+            if (project.getApprovalStatus().equalsIgnoreCase("aceptada")){
+                showStatusLabel = true;
+            }
+
             // Configurar etiqueta de estado [cite: 2026-01-18]
             if (showStatusLabel && tvStatusLabel != null) {
                 tvStatusLabel.setVisibility(View.VISIBLE);
@@ -150,6 +154,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
                 case ADMINISTRATOR_PENDING:
                     btnPrimary.setVisibility(View.VISIBLE);
                     btnSecondary.setVisibility(View.VISIBLE);
+                    btnPrimary.setText("ACEPTAR");
                     btnPrimary.setBackgroundResource(R.drawable.background_button_pill);
                     btnPrimary.setOnClickListener(v -> listener.onAccept(project));
                     btnSecondary.setOnClickListener(v -> listener.onReject(project));
@@ -158,7 +163,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
                 case ADMINISTRATOR_ACCEPTED:
                     btnPrimary.setVisibility(View.VISIBLE);
                     btnPrimary.setText("DAR DE BAJA");
-                    btnPrimary.setOnClickListener(v -> listener.onAccept(project));
+                    btnPrimary.setOnClickListener(v -> listener.onDelete(project));
                     btnSecondary.setOnClickListener(v -> listener.onReject(project));
                     break;
 

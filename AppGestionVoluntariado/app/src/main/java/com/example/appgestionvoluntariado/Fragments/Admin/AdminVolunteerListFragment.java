@@ -169,9 +169,12 @@ public class AdminVolunteerListFragment extends Fragment {
                 }
             });
             rvVolunteers.setAdapter(adapter);
+
         } else {
+            rvVolunteers.setAdapter(adapter);
             adapter.updateList(list);
         }
+
     }
 
     private void processStatusChange(Volunteer vol, StatusRequest request) {

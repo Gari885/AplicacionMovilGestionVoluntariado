@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Models.Organization;
-import com.example.appgestionvoluntariado.Models.ProfileResponse;
+import com.example.appgestionvoluntariado.Models.Response.ProfileResponse;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Utils.FormData;
@@ -144,7 +144,7 @@ public class OrgProfileEditFragment extends Fragment {
     private void populateForm(Organization org) {
         etName.setText(org.getName());
         etEmail.setText(org.getEmail());
-        etVat.setText(org.getVat());
+        etVat.setText(org.getCif());
         etPhone.setText(org.getContactPhone());
         etAddress.setText(org.getAddress());
         etLocality.setText(org.getLocality());

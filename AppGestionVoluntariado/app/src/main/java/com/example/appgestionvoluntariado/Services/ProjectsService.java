@@ -6,6 +6,7 @@ import com.example.appgestionvoluntariado.Models.Request.StatusRequest;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -48,7 +49,7 @@ public interface ProjectsService {
 
 
     @PATCH("actividades/{id}/estado")
-    Call<Void> changeState(@Path("id") int id, @Body StatusRequest status);
+    Call<ResponseBody> changeState(@Path("id") int id, @Body StatusRequest status);
 
 
     @POST("actividades/crear")

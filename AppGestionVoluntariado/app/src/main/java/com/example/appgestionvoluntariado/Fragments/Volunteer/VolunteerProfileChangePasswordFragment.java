@@ -36,12 +36,12 @@ public class VolunteerProfileChangePasswordFragment extends Fragment {
         String confirm = etConfirm.getText().toString();
 
         if (pass.isEmpty() || !pass.equals(confirm)) {
-            Toast.makeText(getContext(), "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+            com.example.appgestionvoluntariado.Utils.StatusHelper.showToast(getContext(), "Las contraseñas no coinciden", true);
             return;
         }
 
         // Llamada a la API para cambiar contraseña
-        Toast.makeText(getContext(), "Contraseña cambiada con éxito", Toast.LENGTH_SHORT).show();
+        com.example.appgestionvoluntariado.Utils.StatusHelper.showToast(getContext(), "Contraseña cambiada con éxito", false);
         getParentFragmentManager().popBackStack();
     }
 }

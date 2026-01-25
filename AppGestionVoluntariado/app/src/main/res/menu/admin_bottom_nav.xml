@@ -7,7 +7,7 @@
     <item
         android:id="@+id/nav_admin_projects"
         android:icon="@drawable/ic_projects"
-        android:title="Proyectos" />
+        android:title="Actividades" />
     <item
         android:id="@+id/nav_admin_vols"
         android:icon="@drawable/ic_volunteers"

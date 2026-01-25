@@ -6,18 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Activities.MainActivity;
 import com.example.appgestionvoluntariado.Models.Organization;
-import com.example.appgestionvoluntariado.Models.ProfileResponse;
+import com.example.appgestionvoluntariado.Models.Response.ProfileResponse;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
@@ -113,7 +110,7 @@ public class OrgProfileHubFragment extends Fragment {
     private void updateUI() {
         if (organization != null) {
             tvName.setText(organization.getName());
-            tvVat.setText("CIF: " + (organization.getVat() != null ? organization.getVat() : "N/A"));
+            tvVat.setText("CIF: " + (organization.getCif() != null ? organization.getCif() : "N/A"));
         }
     }
 

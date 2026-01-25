@@ -87,7 +87,8 @@ public class AdminMatchesListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, new AdminCreateMatchFragment()).commit();
+                        .replace(R.id.admin_fragment_container, new AdminCreateMatchFragment()).
+                        addToBackStack(null).commit();
             }
         });
     }
