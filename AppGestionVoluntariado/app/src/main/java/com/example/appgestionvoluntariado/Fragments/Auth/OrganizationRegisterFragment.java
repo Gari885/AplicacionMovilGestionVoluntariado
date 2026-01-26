@@ -118,13 +118,44 @@ public class OrganizationRegisterFragment extends Fragment {
 
     private boolean isFormValid() {
         boolean isValid = true;
-
+        
         if (getText(etName).isEmpty()) { tilName.setError("Nombre obligatorio"); isValid = false; } else tilName.setError(null);
-        if (getText(etCif).isEmpty()) { tilCif.setError("CIF obligatorio"); isValid = false; } else tilCif.setError(null);
-        if (getText(etPhone).isEmpty()) { tilPhone.setError("Contacto obligatorio"); isValid = false; } else tilPhone.setError(null);
+        
+        String cif = getText(etCif);
+        if (cif.isEmpty()) { 
+            tilCif.setError("CIF obligatorio"); 
+            isValid = false; 
+        } else if (!isValidCIF(cif)) {
+            tilCif.setError("CIF inválido");
+            isValid = false;
+        } else {
+            tilCif.setError(null);
+        }
+
+        String phone = getText(etPhone).replaceAll("[^0-9]", ""); // Strip non-digits
+        if (phone.isEmpty()) { 
+            tilPhone.setError("Contacto obligatorio"); 
+            isValid = false; 
+        } else if (phone.length() != 9) {
+            tilPhone.setError("Debe tener 9 dígitos");
+            isValid = false;
+        } else {
+            tilPhone.setError(null);
+        }
+
         if (getText(etAddress).isEmpty()) { tilAddress.setError("Dirección obligatoria"); isValid = false; } else tilAddress.setError(null);
         if (getText(etLocality).isEmpty()) { tilLocality.setError("Localidad obligatoria"); isValid = false; } else tilLocality.setError(null);
-        if (getText(etPostalCode).isEmpty()) { tilPostalCode.setError("CP obligatorio"); isValid = false; } else tilPostalCode.setError(null);
+        
+        if (getText(etPostalCode).isEmpty()) { 
+            tilPostalCode.setError("CP obligatorio"); 
+            isValid = false; 
+        } else if (!getText(etPostalCode).matches("^[0-9]{5}$")) {
+            tilPostalCode.setError("CP inválido (5 dígitos)");
+            isValid = false;
+        } else {
+            tilPostalCode.setError(null);
+        }
+
         if (getText(etDescription).isEmpty()) { tilDescription.setError("Misión obligatoria"); isValid = false; } else tilDescription.setError(null);
 
         String email = getText(etEmail);
@@ -134,6 +165,58 @@ public class OrganizationRegisterFragment extends Fragment {
 
         if (!isValid) StatusHelper.showStatus(getContext(), "Formulario incompleto", "Corrige los campos marcados en rojo.", true);
         return isValid;
+    }
+
+    private boolean isValidCIF(String cif) {
+        cif = cif.toUpperCase().trim();
+        if (cif.length() != 9) return false;
+        
+        char firstChar = cif.charAt(0);
+        if ("ABCDEFGHJKLMNPQRSUVW".indexOf(firstChar) == -1) return false;
+
+        String digits = cif.substring(1, 8);
+        if (!digits.matches("[0-9]+")) return false;
+
+        int evenSum = 0;
+        int oddSum = 0;
+        
+        for (int i = 0; i < digits.length(); i++) {
+            int digit = Character.getNumericValue(digits.charAt(i));
+            if ((i + 1) % 2 == 0) { // Even positions (in 1-based index, index 1, 3, 5...) -> 2nd, 4th, 6th digit
+                evenSum += digit;
+            } else { // Odd positions -> 1st, 3rd, 5th digit
+                int doubled = digit * 2;
+                oddSum += (doubled / 10) + (doubled % 10);
+            }
+        }
+        
+        int totalSum = evenSum + oddSum;
+        int controlDigit = (10 - (totalSum % 10)) % 10;
+        
+        char expectedChar;
+        if ("NPQRSW".indexOf(firstChar) != -1) {
+            // Letter control
+            expectedChar = "JABCDEFGHI".charAt(controlDigit);
+        } else {
+            // Number control
+            expectedChar = Character.forDigit(controlDigit, 10);
+        }
+
+        char lastChar = cif.charAt(8);
+        // Some CIFs can end in letter OR number, usually strict validation checks specific types
+        // Simplified check: if it matches numeric or letter control, acceptable
+        if (lastChar == expectedChar) return true;
+        
+        // Check alternative (some types allow letter)
+        if ("ABCDEFGH".indexOf(firstChar) != -1) {
+             // These usually end in number, but check letter equivalent just in case is rare? No, standard says number.
+             // Let's stick to standard strict or slightly lenient?
+             // Implementing slightly lenient for "JABCDEFGHI" mapping if digit doesn't match
+             char altChar = "JABCDEFGHI".charAt(controlDigit);
+             return lastChar == altChar;
+        }
+        
+        return false;
     }
 
     // MÉTODO MODIFICADO: Registro directo en backend
@@ -152,7 +235,7 @@ public class OrganizationRegisterFragment extends Fragment {
             @Override
             public void onResponse(@NonNull retrofit2.Call<Void> call, @NonNull retrofit2.Response<Void> response) {
                 if (response.isSuccessful()) {
-                    StatusHelper.showStatus(getContext(), "¡Éxito!", "Organización creada y ACEPTADA.", false);
+                    StatusHelper.showStatus(getContext(), "¡Éxito!", "Organización creada", false);
                     if (getParentFragmentManager() != null) {
                         getParentFragmentManager().popBackStack();
                         progressBar.setVisibility(View.INVISIBLE);

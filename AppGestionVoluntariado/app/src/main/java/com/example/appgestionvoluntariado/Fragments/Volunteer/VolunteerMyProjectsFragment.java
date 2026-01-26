@@ -171,10 +171,11 @@ public class VolunteerMyProjectsFragment extends Fragment {
             }
 
             @Override
-            public void onApply(Project project) {
-
-            }
-        },ViewMode.VOLUNTEER_MY_PROJECTS);
+            public void onApply(Project project) { }
+                
+            @Override
+            public void onEdit(Project project) { }
+            },ViewMode.VOLUNTEER_MY_PROJECTS);
 
         // Mostrar etiqueta de estado SOLO si estamos en la pestaña TAB_ACCEPTED
         projectAdapter.setShowStatusLabel(currentStatusFilter.equals("aceptado"));

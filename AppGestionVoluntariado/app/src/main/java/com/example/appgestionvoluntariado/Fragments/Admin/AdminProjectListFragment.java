@@ -176,6 +176,11 @@ public class AdminProjectListFragment extends Fragment {
                 public void onApply(Project project) {
 
                 }
+
+                @Override
+                public void onEdit(Project project) {
+                    editProject(project);
+                }
             }, view);
 
             rvProjects.setAdapter(adapter);
@@ -242,6 +247,34 @@ public class AdminProjectListFragment extends Fragment {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
         });
+    }
+
+    private void editProject(Project project) {
+        CreateProjectFragment fragment = new CreateProjectFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("is_edit_mode", true);
+        args.putInt("project_id", project.getActivityId());
+        args.putString("project_name", project.getName());
+        args.putString("project_description", project.getName()); // Reusing name as description for now
+        args.putString("project_address", project.getAddress());
+        args.putString("project_start_date", project.getStartDate());
+        args.putString("project_end_date", project.getEndDate());
+        args.putInt("project_participants", project.getMaxParticipants());
+
+        ArrayList<String> odsNames = new ArrayList<>();
+        if(project.getOdsList() != null) for(com.example.appgestionvoluntariado.Models.Ods o : project.getOdsList()) odsNames.add(o.getName());
+        args.putStringArrayList("project_ods", odsNames);
+
+        ArrayList<String> skillNames = new ArrayList<>();
+        if(project.getSkillsList() != null) for(com.example.appgestionvoluntariado.Models.Skill s : project.getSkillsList()) skillNames.add(s.getName());
+        args.putStringArrayList("project_skills", skillNames);
+
+        fragment.setArguments(args);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.admin_fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void filter(String text) {

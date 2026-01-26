@@ -15,6 +15,10 @@ public class ProjectCreationRequest {
     @SerializedName("descripcion")
     private String description;
 
+
+    @SerializedName("sector")
+    private String sector;
+
     @SerializedName("direccion")
     private String address;
 
@@ -41,7 +45,7 @@ public class ProjectCreationRequest {
     }
 
     public ProjectCreationRequest(String organizationCif, String name, String description,
-                                  String address, String startDate, String endDate,
+                                  String address,String sector, String startDate, String endDate,
                                   int maxParticipants, List<String> ods,
                                   List<String> skills, List<String> needs) {
         this.organizationCif = organizationCif;
@@ -54,6 +58,7 @@ public class ProjectCreationRequest {
         this.ods = ods;
         this.skills = skills;
         this.needs = needs;
+        this.sector = sector;
     }
 
     // Getters and Setters
@@ -80,6 +85,10 @@ public class ProjectCreationRequest {
 
     public List<String> getOds() { return ods; }
     public void setOds(List<String> ods) { this.ods = ods; }
+
+    public String getSector() {return sector;}
+
+    public void setSector(String sector) {this.sector = sector;}
 
     public List<String> getSkills() { return skills; }
     public void setSkills(List<String> skills) { this.skills = skills; }

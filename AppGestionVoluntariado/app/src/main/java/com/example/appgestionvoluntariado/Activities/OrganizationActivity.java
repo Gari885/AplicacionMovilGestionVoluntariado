@@ -60,6 +60,7 @@ public class OrganizationActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.organization_fragment_container, new OrgActivitiesFragment())
+                    .addToBackStack(null)
                     .commit();
         }
 

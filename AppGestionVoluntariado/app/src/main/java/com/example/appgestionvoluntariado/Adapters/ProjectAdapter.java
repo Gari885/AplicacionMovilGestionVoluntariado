@@ -38,6 +38,8 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
     private ViewMode viewMode;
     private boolean showStatusLabel = false;
 
+
+
     public void updateAdapter(List<Project> list, ViewMode view) {
 
     }
@@ -48,6 +50,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
         void onReject(Project project);
         void onDelete(Project project);
         void onApply(Project project);
+        void onEdit(Project project);
     }
 
     public ProjectAdapter(List<Project> projects, OnProjectActionListener listener, ViewMode mode) {
@@ -100,7 +103,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
 
     public class ProjectHolder extends RecyclerView.ViewHolder {
         TextView tvTitle, tvZone, tvDate, tvOrgName, tvStatusLabel;
-        Button btnInfo;
+        Button btnInfo, btnEdit;
         AppCompatButton btnPrimary, btnSecondary;
 
         public ProjectHolder(@NonNull View itemView) {
@@ -113,6 +116,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
             btnPrimary = itemView.findViewById(R.id.btnPrimaryAction);
             btnSecondary = itemView.findViewById(R.id.btnSecondaryAction);
             tvStatusLabel = itemView.findViewById(R.id.tvStatusLabel);
+            btnEdit = itemView.findViewById(R.id.btnProjectEdit);
         }
 
         public void bind(Project project, OnProjectActionListener listener, ViewMode mode) {
@@ -164,13 +168,15 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
                     btnPrimary.setVisibility(View.VISIBLE);
                     btnPrimary.setText("DAR DE BAJA");
                     btnPrimary.setOnClickListener(v -> listener.onDelete(project));
-                    btnSecondary.setOnClickListener(v -> listener.onReject(project));
                     break;
 
                 case ORGANIZATION:
                     btnPrimary.setVisibility(View.VISIBLE);
                     btnPrimary.setText("DAR DE BAJA");
                     btnPrimary.setOnClickListener(v -> listener.onDelete(project));
+                    
+                    btnEdit.setVisibility(View.VISIBLE);
+                    btnEdit.setOnClickListener(v -> listener.onEdit(project));
                     break;
 
                 case VOLUNTEER_AVAILABLE:

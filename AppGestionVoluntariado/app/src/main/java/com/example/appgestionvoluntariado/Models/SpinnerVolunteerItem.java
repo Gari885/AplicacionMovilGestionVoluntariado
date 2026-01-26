@@ -1,4 +1,4 @@
-package com.example.appgestionvoluntariado.Models.UI;
+package com.example.appgestionvoluntariado.Models;
 
 public class SpinnerVolunteerItem {
     private String name;

@@ -414,19 +414,83 @@ public class VolunteerRegisterFragment extends Fragment {
         if (tilZona != null) tilZona.setError(null);
 
         if (getText(etName).isEmpty()) { tilName.setError("Campo obligatorio"); isValid = false; }
-        if (getText(etDni).isEmpty()) { tilDni.setError("Campo obligatorio"); isValid = false; }
+        
+        String dni = getText(etDni);
+        if (dni.isEmpty()) { 
+            tilDni.setError("Campo obligatorio"); 
+            isValid = false; 
+        } else if (!isValidSpanishID(dni)) {
+            tilDni.setError("DNI/NIE inválido"); 
+            isValid = false;
+        }
 
         String email = getText(etEmail);
         if (email.isEmpty()) { tilEmail.setError("Campo obligatorio"); isValid = false; }
         else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) { tilEmail.setError("Email inválido"); isValid = false; }
 
         if (getText(etPassword).length() < 6) { tilPassword.setError("Mínimo 6 caracteres"); isValid = false; }
-        if (getText(etBirthDate).isEmpty()) { tilBirthDate.setError("Campo obligatorio"); isValid = false; }
+        
+        String dob = getText(etBirthDate);
+        if (dob.isEmpty()) { 
+            tilBirthDate.setError("Campo obligatorio"); 
+            isValid = false; 
+        } else {
+            // Check Age >= 16
+            try {
+                // Assuming format YYYY-MM-DD from showDatePickerDialog
+                // But showDatePickerDialog uses YYYY-MM-DD? Let's check format.
+                // Looking at showDatePicker: etBirthDate.setText(String.format(Locale.getDefault(), "%d-%02d-%02d", y, m + 1, d));
+                // Yes, YYYY-MM-DD.
+                String[] parts = dob.split("-");
+                int year = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                int day = Integer.parseInt(parts[2]);
+
+                Calendar birth = Calendar.getInstance();
+                birth.set(year, month - 1, day);
+                
+                Calendar minAge = Calendar.getInstance();
+                minAge.add(Calendar.YEAR, -16);
+
+                if (birth.after(minAge)) {
+                    tilBirthDate.setError("Debes tener al menos 16 años");
+                    isValid = false;
+                }
+            } catch (Exception e) {
+                // If parsing fails for some reason
+            }
+        }
 
         if (actvZona.getText().toString().isEmpty()) { if (tilZona != null) tilZona.setError("Selecciona una zona"); isValid = false; }
         if (actvCycle.getText().toString().isEmpty()) { if (tilCycle != null) tilCycle.setError("Selecciona tu ciclo"); isValid = false; }
 
         if (!isValid) StatusHelper.showStatus(getContext(), "Formulario incompleto", "Corrige los campos marcados en rojo.", true);
         return isValid;
+    }
+
+    private boolean isValidSpanishID(String id) {
+        String nif = id.toUpperCase().replaceAll("[^0-9A-Z]", "");
+        if (nif.length() != 9) return false;
+
+        String letter = nif.substring(8);
+        String numbers = nif.substring(0, 8);
+
+        if (Character.isLetter(nif.charAt(0))) { // NIE
+            String niePrefix = nif.substring(0, 1);
+            numbers = nif.substring(1, 8);
+            if (niePrefix.equals("X")) numbers = "0" + numbers;
+            else if (niePrefix.equals("Y")) numbers = "1" + numbers;
+            else if (niePrefix.equals("Z")) numbers = "2" + numbers;
+            else return false;
+        }
+
+        try {
+            int num = Integer.parseInt(numbers);
+            String validLetters = "TRWAGMYFPDXBNJZSQVHLCKE";
+            String calculated = String.valueOf(validLetters.charAt(num % 23));
+            return letter.equals(calculated);
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

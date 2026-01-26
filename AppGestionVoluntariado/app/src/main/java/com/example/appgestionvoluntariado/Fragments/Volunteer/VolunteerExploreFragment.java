@@ -106,6 +106,10 @@ public class VolunteerExploreFragment extends Fragment {
             @Override
             public void onApply(Project project) {enrollInProject(project);}
 
+            @Override
+            public void onEdit(Project project) {
+                // No edit for volunteers
+            }
         }, ViewMode.VOLUNTEER_AVAILABLE);
         recyclerView.setAdapter(projectAdapter);
     }

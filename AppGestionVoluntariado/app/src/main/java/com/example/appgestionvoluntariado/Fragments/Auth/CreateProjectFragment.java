@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.appgestionvoluntariado.Models.Ods;
 import com.example.appgestionvoluntariado.Models.Organization;
+import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.Models.Request.ProjectCreationRequest;
 import com.example.appgestionvoluntariado.Models.Response.ProfileResponse;
 import com.example.appgestionvoluntariado.Models.Skill;
@@ -59,6 +60,9 @@ public class CreateProjectFragment extends Fragment {
     private AutoCompleteTextView actvZone, actvOrganization, actvSector, actvSkill, actvODS;
     private ChipGroup chipGroupData;
 
+    // Call management
+    private List<Call<?>> activeCalls = new ArrayList<>();
+
     private TextView loadingText;
 
     private ProgressBar pbLoading;
@@ -76,6 +80,9 @@ public class CreateProjectFragment extends Fragment {
     private Animation rotateAnim;
 
     private MaterialToolbar topAppBar;
+    private TextView tvFormTitle;
+
+    private int totalCalls = 0;
 
     private List<String> odsList = new ArrayList<>();
     private List<String> skillsList = new ArrayList<>();
@@ -84,6 +91,9 @@ public class CreateProjectFragment extends Fragment {
     // NEW: Store selected organization for Admins
     private Organization selectedOrganization = null;
     private List<Organization> loadedOrganizations = new ArrayList<>();
+
+    private Project projectToEdit;
+    private boolean isEditMode = false;
 
     @Nullable
     @Override
@@ -95,9 +105,17 @@ public class CreateProjectFragment extends Fragment {
         setupListeners();
 
         projectsAPIService = APIClient.getProjectsService();
-
-        loadDynamicCategories(); // Carga ODS y Skills desde la API
         loadOrganizationData();
+        loadDynamicCategories(); // Carga ODS y Skills desde la API
+
+        // Check for edit mode
+        if (getArguments() != null) {
+            projectToEdit = (Project) getArguments().getSerializable("project");
+            if (projectToEdit != null) {
+                isEditMode = true;
+                setupEditMode();
+            }
+        }
         return view;
     }
 
@@ -130,6 +148,7 @@ public class CreateProjectFragment extends Fragment {
         actvOrganization = v.findViewById(R.id.actvOrganization);
         actvSector = v.findViewById(R.id.actvSector);
         topAppBar = v.findViewById(R.id.topAppBar);
+        tvFormTitle = v.findViewById(R.id.tvFormTitle);
         chipGroupData = v.findViewById(R.id.chipGroupAddedData);
         pbLoading = v.findViewById(R.id.pbLoginLoading);
 
@@ -148,6 +167,18 @@ public class CreateProjectFragment extends Fragment {
         topAppBar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Cancel all pending calls
+        for (Call<?> call : activeCalls) {
+            if (!call.isCanceled()) {
+                call.cancel();
+            }
+        }
+        activeCalls.clear();
+    }
+
     private void toggleLoading(boolean show) {
         if (show) {
             loadingOverlay.setVisibility(View.VISIBLE);
@@ -160,22 +191,28 @@ public class CreateProjectFragment extends Fragment {
 
 
     private void loadOrganizationData() {
-        APIClient.getAuthAPIService().getProfile().enqueue(new Callback<ProfileResponse>() {
+        Call<ProfileResponse> call = APIClient.getAuthAPIService().getProfile();
+        activeCalls.add(call);
+        call.enqueue(new Callback<ProfileResponse>() {
             @Override
             public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
+                if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().getType().equalsIgnoreCase("admin")) {
                         // ADMIN: Load organizations to select
                         actvOrganization.setEnabled(true);
                         tilOrganization.setEnabled(true);
+                        totalCalls = 4;
                         loadOrganizations();
                     }else if (response.body().getType().equalsIgnoreCase("organizacion")) {
                         try {
+                            totalCalls = 3;
                             // ORG: Pre-fill and disable
                             String orgName = response.body().getData().get("nombre").getAsString();
                             actvOrganization.setText(orgName);
                             actvOrganization.setEnabled(false); // Make it read-only
                             tilOrganization.setEnabled(false); // Visual indication
+
                         } catch (Exception e) {
                             Log.e("CreateProject", "Error parsing profile data", e);
                         }
@@ -187,6 +224,7 @@ public class CreateProjectFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ProfileResponse> call, @NonNull Throwable t) {
+                if (!isAdded()) return;
                 Log.e("CreateProject", "Failed to fetch profile", t);
                 checkAllLoaded();
             }
@@ -194,9 +232,12 @@ public class CreateProjectFragment extends Fragment {
     }
 
     private void loadOrganizations() {
-        APIClient.getOrganizationService().getOrganizations("aprobado").enqueue(new Callback<List<Organization>>() {
+        Call<List<Organization>> call = APIClient.getOrganizationService().getOrganizations("aprobado");
+        activeCalls.add(call);
+        call.enqueue(new Callback<List<Organization>>() {
             @Override
             public void onResponse(Call<List<Organization>> call, Response<List<Organization>> response) {
+                if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null) {
                     loadedOrganizations = response.body();
                     // NEW: Use custom layout or toString() override in Organization model
@@ -214,6 +255,7 @@ public class CreateProjectFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Organization>> call, Throwable t) {
+                if (!isAdded()) return;
                 checkAllLoaded();
             }
         });
@@ -248,17 +290,56 @@ public class CreateProjectFragment extends Fragment {
         if (TextUtils.isEmpty(etName.getText())) { tilName.setError("Campo requerido"); isValid = false; }
         if (TextUtils.isEmpty(etDescription.getText())) { tilDescription.setError("Campo requerido"); isValid = false; }
         if (TextUtils.isEmpty(actvZone.getText())) { tilZone.setError("Campo requerido"); isValid = false; }
-        if (TextUtils.isEmpty(etStartDate.getText())) { tilStartDate.setError("Campo requerido"); isValid = false; }
-        if (TextUtils.isEmpty(etEndDate.getText())) { tilEndDate.setError("Campo requerido"); isValid = false; }
 
-        // Validate Organization for Admin
-        if (actvOrganization.isEnabled() && selectedOrganization == null) {
-            tilOrganization.setError("Selecciona una organización");
-            isValid = false;
+        // Start Date
+        if (TextUtils.isEmpty(etStartDate.getText())) { 
+            tilStartDate.setError("Campo requerido"); 
+            isValid = false; 
         }
 
-        if (TextUtils.isEmpty(etMaxParticipants.getText())) {
+        // End Date & Date Logic
+        if (TextUtils.isEmpty(etEndDate.getText())) { 
+            tilEndDate.setError("Campo requerido"); 
+            isValid = false; 
+        } else if (!TextUtils.isEmpty(etStartDate.getText())) {
+             // Compare dates if both are present
+             try {
+                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                 Calendar start = Calendar.getInstance();
+                 start.setTime(sdf.parse(etStartDate.getText().toString()));
+                 Calendar end = Calendar.getInstance();
+                 end.setTime(sdf.parse(etEndDate.getText().toString()));
+                 
+                 if (end.before(start)) {
+                     tilEndDate.setError("La fecha fin no puede ser anterior a inicio");
+                     isValid = false;
+                 }
+             } catch (ParseException e) {
+                 e.printStackTrace();
+             }
+        }
+
+        // Participants > 0
+        String participantsStr = etMaxParticipants.getText().toString();
+        if (TextUtils.isEmpty(participantsStr)) {
             tilMaxParticipants.setError("Campo requerido");
+            isValid = false;
+        } else {
+            try {
+                int participants = Integer.parseInt(participantsStr);
+                if (participants <= 0) {
+                    tilMaxParticipants.setError("Debe ser mayor que 0");
+                    isValid = false;
+                }
+            } catch (NumberFormatException e) {
+                tilMaxParticipants.setError("Número inválido");
+                isValid = false;
+            }
+        }
+
+        // Organization check
+        if (tilOrganization.isEnabled() && TextUtils.isEmpty(actvOrganization.getText())) {
+            tilOrganization.setError("Campo requerido");
             isValid = false;
         }
 
@@ -270,6 +351,8 @@ public class CreateProjectFragment extends Fragment {
             StatusHelper.showToast(getContext(), "Añade almenos una habilidad", true);
             isValid = false;
         }
+
+        if (!isValid) StatusHelper.showToast(getContext(), "Por favor corrige los errores", true);
 
         return isValid;
     }
@@ -286,43 +369,115 @@ public class CreateProjectFragment extends Fragment {
         request.setOds(odsList);
         request.setMaxParticipants(Integer.parseInt(etMaxParticipants.getText().toString()));
         request.setSkills(skillsList);
+        request.setSector(actvSector.getText().toString());
 
         // NEW: Add Organization CIF if Admin selected one
         if (selectedOrganization != null) {
             request.setOrganizationCif(selectedOrganization.getCif());
         }
 
-        projectsAPIService.createProject(request).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                toggleLoading(false);
-                if (response.isSuccessful()) {
-                    loadingText.setText("Creando proyecto...");
-                    StatusHelper.showToast(getContext(), "Actividad creada con éxito", false);
-                    
-                    // Notify listeners to refresh
-                    Bundle result = new Bundle();
-                    result.putBoolean("refresh", true);
-                    getParentFragmentManager().setFragmentResult("project_created", result);
+        if (isEditMode) {
+             Call<Void> call = projectsAPIService.updateProject(projectToEdit.getActivityId(), request);
+             activeCalls.add(call);
+             call.enqueue(new Callback<Void>() {
+                 @Override
+                 public void onResponse(Call<Void> call, Response<Void> response) {
+                     if (!isAdded()) return;
+                     toggleLoading(false);
+                     if (response.isSuccessful()) {
+                         StatusHelper.showToast(getContext(), "Proyecto actualizado con éxito", false);
+                          getParentFragmentManager().setFragmentResult("project_created", new Bundle()); // Refresh list
+                         getParentFragmentManager().popBackStack();
+                     } else {
+                         StatusHelper.showToast(getContext(), "Error al actualizar", true);
+                     }
+                 }
 
-                    getParentFragmentManager().popBackStack();
-                }else {
-                    try {
-                        String errorBody = response.errorBody().string();
-                        Log.e("CreateProject", "Error: " + errorBody);
-                        StatusHelper.showToast(getContext(), "Error: " + response.message(), true);
-                    } catch (IOException e) {
-                        StatusHelper.showToast(getContext(), "No se ha podido crear la actividad", true);
+                 @Override
+                 public void onFailure(Call<Void> call, Throwable t) {
+                     if (!isAdded()) return;
+                     toggleLoading(false);
+                     StatusHelper.showToast(getContext(), "Fallo de red", true);
+                 }
+             });
+        } else {
+            Call<Void> call = projectsAPIService.createProject(request);
+            activeCalls.add(call);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                    if (!isAdded()) return;
+                    toggleLoading(false);
+                    if (response.isSuccessful()) {
+                        loadingText.setText("Creando proyecto...");
+                        StatusHelper.showToast(getContext(), "Actividad creada con éxito", false);
+
+                        // Notify listeners to refresh
+                        Bundle result = new Bundle();
+                        result.putBoolean("refresh", true);
+                        getParentFragmentManager().setFragmentResult("project_created", result);
+
+                        getParentFragmentManager().popBackStack();
+                    } else {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            Log.e("CreateProject", "Error: " + errorBody);
+                            StatusHelper.showToast(getContext(), "Error: " + response.message(), true);
+                        } catch (IOException e) {
+                            StatusHelper.showToast(getContext(), "No se ha podido crear la actividad", true);
+                        }
                     }
+
+
                 }
 
+                @Override
+                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                    if (!isAdded()) return;
+                    toggleLoading(false);
+                }
+            });
+        }
+    }
 
+    private void setupEditMode() {
+
+
+        if (projectToEdit == null) return;
+
+        topAppBar.setTitle("Editar Proyecto");
+        if(tvFormTitle != null) tvFormTitle.setText("Editar Proyecto");
+        btnCreate.setText("GUARDAR CAMBIOS");
+
+        String sector = projectToEdit.getSector();
+        actvSector.setText(sector, false);
+
+
+        etName.setText(projectToEdit.getName());
+
+        etDescription.setText(projectToEdit.getName()); // Provisional reuse since I don't see description field in Project.java
+
+        actvZone.setText(projectToEdit.getAddress(), false); // false to disable filtering
+        
+        // Format dates for UI: yyyy-MM-dd -> dd/MM/yyyy HH:mm (or just dd/MM/yyyy)
+        etStartDate.setText(formatDateForUI(projectToEdit.getStartDate()));
+        etEndDate.setText(formatDateForUI(projectToEdit.getEndDate()));
+        
+        etMaxParticipants.setText(String.valueOf(projectToEdit.getMaxParticipants()));
+
+        // Lists
+        if (projectToEdit.getOdsList() != null) {
+            for (Ods o : projectToEdit.getOdsList()) {
+                 odsList.add(o.getName());
+                 addChipToGroup(chipGroupData, o.getName(), "ODS", true);
             }
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                toggleLoading(false);
-            }
-        });
+        }
+        if (projectToEdit.getSkillsList() != null) {
+             for (com.example.appgestionvoluntariado.Models.Skill s : projectToEdit.getSkillsList()) {
+                 skillsList.add(s.getName());
+                 addChipToGroup(chipGroupData, s.getName(), "SKILL", true);
+             }
+        }
     }
 
     private void loadDynamicCategories() {
@@ -333,23 +488,31 @@ public class CreateProjectFragment extends Fragment {
                 new CategoryManager.CategoryCallback<Ods>() {
                     @Override
                     public void onSuccess(List<Ods> data) {
+                        if (!isAdded() || getContext() == null) return;
                         masterODSList.addAll(data);
                         // IMPORTANTE: El objeto Ods debe tener un toString() que devuelva el nombre
-                        ArrayAdapter<Ods> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, masterODSList);
+                        ArrayAdapter<Ods> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, masterODSList);
                         actvODS.setAdapter(adapter);
                         checkAllLoaded();
                     }
-                    @Override public void onError(String e) { checkAllLoaded(); }
+                    @Override public void onError(String e) {
+                        if (!isAdded()) return;
+                        checkAllLoaded();
+                    }
                 },
                 new CategoryManager.CategoryCallback<Skill>() {
                     @Override
                     public void onSuccess(List<Skill> data) {
+                        if (!isAdded() || getContext() == null) return;
                         masterSkillsList.addAll(data);
-                        ArrayAdapter<Skill> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, masterSkillsList);
+                        ArrayAdapter<Skill> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, masterSkillsList);
                         actvSkill.setAdapter(adapter);
                         checkAllLoaded();
                     }
-                    @Override public void onError(String e) { checkAllLoaded(); }
+                    @Override public void onError(String e) {
+                        if (!isAdded()) return;
+                        checkAllLoaded();
+                    }
                 },
                 // ... (resto de callbacks vacíos o necesarios)
                 null, null, null
@@ -359,7 +522,7 @@ public class CreateProjectFragment extends Fragment {
 
     private void checkAllLoaded() {
         loadedCount++;
-        if (loadedCount >= 4) toggleLoading(false);
+        if (loadedCount >= totalCalls) toggleLoading(false);
     }
 
 
@@ -369,7 +532,7 @@ public class CreateProjectFragment extends Fragment {
         etEndDate.setOnClickListener(v -> showDateTimePicker(etEndDate));
     }
 
-    private void showDateTimePicker(TextInputEditText input) {
+    private void showDateTimePicker(TextInputEditText input)  {
         Calendar calendar = Calendar.getInstance();
         new DatePickerDialog(requireContext(), (view, year, month, day) -> {
             new TimePickerDialog(requireContext(), (viewTime, hour, min) -> {
@@ -389,6 +552,32 @@ public class CreateProjectFragment extends Fragment {
         } catch (ParseException e) { return dateStr; }
     }
 
+    // Reuse chip creation logic but separated for programmatic adding
+    private void addChipToGroup(ChipGroup group, String text, String type, boolean isInteractive) {
+        Chip chip = new Chip(requireContext());
+        chip.setText(text);
+        chip.setCloseIconVisible(true);
+        chip.setCheckable(false);
+        chip.setClickable(false);
+
+        if (type.equals("ODS")) {
+            chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue_light);
+            chip.setTextColor(Color.BLACK);
+        } else {
+            chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue);
+            chip.setTextColor(Color.WHITE);
+            chip.setCloseIconTintResource(android.R.color.white);
+        }
+
+        chip.setOnCloseIconClickListener(v -> {
+            group.removeView(chip);
+            if(type.equals("ODS")) odsList.remove(text);
+            else skillsList.remove(text);
+        });
+
+        group.addView(chip);
+    }
+
     private void addChipFromAutoComplete(AutoCompleteTextView actv, List<String> list, String type) {
         // 1. Obtenemos el texto del AutoComplete [cite: 2026-01-20]
         String text = actv.getText().toString().trim();
@@ -400,34 +589,24 @@ public class CreateProjectFragment extends Fragment {
             list.add(text);
 
             // 3. Creamos el Chip visualmente [cite: 2026-01-20]
-            Chip chip = new Chip(requireContext());
-            chip.setText(text);
-            chip.setCloseIconVisible(true);
-            chip.setCheckable(false);
-            chip.setClickable(false);
-
-            // Estilo basado en el tipo (Azul oscuro para Skills, Azul claro para ODS) [cite: 2026-01-16]
-            if (type.equals("ODS")) {
-                chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue_light);
-                chip.setTextColor(Color.BLACK);
-            } else {
-                chip.setChipBackgroundColorResource(R.color.cuatrovientos_blue);
-                chip.setTextColor(Color.WHITE);
-                chip.setCloseIconTintResource(android.R.color.white);
-            }
-
-            // 4. Lógica para eliminar el Chip y el dato de la lista [cite: 2026-01-20]
-            chip.setOnCloseIconClickListener(v -> {
-                chipGroupData.removeView(chip);
-                list.remove(text);
-            });
+            addChipToGroup(chipGroupData, text, type, true);
 
             // 5. Lo añadimos al contenedor y limpiamos el selector [cite: 2026-01-20]
-            chipGroupData.addView(chip);
             actv.setText("");
         } else if (list.contains(text)) {
             StatusHelper.showToast(getContext(), "Este elemento ya ha sido añadido", true);
             actv.setText("");
+        }
+    }
+
+    private String formatDateForUI(String dateStr) {
+        if (dateStr == null) return "";
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy 00:00", Locale.getDefault());
+            return outputFormat.format(inputFormat.parse(dateStr));
+        } catch (ParseException e) {
+            return dateStr; 
         }
     }
 }

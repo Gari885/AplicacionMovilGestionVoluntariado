@@ -105,7 +105,7 @@ public class OrgActivitiesFragment extends Fragment {
         });
 
         tabAccepted.setOnClickListener(v -> {
-            currentStatus = "aprobado";
+            currentStatus = "aceptada";
             updateTabUI(tabAccepted, tabPending);
             loadMyProjects();
         });
@@ -120,9 +120,6 @@ public class OrgActivitiesFragment extends Fragment {
 
     private void loadMyProjects() {
         loadingLayout.setVisibility(View.VISIBLE);
-        // Toast.makeText(getContext(), "Cargando proyectos...", Toast.LENGTH_SHORT).show(); // Removed prompt to avoid noise, user sees spinner
-        // El servidor filtra por el Token de Firebase de la organización
-        // Enviamos el estado como Query Param ?estado=
         APIClient.getOrganizationService().getMyProjects(currentStatus)
                 .enqueue(new Callback<List<Project>>() {
                     @Override
@@ -156,6 +153,18 @@ public class OrgActivitiesFragment extends Fragment {
             public void onDelete(Project project) {cancelProject(project);}
             @Override
             public void onApply(Project project) {}
+            @Override
+            public void onEdit(Project project) {
+                CreateProjectFragment fragment = new CreateProjectFragment();
+                Bundle args = new Bundle();
+                args.putSerializable("project", project);
+                fragment.setArguments(args);
+
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.organization_fragment_container, fragment) // Asegúrate que este ID es correcto para tu layout
+                        .addToBackStack(null)
+                        .commit();
+            }
         }, ViewMode.ORGANIZATION);
         recyclerView.setAdapter(adapter);
     }

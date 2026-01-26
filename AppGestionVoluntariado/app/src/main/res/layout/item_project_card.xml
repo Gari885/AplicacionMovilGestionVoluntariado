@@ -34,6 +34,7 @@
                 app:srcCompat="@drawable/ic_apartment"
                 app:tint="#1A3B85" />
         </androidx.cardview.widget.CardView>
+
         <TextView
             android:id="@+id/tvStatusLabel"
             android:layout_width="wrap_content"
@@ -82,7 +83,6 @@
             android:id="@+id/tvProjectDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
             android:textColor="#757575"
             android:textSize="13sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -114,6 +114,23 @@
             app:iconTint="#1A3B85"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnProjectEdit"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:letterSpacing="0.05"
+            android:text="EDITAR"
+            android:textColor="#1A3B85"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:icon="@drawable/ic_back_arrow"
+            app:iconPadding="8dp"
+            app:iconTint="#1A3B85"
+            app:layout_constraintStart_toEndOf="@+id/btnProjectInfo"
+            app:layout_constraintTop_toTopOf="@+id/btnProjectInfo" />
 
         <LinearLayout
             android:id="@+id/layoutActions"

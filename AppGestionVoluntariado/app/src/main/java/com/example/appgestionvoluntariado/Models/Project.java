@@ -1,9 +1,10 @@
 package com.example.appgestionvoluntariado.Models;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 import java.util.List;
 
-public class Project {
+public class Project implements Serializable {
 
     @SerializedName("codActividad")
     private int activityId;
@@ -13,6 +14,9 @@ public class Project {
 
     @SerializedName("estado")
     private String status;
+
+    @SerializedName("sector")
+    private String sector;
 
     @SerializedName("estadoAprobacion")
     private String approvalStatus;
@@ -37,6 +41,10 @@ public class Project {
 
     @SerializedName("ods")
     private List<Ods> odsList;
+
+    public String getSector() {return sector;}
+
+    public void setSector(String sector) {this.sector = sector;}
 
     @SerializedName("habilidades")
     private List<Skill> skillsList;

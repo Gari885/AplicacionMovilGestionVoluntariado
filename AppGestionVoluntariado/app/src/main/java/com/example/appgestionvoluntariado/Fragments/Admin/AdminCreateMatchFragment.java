@@ -12,10 +12,11 @@ import android.widget.Spinner;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.appgestionvoluntariado.Models.Organization;
 import com.example.appgestionvoluntariado.Models.Project;
 import com.example.appgestionvoluntariado.Models.Request.VolunteerEnrollmentRequest;
-import com.example.appgestionvoluntariado.Models.UI.SpinnerProjectItem;
-import com.example.appgestionvoluntariado.Models.UI.SpinnerVolunteerItem;
+import com.example.appgestionvoluntariado.Models.SpinnerProjectItem;
+import com.example.appgestionvoluntariado.Models.SpinnerVolunteerItem;
 import com.example.appgestionvoluntariado.Models.Volunteer;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Services.APIClient;
