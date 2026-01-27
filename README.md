@@ -47,3 +47,13 @@ Para mantener la estabilidad del código, implementamos una estrategia de **Git 
     ```
 2. **Abrirlo con AndroidStudio**
 3. **Arrancar la aplicación**
+
+## Usuarios de Prueba
+
+Para facilitar las pruebas de la aplicación, se proporcionan los siguientes usuarios predeterminados:
+
+| Rol            | Email                           | Contraseña    |
+|----------------|---------------------------------|---------------|
+| **Voluntario** | `garinovoselskyyjaka@gmail.com` | `adiosBola*`  |
+| **Organización**| `g@gmail.com`                   | `1234567890`  |
+| **Admin**      | `admin@admin.com`               | `adminTest`   |
