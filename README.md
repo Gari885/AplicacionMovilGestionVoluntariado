@@ -3,6 +3,10 @@
 ## Objetivo del Proyecto
 El objetivo central es proporcionar aplicación móvil para la gestión del voluntariado de cuatrovientos. El sistema orquesta la relación entre organizaciones que publican causas sociales y voluntarios dispuestos a participar, garantizando la integridad de los datos en procesos críticos como el **Match** y el **Control de Inscripciones**.
 
+## 🔗 Repositorio Global (API y Backend)
+Este repositorio corresponde al **Cliente Android**. Para acceder al backend, la API y la documentación general del sistema, consulta el repositorio principal:
+👉 [**AplicacionWebGestionVoluntariado**](https://github.com/Sergiodlf/AplicacionWebGestionVoluntariado)
+
 ---
 ## Funcionalidades Core (Actualizado)
 
@@ -48,12 +52,3 @@ Para mantener la estabilidad del código, implementamos una estrategia de **Git 
 2. **Abrirlo con AndroidStudio**
 3. **Arrancar la aplicación**
 
-## Usuarios de Prueba
-
-Para facilitar las pruebas de la aplicación, se proporcionan los siguientes usuarios predeterminados:
-
-| Rol            | Email                           | Contraseña    |
-|----------------|---------------------------------|---------------|
-| **Voluntario** | `garinovoselskyyjaka@gmail.com` | `adiosBola*`  |
-| **Organización**| `g@gmail.com`                   | `1234567890`  |
-| **Admin**      | `admin@admin.com`               | `adminTest`   |
