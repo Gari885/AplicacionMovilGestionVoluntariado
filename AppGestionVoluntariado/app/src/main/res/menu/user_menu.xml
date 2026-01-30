@@ -4,6 +4,12 @@
         android:title="Cerrar Sesión"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_notifications"
+        android:icon="@drawable/ic_notifications"
+        android:title="Notificaciones"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_user"
         android:icon="@drawable/ic_user_avatar"
         android:title="Usuario"

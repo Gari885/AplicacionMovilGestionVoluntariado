@@ -1,4 +1,5 @@
 package com.example.appgestionvoluntariado.Fragments.Auth;
+
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -7,26 +8,26 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.example.appgestionvoluntariado.Models.Request.ForgotPasswordRequest;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.firebase.auth.FirebaseAuth;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AuthResetPasswordFragment extends Fragment {
 
     private EditText etEmail;
     private Button btnReset;
     private ProgressBar pbLoading;
-    private FirebaseAuth mAuth;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,7 +47,13 @@ public class AuthResetPasswordFragment extends Fragment {
         pbLoading = v.findViewById(R.id.pbLoading);
         
         MaterialToolbar toolbar = v.findViewById(R.id.topAppBar);
-        toolbar.setNavigationOnClickListener(view -> getParentFragmentManager().popBackStack());
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(view -> {
+                if (getParentFragmentManager() != null) {
+                    getParentFragmentManager().popBackStack();
+                }
+            });
+        }
     }
 
     private void setupListeners() {
@@ -68,34 +75,39 @@ public class AuthResetPasswordFragment extends Fragment {
 
         toggleLoading(true);
 
-        // Always show success message for security reasons, or handle specific errors if preferred by user [cite: 2026-01-19]
-        // User asked to check if email exists. Firebase creates an error if user not found, 
-        // but for security it's often better to say "If account exists, email sent".
-        // However, user specifically asked: "comprobamos si ese emxail existe, si existe mandamos un email"
-        // Firebase sendPasswordResetEmail fails if user doesn't exist.
-        
-        mAuth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(task -> {
-                    toggleLoading(false);
-                    if (task.isSuccessful()) {
-                        StatusHelper.showStatus(getContext(), "Correo enviado", 
-                                "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.", false);
-                        getParentFragmentManager().popBackStack(); // Go back to login
-                    } else {
-                         // To avoid enumeration attacks, stick to generic message or only show error for network issues
-                         // But for this project, let's show success message even if it failed due to user not found?
-                         // User asked "si existe mandamos un email", implying if NOT exists, maybe tell them?
-                         // "asi damos menos pistas por si alguien quiere intentar entrar" -> This means GENERIC MESSAGE.
-                         
-                         // So regardless of success/failure (except network error), we should probably show success.
-                         // But sendPasswordResetEmail returns failure if email not found. 
-                         // To be secure: "If email exists, sent."
-                         
-                        StatusHelper.showStatus(getContext(), "Proceso finalizado", 
-                                "Si el correo es correcto y está registrado, se han enviado las instrucciones.", false);
+        ForgotPasswordRequest request = new ForgotPasswordRequest(email);
+
+        APIClient.getAuthAPIService().forgotPassword(request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                toggleLoading(false);
+                // Si es 200 OK, la API ha enviado el correo.
+                // Si es 404 Not Found u otro error, la API puede decidir no revelarlo por seguridad, 
+                // o enviar un 200 genérico. Asumimos comportamiento estándar: 
+                // "Si el usuario existe, se enviará un correo".
+                
+                if (response.isSuccessful()) {
+                    StatusHelper.showStatus(getContext(), "Solicitud recibida", 
+                            "Si el correo está registrado, recibirás un enlace de recuperación.", false);
+                    if (getParentFragmentManager() != null) {
                         getParentFragmentManager().popBackStack();
                     }
-                });
+                } else {
+                    // Manejar errores si es necesario. Por ahora mostramos mensaje genérico o el error del servidor.
+                    // Para seguridad (user enumeration), idealmente mostraríamos el mismo mensaje de éxito.
+                    // Pero si el servidor devuelve error explícito (ej 500), avisamos.
+                    StatusHelper.showStatus(getContext(), "Error en el servidor", 
+                            "Inténtalo de nuevo más tarde (" + response.code() + ")", true);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                toggleLoading(false);
+                StatusHelper.showStatus(getContext(), "Error de conexión", 
+                        "Verificia tu conexión a internet.", true);
+            }
+        });
     }
 
     private void toggleLoading(boolean isLoading) {

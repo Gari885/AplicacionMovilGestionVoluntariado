@@ -23,4 +23,7 @@ public interface AuthAPIService {
 
     @POST("auth/change-password")
     Call<Void> changePassword(@Body PasswordRequest request);
+
+    @POST("auth/forgot-password")
+    Call<Void> forgotPassword(@Body com.example.appgestionvoluntariado.Models.Request.ForgotPasswordRequest request);
 }

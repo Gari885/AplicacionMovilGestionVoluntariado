@@ -43,7 +43,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-// import com.google.firebase.auth.FirebaseAuth; // YA NO SE NECESITA FirebaseAuth AQUÍ
+
 
 import org.json.JSONObject; // Importante para leer el error JSON
 
@@ -83,13 +83,13 @@ public class VolunteerRegisterFragment extends Fragment {
     private final List<String> selectedAvailability = new ArrayList<>();
     private final List<String> selectedLanguages = new ArrayList<>();
 
-    // private FirebaseAuth mAuth; // ELIMINADO
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_volunteer_register, container, false);
-        // mAuth = FirebaseAuth.getInstance(); // ELIMINADO
+
 
         initViews(view);
         setupToolbar(view);
@@ -419,46 +419,18 @@ public class VolunteerRegisterFragment extends Fragment {
         if (dni.isEmpty()) { 
             tilDni.setError("Campo obligatorio"); 
             isValid = false; 
-        } else if (!isValidSpanishID(dni)) {
-            tilDni.setError("DNI/NIE inválido"); 
-            isValid = false;
         }
 
         String email = getText(etEmail);
         if (email.isEmpty()) { tilEmail.setError("Campo obligatorio"); isValid = false; }
         else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) { tilEmail.setError("Email inválido"); isValid = false; }
 
-        if (getText(etPassword).length() < 6) { tilPassword.setError("Mínimo 6 caracteres"); isValid = false; }
+        if (getText(etPassword).isEmpty()) { tilPassword.setError("Campo obligatorio"); isValid = false; }
         
         String dob = getText(etBirthDate);
         if (dob.isEmpty()) { 
             tilBirthDate.setError("Campo obligatorio"); 
             isValid = false; 
-        } else {
-            // Check Age >= 16
-            try {
-                // Assuming format YYYY-MM-DD from showDatePickerDialog
-                // But showDatePickerDialog uses YYYY-MM-DD? Let's check format.
-                // Looking at showDatePicker: etBirthDate.setText(String.format(Locale.getDefault(), "%d-%02d-%02d", y, m + 1, d));
-                // Yes, YYYY-MM-DD.
-                String[] parts = dob.split("-");
-                int year = Integer.parseInt(parts[0]);
-                int month = Integer.parseInt(parts[1]);
-                int day = Integer.parseInt(parts[2]);
-
-                Calendar birth = Calendar.getInstance();
-                birth.set(year, month - 1, day);
-                
-                Calendar minAge = Calendar.getInstance();
-                minAge.add(Calendar.YEAR, -16);
-
-                if (birth.after(minAge)) {
-                    tilBirthDate.setError("Debes tener al menos 16 años");
-                    isValid = false;
-                }
-            } catch (Exception e) {
-                // If parsing fails for some reason
-            }
         }
 
         if (actvZona.getText().toString().isEmpty()) { if (tilZona != null) tilZona.setError("Selecciona una zona"); isValid = false; }
@@ -468,29 +440,5 @@ public class VolunteerRegisterFragment extends Fragment {
         return isValid;
     }
 
-    private boolean isValidSpanishID(String id) {
-        String nif = id.toUpperCase().replaceAll("[^0-9A-Z]", "");
-        if (nif.length() != 9) return false;
 
-        String letter = nif.substring(8);
-        String numbers = nif.substring(0, 8);
-
-        if (Character.isLetter(nif.charAt(0))) { // NIE
-            String niePrefix = nif.substring(0, 1);
-            numbers = nif.substring(1, 8);
-            if (niePrefix.equals("X")) numbers = "0" + numbers;
-            else if (niePrefix.equals("Y")) numbers = "1" + numbers;
-            else if (niePrefix.equals("Z")) numbers = "2" + numbers;
-            else return false;
-        }
-
-        try {
-            int num = Integer.parseInt(numbers);
-            String validLetters = "TRWAGMYFPDXBNJZSQVHLCKE";
-            String calculated = String.valueOf(validLetters.charAt(num % 23));
-            return letter.equals(calculated);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
 }
