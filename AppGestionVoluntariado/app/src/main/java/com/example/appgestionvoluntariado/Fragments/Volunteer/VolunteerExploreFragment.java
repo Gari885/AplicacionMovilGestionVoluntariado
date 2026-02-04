@@ -40,6 +40,9 @@ public class VolunteerExploreFragment extends Fragment {
     private TextView loadingText;
     private android.widget.ImageView logoSpinner;
     private android.view.animation.Animation rotateAnimation;
+    private android.widget.EditText etSearch;
+
+
 
     @Nullable
     @Override
@@ -48,9 +51,14 @@ public class VolunteerExploreFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_volunteer_explore_projects, container, false);
 
         initViews(view);
-        loadAvailableProjects();
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadAvailableProjects();
     }
 
     private void initViews(View view) {
@@ -68,6 +76,38 @@ public class VolunteerExploreFragment extends Fragment {
 
         // APIClient ya inyecta automáticamente el Token de Firebase en la cabecera
         projectsService = APIClient.getProjectsService();
+        
+        etSearch = view.findViewById(R.id.etSearchProject);
+        setupSearch();
+    }
+
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filter(s.toString());
+            }
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+    }
+
+    private void filter(String text) {
+        List<Project> filteredList = new ArrayList<>();
+        for (Project item : availableProjects) {
+            String q = text.toLowerCase();
+            boolean matchName = item.getName() != null && item.getName().toLowerCase().contains(q);
+            boolean matchDesc = item.getDescription() != null && item.getDescription().toLowerCase().contains(q);
+            
+            if (matchName || matchDesc) {
+                filteredList.add(item);
+            }
+        }
+        if (projectAdapter != null) {
+            projectAdapter.updateList(filteredList);
+        }
     }
 
     private void loadAvailableProjects() {
@@ -153,12 +193,18 @@ public class VolunteerExploreFragment extends Fragment {
         if (loadingLayout != null) {
             loadingLayout.setVisibility(View.VISIBLE);
             loadingText.setText(message);
+            if (logoSpinner != null && rotateAnimation != null) {
+                logoSpinner.startAnimation(rotateAnimation);
+            }
         }
     }
 
     private void hideLoading() {
         if (loadingLayout != null) {
             loadingLayout.setVisibility(View.GONE);
+            if (logoSpinner != null) {
+                logoSpinner.clearAnimation();
+            }
         }
     }
 }

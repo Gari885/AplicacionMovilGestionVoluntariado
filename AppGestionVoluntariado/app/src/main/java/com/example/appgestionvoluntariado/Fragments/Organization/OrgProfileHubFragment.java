@@ -21,6 +21,11 @@ import com.example.appgestionvoluntariado.Utils.SessionManager;
 import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -128,13 +133,25 @@ public class OrgProfileHubFragment extends Fragment {
     }
 
     private void performLogout() {
-        FirebaseAuth.getInstance().signOut();
-        SessionManager.getInstance(getContext()).logout();
+        // 0. Sign out from Google Client
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
 
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener(requireActivity(), task -> {
+            if (getActivity() == null) return;
 
-        if (getActivity() != null) getActivity().finish();
+            FirebaseAuth.getInstance().signOut();
+            com.example.appgestionvoluntariado.Utils.TokenManager.getInstance(getContext()).clearToken();
+            SessionManager.getInstance(getContext()).logout();
+
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+
+            if (getActivity() != null) getActivity().finish();
+        });
     }
 }

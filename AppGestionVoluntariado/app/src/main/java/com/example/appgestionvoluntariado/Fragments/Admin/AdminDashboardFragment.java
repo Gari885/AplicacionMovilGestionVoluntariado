@@ -56,10 +56,15 @@ public class AdminDashboardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin_dashboard, container, false);
 
         initViews(view);
-        startLoadingAnimation();
-        fetchDashboardStats();
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startLoadingAnimation();
+        fetchDashboardStats();
     }
 
     private void initViews(View v) {
@@ -80,6 +85,8 @@ public class AdminDashboardFragment extends Fragment {
             @Override
             public void onResponse(Call<AdminStatsResponse> call, Response<AdminStatsResponse> response) {
                 stopLoadingAnimation();
+                if (getContext() == null) return;
+
                 loadingLayout.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
@@ -92,6 +99,8 @@ public class AdminDashboardFragment extends Fragment {
             @Override
             public void onFailure(Call<AdminStatsResponse> call, Throwable t) {
                 stopLoadingAnimation();
+                if (getContext() == null) return;
+                
                 loadingLayout.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "Fallo de conexión", Toast.LENGTH_SHORT).show();
             }

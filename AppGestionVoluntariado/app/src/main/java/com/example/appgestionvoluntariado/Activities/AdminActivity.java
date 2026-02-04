@@ -23,6 +23,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminActivity extends AppCompatActivity {
+    
+    private boolean isTabNavigation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,40 +75,103 @@ public class AdminActivity extends AppCompatActivity {
                 });
         }
 
+        // ViewPager2 Setup
+        androidx.viewpager2.widget.ViewPager2 viewPager = findViewById(R.id.adminViewPager);
+        com.example.appgestionvoluntariado.Adapters.AdminPagerAdapter adapter = 
+            new com.example.appgestionvoluntariado.Adapters.AdminPagerAdapter(this);
+        viewPager.setAdapter(adapter);
+
         // 2. Configurar Bottom Navigation (5 Secciones)
         BottomNavigationView bottomNav = findViewById(R.id.admin_bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
+            isTabNavigation = true;
+            
+            // Re-enable checking for normal tabs if it was disabled
+            bottomNav.getMenu().setGroupCheckable(0, true, true);
+
             int id = item.getItemId();
 
             if (id == R.id.nav_admin_more) {
                 showMoreOptionsBottomSheet();
-                return false;
+                return false; 
+            }
+
+            // Tabs
+            viewPager.setVisibility(View.VISIBLE);
+            findViewById(R.id.admin_fragment_container).setVisibility(View.GONE);
+            // Clear back stack
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                 getSupportFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }
 
             if (id == R.id.nav_admin_dashboard) {
-                selectedFragment = new AdminDashboardFragment();
-            } else if (id == R.id.nav_admin_vols) {
-                selectedFragment = new AdminVolunteerListFragment();
+                viewPager.setCurrentItem(0, true);
             } else if (id == R.id.nav_admin_projects) {
-                selectedFragment = new AdminProjectListFragment();
+                viewPager.setCurrentItem(1, true);
+            } else if (id == R.id.nav_admin_vols) {
+                viewPager.setCurrentItem(2, true);
             } else if (id == R.id.nav_admin_orgs) {
-                selectedFragment = new AdminOrganizationListFragment();
-            }
-
-            if (selectedFragment != null) {
-                replaceFragment(selectedFragment);
+                viewPager.setCurrentItem(3, true);
             }
             return true;
         });
 
-        // Pantalla inicial por defecto: Dashboard
-        if (savedInstanceState == null) {
-            replaceFragment(new AdminDashboardFragment());
-            bottomNav.setSelectedItemId(R.id.nav_admin_dashboard);
-        }
+        viewPager.registerOnPageChangeCallback(new androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                switch (position) {
+                    case 0: bottomNav.setSelectedItemId(R.id.nav_admin_dashboard); break;
+                    case 1: bottomNav.setSelectedItemId(R.id.nav_admin_projects); break;
+                    case 2: bottomNav.setSelectedItemId(R.id.nav_admin_vols); break;
+                    case 3: bottomNav.setSelectedItemId(R.id.nav_admin_orgs); break;
+                }
+            }
+        });
+
+        // Pantalla inicial por defecto: Dashboard (managed by ViewPager default item 0)
+        // Ensure ViewPager is visible
+        viewPager.setVisibility(View.VISIBLE);
+        findViewById(R.id.admin_fragment_container).setVisibility(View.GONE);
 
         askNotificationPermission();
+        
+        // Monitor back stack changes to sync UI state
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            
+            // Ignore if triggered by tab navigation to prevent race conditions
+            if (isTabNavigation) {
+                isTabNavigation = false;
+                return;
+            }
+
+            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                viewPager.setVisibility(View.VISIBLE);
+                findViewById(R.id.admin_fragment_container).setVisibility(View.GONE);
+                
+                // Restore chekable behavior
+                bottomNav.getMenu().setGroupCheckable(0, true, true);
+
+                // Restore bottom nav selection based on ViewPager
+                int item = viewPager.getCurrentItem();
+                switch (item) {
+                    case 0: bottomNav.setSelectedItemId(R.id.nav_admin_dashboard); break;
+                    case 1: bottomNav.setSelectedItemId(R.id.nav_admin_projects); break;
+                    case 2: bottomNav.setSelectedItemId(R.id.nav_admin_vols); break;
+                    case 3: bottomNav.setSelectedItemId(R.id.nav_admin_orgs); break;
+                }
+            } else {
+                viewPager.setVisibility(View.GONE);
+                findViewById(R.id.admin_fragment_container).setVisibility(View.VISIBLE);
+
+                // Uncheck bottom navigation items when a sub-fragment is visible
+                bottomNav.getMenu().setGroupCheckable(0, false, true);
+                for (int i = 0; i < bottomNav.getMenu().size(); i++) {
+                    bottomNav.getMenu().getItem(i).setChecked(false);
+                }
+                bottomNav.getMenu().setGroupCheckable(0, true, true);
+            }
+        });
     }
 
     private final androidx.activity.result.ActivityResultLauncher<String> requestPermissionLauncher =
@@ -138,7 +203,6 @@ public class AdminActivity extends AppCompatActivity {
     }
 
     private void showMoreOptionsBottomSheet() {
-        // We can reuse our pretty Bottom Sheet logic [cite: 2026-01-16]
         BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
         View view = getLayoutInflater().inflate(R.layout.layout_admin_more_options, null);
 
@@ -148,9 +212,10 @@ public class AdminActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
-        // New ODS & Skills Management Option [cite: 2026-01-16]
+        // New ODS & Skills Management Option
         view.findViewById(R.id.optionCategories).setOnClickListener(v -> {
             replaceFragment(new AdminCategoriesAddFragment());
+            
             dialog.dismiss();
         });
 
@@ -158,22 +223,24 @@ public class AdminActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void replaceFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.admin_fragment_container, fragment)
-                .commit();
-    }
+    public void replaceFragment(Fragment fragment) {
+        // Toggle visibility
+        findViewById(R.id.adminViewPager).setVisibility(View.GONE);
+        findViewById(R.id.admin_fragment_container).setVisibility(View.VISIBLE);
 
-    private void openNotifications() {
-        Fragment fragment = new com.example.appgestionvoluntariado.Fragments.NotificationsFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.admin_fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
     }
 
+    private void openNotifications() {
+        replaceFragment(new com.example.appgestionvoluntariado.Fragments.NotificationsFragment());
+    }
+
     private void performLogout() {
         FirebaseAuth.getInstance().signOut();
+        com.example.appgestionvoluntariado.Utils.TokenManager.getInstance(this).clearToken();
         SessionManager.getInstance(this).logout();
         android.content.Intent intent = new android.content.Intent(this, MainActivity.class);
         intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -348,9 +348,13 @@ public class VolunteerProfileEditDataFragment extends Fragment {
         cgSummary.addView(chip);
     }
 
-    // --- GUARDADO ---
     private void saveData() {
         if (loadingOverlay != null) loadingOverlay.setVisibility(View.VISIBLE);
+        
+        // Button Feedback
+        btnSave.setEnabled(false);
+        btnSave.setText("Guardando...");
+        btnSave.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#757575"))); // Gris visual
 
         // 1. Split Nombre
         String[] parts = etFullName.getText().toString().trim().split(" ");
@@ -390,6 +394,12 @@ public class VolunteerProfileEditDataFragment extends Fragment {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (loadingOverlay != null) loadingOverlay.setVisibility(View.GONE);
+                
+                // Restore Button
+                btnSave.setEnabled(true);
+                btnSave.setText("Actualizar Información");
+                btnSave.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#1A3B85")));
+
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Perfil actualizado", Toast.LENGTH_SHORT).show();
                     getParentFragmentManager().popBackStack();
@@ -399,6 +409,12 @@ public class VolunteerProfileEditDataFragment extends Fragment {
             }
             @Override public void onFailure(Call<Void> call, Throwable t) {
                 if (loadingOverlay != null) loadingOverlay.setVisibility(View.GONE);
+
+                // Restore Button on Failure
+                btnSave.setEnabled(true);
+                btnSave.setText("Actualizar Información");
+                btnSave.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#1A3B85")));
+
                 Toast.makeText(getContext(), "Error de red", Toast.LENGTH_SHORT).show();
             }
         });

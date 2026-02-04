@@ -63,9 +63,14 @@ public class AdminOrganizationListFragment extends Fragment {
 
         setupTabs();
         setupSearch();
-        loadData();
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
     }
 
     private void initViews(View v) {
@@ -101,9 +106,10 @@ public class AdminOrganizationListFragment extends Fragment {
         fabAddOrganization.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, new OrganizationRegisterFragment())
-                        .addToBackStack(null).commit();
+                if (getActivity() instanceof com.example.appgestionvoluntariado.Activities.AdminActivity) {
+                    ((com.example.appgestionvoluntariado.Activities.AdminActivity) getActivity())
+                            .replaceFragment(new OrganizationRegisterFragment());
+                }
             }
         });
     }
@@ -117,6 +123,11 @@ public class AdminOrganizationListFragment extends Fragment {
 
     private void loadData() {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (logoSpinner != null && rotateAnimation != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
+        if (fabAddOrganization != null) fabAddOrganization.setVisibility(View.INVISIBLE);
+
         organizationService.getOrganizations(currentFilter).enqueue(new Callback<List<Organization>>() {
             @Override
             public void onResponse(Call<List<Organization>> call, Response<List<Organization>> response) {
@@ -129,7 +140,7 @@ public class AdminOrganizationListFragment extends Fragment {
             }
             @Override
             public void onFailure(Call<List<Organization>> call, Throwable t) {
-                Log.e("API_ERROR", "Error al llamar a getOrganizations", t); // <--- Mira el Logcat
+                Log.e("API_ERROR", "Error al llamar a getOrganizations", t);
                 Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -141,24 +152,28 @@ public class AdminOrganizationListFragment extends Fragment {
             adapter = new OrganizationAdapter(list, new OrganizationAdapter.OnOrgActionListener() {
                 @Override
                 public void onAccept(Organization org) {
-                    // Solo enviamos el estado, el token identifica a la entidad
-                    processStatusChange(org, new StatusRequest("Aceptada"));
+                    processStatusChange(org, new StatusRequest("ACEPTADA"));
+
                 }
 
                 @Override
                 public void onReject(Organization org) {
-                    processStatusChange(org, new StatusRequest("rechazado"));
+                    processStatusChange(org, new StatusRequest("RECHAZADO"));
+
                 }
 
                 @Override
                 public void onDelete(Organization org) {
                     showConfirmDeleteDialog(org);
+
                 }
 
                 @Override
                 public void onDetails(Organization org) {
                     showDetailsPopup(org);
+
                 }
+
             });
             rvOrgs.setAdapter(adapter);
         } else {
@@ -172,7 +187,7 @@ public class AdminOrganizationListFragment extends Fragment {
                 .setTitle("¿Dar de baja?")
                 .setMessage("¿Estás seguro de que quieres dar de baja a " + org.getName() + "?")
                 .setPositiveButton("Dar de baja", (dialog, which) -> {
-                    processStatusChange(org, new StatusRequest("rechazado"));
+                    processStatusChange(org, new StatusRequest("RECHAZADO"));
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();
@@ -229,11 +244,19 @@ public class AdminOrganizationListFragment extends Fragment {
 
     public void processStatusChange( Organization org,StatusRequest request) {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (logoSpinner != null && rotateAnimation != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
         APIClient.getOrganizationService().updateStatus(org.getCif() , request)
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
+                            String msg = "Estado actualizado";
+                            if(request.getStatus().equalsIgnoreCase("ACEPTADA")) msg = "Organización aceptada";
+                            else if(request.getStatus().equalsIgnoreCase("RECHAZADO")) msg = "Organización dada de baja";
+                            
+                            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                             loadData(); // Refrescamos la lista para mover el item de pestaña
                         } else {
                             loadingLayout.setVisibility(View.GONE);

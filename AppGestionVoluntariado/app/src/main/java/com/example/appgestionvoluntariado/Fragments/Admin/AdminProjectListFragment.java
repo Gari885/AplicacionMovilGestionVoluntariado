@@ -64,10 +64,11 @@ public class AdminProjectListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (currentStatus.equalsIgnoreCase("aceptada")){
+        if (currentStatus != null && currentStatus.equalsIgnoreCase("aceptada")){
             view = ViewMode.ADMINISTRATOR_ACCEPTED;
             updateTabUI(tabAccepted,tabPending);
         }
+        loadProjects();
     }
 
     @Override
@@ -90,9 +91,6 @@ public class AdminProjectListFragment extends Fragment {
 
         setupTabs();
         setupSearch();
-        setupSearch();
-
-        loadProjects(); // Initial load
 
         return v;
     }
@@ -116,9 +114,10 @@ public class AdminProjectListFragment extends Fragment {
         fabAddProject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, new CreateProjectFragment())
-                        .addToBackStack(null).commit();
+                if (getActivity() instanceof com.example.appgestionvoluntariado.Activities.AdminActivity) {
+                    ((com.example.appgestionvoluntariado.Activities.AdminActivity) getActivity())
+                            .replaceFragment(new CreateProjectFragment());
+                }
             }
         });
     }
@@ -132,6 +131,9 @@ public class AdminProjectListFragment extends Fragment {
 
     private void loadProjects() {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (logoSpinner != null && rotateAnimation != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
         APIClient.getAdminService().getProjects(currentStatus)
                 .enqueue(new Callback<List<Project>>() {
                     @Override
@@ -140,7 +142,7 @@ public class AdminProjectListFragment extends Fragment {
                         if (response.isSuccessful() && response.body() != null) {
                             fabAddProject.setVisibility(View.VISIBLE);
                             fullList = response.body();
-                            StatusHelper.showToast(getContext(), "Admin proyectos: " + fullList.size(), false); // Debug
+                            fullList = response.body();
                             updateAdapter(fullList);
                         } else {
                             StatusHelper.showToast(getContext(), "Error Admin: " + response.code(), true);
@@ -192,6 +194,9 @@ public class AdminProjectListFragment extends Fragment {
 
     private void updateStatus(int projectId, String status) {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (logoSpinner != null && rotateAnimation != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
 
         // Loguea qué estás enviando
         Log.d("DEBUG_STATE", "Enviando -> ID: " + projectId + ", Status: " + status);
@@ -211,7 +216,13 @@ public class AdminProjectListFragment extends Fragment {
                                 // Aquí verás algo como: {"campo_actualizado": "estado", "valor_nuevo": "CANCELADO"}
                                 // Si dice "valor_nuevo": "PENDIENTE", ¡ahí está tu problema!
 
-                                StatusHelper.showToast(getContext(), "Estado actualizado", false);
+                                // Custom Toast Message
+                                String msg = "Proyecto actualizado";
+                                if (status.equalsIgnoreCase("aceptada")) msg = "Proyecto aceptado";
+                                else if (status.equalsIgnoreCase("rechazada")) msg = "Proyecto rechazado";
+                                else if (status.equalsIgnoreCase("cancelado")) msg = "Proyecto cancelado";
+                                
+                                StatusHelper.showToast(getContext(), msg, false);
                                 loadProjects();
 
                             } catch (IOException e) {
@@ -255,7 +266,8 @@ public class AdminProjectListFragment extends Fragment {
         args.putBoolean("is_edit_mode", true);
         args.putInt("project_id", project.getActivityId());
         args.putString("project_name", project.getName());
-        args.putString("project_description", project.getName()); // Reusing name as description for now
+        args.putString("project_description", project.getDescription());
+
         args.putString("project_address", project.getAddress());
         args.putString("project_start_date", project.getStartDate());
         args.putString("project_end_date", project.getEndDate());
@@ -281,7 +293,9 @@ public class AdminProjectListFragment extends Fragment {
         List<Project> filtered = new ArrayList<>();
         String query = text.toLowerCase().trim();
         for (Project p : fullList) {
-            if (p.getName().toLowerCase().contains(query)) {
+            boolean matchName = p.getName() != null && p.getName().toLowerCase().contains(query);
+            boolean matchDesc = p.getDescription() != null && p.getDescription().toLowerCase().contains(query);
+            if (matchName || matchDesc) {
                 filtered.add(p);
             }
         }

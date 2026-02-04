@@ -10,17 +10,24 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 
+import com.example.appgestionvoluntariado.Models.Request.PasswordRequest;
 import com.example.appgestionvoluntariado.R;
+import com.example.appgestionvoluntariado.Services.APIClient;
+import com.example.appgestionvoluntariado.Utils.StatusHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
+import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class OrgChangePasswordFragment extends Fragment {
@@ -28,6 +35,9 @@ public class OrgChangePasswordFragment extends Fragment {
     private TextInputEditText etCurrent, etNew, etConfirm;
     private TextInputLayout tilCurrent, tilNew, tilConfirm;
     private MaterialButton btnUpdate;
+    private View loadingOverlay;
+    private ImageView logoSpinner;
+    private Animation rotateAnimation;
 
     private MaterialToolbar back;
 
@@ -55,7 +65,10 @@ public class OrgChangePasswordFragment extends Fragment {
         tilConfirm = v.findViewById(R.id.tilConfirmPass);
         btnUpdate = v.findViewById(R.id.btnUpdatePassword);
         back = v.findViewById(R.id.topAppBarOrg);
-
+        
+        loadingOverlay = v.findViewById(R.id.loadingOverlay);
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
     }
 
     private void validateAndUpdate() {
@@ -67,29 +80,87 @@ public class OrgChangePasswordFragment extends Fragment {
         if (newPass.length() < 6) { tilNew.setError("Mínimo 6 caracteres"); return; }
         if (!newPass.equals(confirm)) { tilConfirm.setError("Las contraseñas no coinciden"); return; }
 
-        updatePasswordInFirebase(current, newPass);
+        updatePasswordInBackend(current, newPass);
     }
 
-    private void updatePasswordInFirebase(String currentPass, String newPass) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || user.getEmail() == null) return;
-
-        // Re-autenticación necesaria por seguridad en Firebase
-        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPass);
-
-        user.reauthenticate(credential).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                user.updatePassword(newPass).addOnCompleteListener(updateTask -> {
-                    if (updateTask.isSuccessful()) {
-                        Toast.makeText(getContext(), "Contraseña actualizada", Toast.LENGTH_SHORT).show();
-                        getParentFragmentManager().popBackStack();
-                    } else {
-                        Toast.makeText(getContext(), "Error al actualizar", Toast.LENGTH_SHORT).show();
+    private void updatePasswordInBackend(String currentPass, String newPass) {
+        toggleLoading(true);
+        
+        PasswordRequest request = new PasswordRequest(currentPass, newPass);
+        
+        APIClient.getAuthAPIService().changePassword(request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                toggleLoading(false);
+                
+                if (response.isSuccessful()) {
+                    StatusHelper.showStatus(getContext(), "Éxito", "Contraseña actualizada correctamente", false);
+                    getParentFragmentManager().popBackStack();
+                } else {
+                    String errorMessage = "";
+                    
+                    // Try to parse backend error message
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            JSONObject jsonError = new JSONObject(errorBody);
+                            if (jsonError.has("error")) {
+                                errorMessage = jsonError.getString("error");
+                            } else if (jsonError.has("message")) {
+                                errorMessage = jsonError.getString("message");
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                });
-            } else {
-                tilCurrent.setError("Contraseña actual incorrecta");
+                    
+                    // If no message from backend, provide specific message based on status code
+                    if (errorMessage.isEmpty()) {
+                        switch (response.code()) {
+                            case 400:
+                                errorMessage = "Datos inválidos. Verifica que la nueva contraseña cumpla los requisitos";
+                                break;
+                            case 401:
+                                errorMessage = "Contraseña actual incorrecta";
+                                tilCurrent.setError("Contraseña incorrecta");
+                                break;
+                            case 403:
+                                errorMessage = "No tienes permisos para realizar esta acción";
+                                break;
+                            case 404:
+                                errorMessage = "Servicio no disponible. Contacta con soporte técnico";
+                                break;
+                            case 500:
+                                errorMessage = "Error del servidor. Inténtalo de nuevo más tarde";
+                                break;
+                            default:
+                                errorMessage = "No se pudo actualizar la contraseña (Error " + response.code() + ")";
+                        }
+                    } else if (response.code() == 401) {
+                        tilCurrent.setError("Contraseña incorrecta");
+                    }
+                    
+                    StatusHelper.showStatus(getContext(), "Error", errorMessage, true);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                toggleLoading(false);
+                StatusHelper.showStatus(getContext(), "Error de conexión", "Sin conexión con el servidor", true);
             }
         });
+    }
+    
+    private void toggleLoading(boolean isLoading) {
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            if (isLoading && logoSpinner != null && rotateAnimation != null) {
+                logoSpinner.startAnimation(rotateAnimation);
+            }
+        }
+        if (btnUpdate != null) {
+            btnUpdate.setEnabled(!isLoading);
+        }
     }
 }

@@ -21,6 +21,11 @@ import com.example.appgestionvoluntariado.Services.AuthAPIService;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,6 +34,7 @@ import retrofit2.Response;
 public class VolunteerProfileHubFragment extends Fragment {
 
     private TextView tvName;
+    private androidx.appcompat.widget.SwitchCompat switchNotifications;
     private AuthAPIService authAPIService;
 
     private Volunteer volunteer;
@@ -55,6 +61,10 @@ public class VolunteerProfileHubFragment extends Fragment {
 
         // Logout
         view.findViewById(R.id.btnLogout).setOnClickListener(v -> performLogout());
+
+        // Configurar Switch de Notificaciones
+        switchNotifications = view.findViewById(R.id.switchNotificaciones);
+        setupNotificationSwitch();
 
         return view;
     }
@@ -91,6 +101,22 @@ public class VolunteerProfileHubFragment extends Fragment {
         }
     }
 
+    private void setupNotificationSwitch() {
+        // 1. Obtener preferencia guardada (Default: true)
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
+        boolean areNotificationsEnabled = prefs.getBoolean("notifications_enabled", true);
+        
+        switchNotifications.setChecked(areNotificationsEnabled);
+
+        // 2. Guardar preferencia al cambiar
+        switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean("notifications_enabled", isChecked).apply();
+            
+            String msg = isChecked ? "Notificaciones activadas" : "Notificaciones desactivadas";
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        });
+    }
+
     private void replaceFragment(Fragment fragment) {
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
@@ -99,21 +125,33 @@ public class VolunteerProfileHubFragment extends Fragment {
     }
 
     private void performLogout() {
-        // 1. Cerrar sesión en Firebase
-        FirebaseAuth.getInstance().signOut();
+        // 0. Sign out from Google Client to force account picker next time
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
 
-        // 2. Limpiar preferencias locales (token, etc.)
-        SessionManager.getInstance(getContext()).logout();
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener(requireActivity(), task -> {
+            if (getActivity() == null) return;
 
-        // 3. Volver al Login limpiando el historial de actividades
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+            // 1. Cerrar sesión en Firebase
+            FirebaseAuth.getInstance().signOut();
+            com.example.appgestionvoluntariado.Utils.TokenManager.getInstance(getContext()).clearToken();
+            
+            // 2. Limpiar preferencias locales (token, etc.)
+            SessionManager.getInstance(getContext()).logout();
 
-        if (getActivity() != null) {
-            getActivity().finish();
-        }
+            // 3. Volver al Login limpiando el historial de actividades
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
 
-        Toast.makeText(getContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
+
+            Toast.makeText(getContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
+        });
     }
 }

@@ -110,10 +110,28 @@ public class CreateProjectFragment extends Fragment {
 
         // Check for edit mode
         if (getArguments() != null) {
-            projectToEdit = (Project) getArguments().getSerializable("project");
-            if (projectToEdit != null) {
-                isEditMode = true;
-                setupEditMode();
+            String projectJson = getArguments().getString("project_json");
+            if (projectJson != null) {
+                Log.d("CreateProject", "Project JSON found");
+                try {
+                    projectToEdit = new com.google.gson.Gson().fromJson(projectJson, Project.class);
+                    if (projectToEdit != null) {
+                        Log.d("CreateProject", "Project deserialized: " + projectToEdit.getName());
+                        isEditMode = true;
+                        setupEditMode();
+                    }
+                } catch (Exception e) {
+                    Log.e("CreateProject", "Error deserializing project", e);
+                }
+            } else {
+                 // Fallback for older code or if passed as Serializable
+                 try {
+                    projectToEdit = (Project) getArguments().getSerializable("project");
+                    if (projectToEdit != null) {
+                        isEditMode = true;
+                        setupEditMode();
+                    }
+                 } catch (Exception e) {}
             }
         }
         return view;
@@ -198,13 +216,14 @@ public class CreateProjectFragment extends Fragment {
             public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
                 if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null) {
-                    if (response.body().getType().equalsIgnoreCase("admin")) {
+                    String type = response.body().getType();
+                    if (type != null && type.equalsIgnoreCase("admin")) {
                         // ADMIN: Load organizations to select
                         actvOrganization.setEnabled(true);
                         tilOrganization.setEnabled(true);
                         totalCalls = 4;
                         loadOrganizations();
-                    }else if (response.body().getType().equalsIgnoreCase("organizacion")) {
+                    }else if (type != null && type.equalsIgnoreCase("organizacion")) {
                         try {
                             totalCalls = 3;
                             // ORG: Pre-fill and disable
@@ -263,7 +282,21 @@ public class CreateProjectFragment extends Fragment {
 
     private void setupListeners() {
 
-        topAppBar.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        topAppBar.setOnClickListener(v -> {
+            // Restore ViewPager visibility when going back
+            if (getActivity() != null) {
+                View fragmentContainer = getActivity().findViewById(R.id.organization_fragment_container);
+                View viewPager = getActivity().findViewById(R.id.organizationViewPager);
+                
+                if (fragmentContainer != null) {
+                    fragmentContainer.setVisibility(View.GONE);
+                }
+                if (viewPager != null) {
+                    viewPager.setVisibility(View.VISIBLE);
+                }
+            }
+            getParentFragmentManager().popBackStack();
+        });
 
         btnAddSkill.setOnClickListener(v -> addChipFromAutoComplete(actvSkill, skillsList, "SKILL"));
         btnAddODS.setOnClickListener(v -> addChipFromAutoComplete(actvODS, odsList, "ODS"));
@@ -338,9 +371,28 @@ public class CreateProjectFragment extends Fragment {
         }
 
         // Organization check
-        if (tilOrganization.isEnabled() && TextUtils.isEmpty(actvOrganization.getText())) {
-            tilOrganization.setError("Campo requerido");
-            isValid = false;
+        if (tilOrganization.isEnabled()) {
+            String orgName = actvOrganization.getText().toString().trim();
+            if (TextUtils.isEmpty(orgName)) {
+                tilOrganization.setError("Campo requerido");
+                isValid = false;
+            } else {
+                // Robust verification: If selectedOrganization is null (or name mismatch), try to find by name
+                if (selectedOrganization == null || !selectedOrganization.getName().equalsIgnoreCase(orgName)) {
+                    selectedOrganization = null; // Reset if mismatch
+                    for (Organization org : loadedOrganizations) {
+                        if (org.getName().equalsIgnoreCase(orgName)) {
+                            selectedOrganization = org;
+                            break;
+                        }
+                    }
+                }
+                
+                if (selectedOrganization == null) {
+                    tilOrganization.setError("Seleccione una organización válida de la lista");
+                    isValid = false;
+                }
+            }
         }
 
         if (odsList.isEmpty()) {
@@ -381,17 +433,40 @@ public class CreateProjectFragment extends Fragment {
              activeCalls.add(call);
              call.enqueue(new Callback<Void>() {
                  @Override
-                 public void onResponse(Call<Void> call, Response<Void> response) {
-                     if (!isAdded()) return;
-                     toggleLoading(false);
-                     if (response.isSuccessful()) {
-                         StatusHelper.showToast(getContext(), "Proyecto actualizado con éxito", false);
-                          getParentFragmentManager().setFragmentResult("project_created", new Bundle()); // Refresh list
-                         getParentFragmentManager().popBackStack();
-                     } else {
-                         StatusHelper.showToast(getContext(), "Error al actualizar", true);
-                     }
+             public void onResponse(Call<Void> call, Response<Void> response) {
+                 if (!isAdded()) return;
+                 toggleLoading(false);
+                 if (response.isSuccessful()) {
+                     StatusHelper.showToast(getContext(), "Proyecto actualizado con éxito", false);
+                     getParentFragmentManager().setFragmentResult("project_created", new Bundle()); // Refresh list
+                     
+                     // Close fragment with small delay to show toast
+                     new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                         if (isAdded() && getActivity() != null) {
+                             // Store references before popping
+                             final androidx.fragment.app.FragmentManager fm = getParentFragmentManager();
+                             final android.app.Activity activity = getActivity();
+                             
+                             // Restore ViewPager visibility AFTER popping
+                             fm.addOnBackStackChangedListener(new androidx.fragment.app.FragmentManager.OnBackStackChangedListener() {
+                                 @Override
+                                 public void onBackStackChanged() {
+                                     if (activity != null) {
+                                         View fragmentContainer = activity.findViewById(R.id.organization_fragment_container);
+                                         View viewPager = activity.findViewById(R.id.organizationViewPager);
+                                         if (fragmentContainer != null) fragmentContainer.setVisibility(View.GONE);
+                                         if (viewPager != null) viewPager.setVisibility(View.VISIBLE);
+                                     }
+                                     fm.removeOnBackStackChangedListener(this);
+                                 }
+                             });
+                             fm.popBackStack();
+                         }
+                     }, 500);
+                 } else {
+                     StatusHelper.showToast(getContext(), "Error al actualizar", true);
                  }
+             }
 
                  @Override
                  public void onFailure(Call<Void> call, Throwable t) {
@@ -409,7 +484,6 @@ public class CreateProjectFragment extends Fragment {
                     if (!isAdded()) return;
                     toggleLoading(false);
                     if (response.isSuccessful()) {
-                        loadingText.setText("Creando proyecto...");
                         StatusHelper.showToast(getContext(), "Actividad creada con éxito", false);
 
                         // Notify listeners to refresh
@@ -417,7 +491,29 @@ public class CreateProjectFragment extends Fragment {
                         result.putBoolean("refresh", true);
                         getParentFragmentManager().setFragmentResult("project_created", result);
 
-                        getParentFragmentManager().popBackStack();
+                        // Close fragment with small delay to show toast
+                        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                            if (isAdded() && getActivity() != null) {
+                                // Store references before popping
+                                final androidx.fragment.app.FragmentManager fm = getParentFragmentManager();
+                                final android.app.Activity activity = getActivity();
+                                
+                                // Restore ViewPager visibility AFTER popping
+                                fm.addOnBackStackChangedListener(new androidx.fragment.app.FragmentManager.OnBackStackChangedListener() {
+                                    @Override
+                                    public void onBackStackChanged() {
+                                        if (activity != null) {
+                                            View fragmentContainer = activity.findViewById(R.id.organization_fragment_container);
+                                            View viewPager = activity.findViewById(R.id.organizationViewPager);
+                                            if (fragmentContainer != null) fragmentContainer.setVisibility(View.GONE);
+                                            if (viewPager != null) viewPager.setVisibility(View.VISIBLE);
+                                        }
+                                        fm.removeOnBackStackChangedListener(this);
+                                    }
+                                });
+                                fm.popBackStack();
+                            }
+                        }, 500);
                     } else {
                         try {
                             String errorBody = response.errorBody().string();
@@ -455,7 +551,7 @@ public class CreateProjectFragment extends Fragment {
 
         etName.setText(projectToEdit.getName());
 
-        etDescription.setText(projectToEdit.getName()); // Provisional reuse since I don't see description field in Project.java
+        etDescription.setText(projectToEdit.getDescription());
 
         actvZone.setText(projectToEdit.getAddress(), false); // false to disable filtering
         

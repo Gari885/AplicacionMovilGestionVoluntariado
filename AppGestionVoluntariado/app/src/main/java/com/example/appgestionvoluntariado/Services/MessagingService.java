@@ -64,6 +64,15 @@ public class MessagingService extends FirebaseMessagingService {
         Log.e(TAG, "========== ¡MENSAJE RECIBIDO! ==========");
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
+        // Check User Preference [cite: 2026-02-03]
+        android.content.SharedPreferences prefs = getApplicationContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
+        boolean areNotificationsEnabled = prefs.getBoolean("notifications_enabled", true);
+
+        if (!areNotificationsEnabled) {
+            Log.d(TAG, "Notificaciones desactivadas por el usuario. Omitiendo mensaje.");
+            return;
+        }
+
         String title = "Notificación";
         String body = "";
 

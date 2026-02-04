@@ -38,7 +38,8 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchHol
     @Override
     public MatchHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Decide layout based on the first item's status [cite: 2026-01-16]
-        int layout = matches.get(0).getStatus().equalsIgnoreCase("pendiente")
+        String status = matches.get(0).getStatus();
+        int layout = (status != null && status.equalsIgnoreCase("pendiente"))
                 ? R.layout.item_match_pending
                 : R.layout.item_match_accepted;
 
@@ -95,7 +96,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchHol
 
 
             // Button logic for PENDIENTE vs OTHER states [cite: 2026-01-16]
-            if (match.getStatus().equalsIgnoreCase("pendiente")) {
+            if (match.getStatus() != null && match.getStatus().equalsIgnoreCase("pendiente")) {
                 if (btnAction1 != null) btnAction1.setOnClickListener(v -> listener.onAccept(match));
                 if (btnAction2 != null) btnAction2.setOnClickListener(v -> listener.onReject(match));
             } else {

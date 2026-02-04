@@ -60,9 +60,14 @@ public class VolunteerMyProjectsFragment extends Fragment {
         initViews(view);
         setupSearch();
         setupFilterTabs();
-        loadEnrolledProjects(currentStatusFilter);
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadEnrolledProjects(currentStatusFilter);
     }
 
     private void initViews(View view) {
@@ -228,20 +233,23 @@ public class VolunteerMyProjectsFragment extends Fragment {
     }
 
     private void filter(String text) {
-        displayedProjects.clear();
-        if (text.isEmpty()) {
-            displayedProjects.addAll(allEnrolledProjects);
+        List<Project> filtered = new ArrayList<>();
+        String query = text.toLowerCase().trim();
+
+        if (query.isEmpty()) {
+            filtered.addAll(allEnrolledProjects);
         } else {
-            String query = text.toLowerCase().trim();
             for (Project p : allEnrolledProjects) {
-                if (p.getName().toLowerCase().contains(query) ||
-                        p.getAddress().toLowerCase().contains(query)) {
-                    displayedProjects.add(p);
+                boolean matchName = p.getName() != null && p.getName().toLowerCase().contains(query);
+                boolean matchDesc = p.getDescription() != null && p.getDescription().toLowerCase().contains(query);
+                if (matchName || matchDesc) {
+                    filtered.add(p);
                 }
             }
         }
+        
         if (projectAdapter != null) {
-            projectAdapter.notifyDataSetChanged();
+            projectAdapter.updateList(filtered);
         }
     }
 

@@ -20,16 +20,20 @@ public class RegisterMenuFragment extends Fragment {
 
         btnOrganization = view.findViewById(R.id.btnOrganization);
         btnOrganization.setOnClickListener(v -> {
+            OrganizationRegisterFragment fragment = new OrganizationRegisterFragment();
+            fragment.setArguments(getArguments());
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new OrganizationRegisterFragment()) // New Fragment
+                    .replace(R.id.fragmentContainer, fragment)
                     .addToBackStack(null)
                     .commit();
         });
 
         btnVolunteer = view.findViewById(R.id.btnVolunteer);
         btnVolunteer.setOnClickListener(v -> {
+            VolunteerRegisterFragment fragment = new VolunteerRegisterFragment();
+            fragment.setArguments(getArguments());
             getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new VolunteerRegisterFragment()) // New Fragment
+                    .replace(R.id.fragmentContainer, fragment)
                     .addToBackStack(null)
                     .commit();
         });

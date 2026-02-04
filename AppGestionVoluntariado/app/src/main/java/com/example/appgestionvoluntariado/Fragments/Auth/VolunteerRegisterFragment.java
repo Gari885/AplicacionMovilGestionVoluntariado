@@ -140,6 +140,13 @@ public class VolunteerRegisterFragment extends Fragment {
         loadingOverlay = v.findViewById(R.id.loadingOverlay);
         ivLogoSpinner = v.findViewById(R.id.ivLogoSpinner);
         rotateAnim = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
+
+        if (getArguments() != null) {
+            String email = getArguments().getString("email");
+            if (email != null && !email.isEmpty()) {
+                etEmail.setText(email);
+            }
+        }
     }
 
     private void toggleLoading(boolean load) {
@@ -433,8 +440,33 @@ public class VolunteerRegisterFragment extends Fragment {
             isValid = false; 
         }
 
-        if (actvZona.getText().toString().isEmpty()) { if (tilZona != null) tilZona.setError("Selecciona una zona"); isValid = false; }
-        if (actvCycle.getText().toString().isEmpty()) { if (tilCycle != null) tilCycle.setError("Selecciona tu ciclo"); isValid = false; }
+        // Validate Zone
+        String zona = actvZona.getText().toString();
+        boolean validZona = false;
+        for (String z : ZONES_LIST) {
+            if (z.equalsIgnoreCase(zona)) {
+                validZona = true;
+                break;
+            }
+        }
+        if (!validZona) { 
+            if (tilZona != null) tilZona.setError("Selecciona una zona válida"); 
+            isValid = false; 
+        }
+
+        // Validate Cycle
+        String cycle = actvCycle.getText().toString();
+        boolean validCycle = false;
+        for (String c : cycleList) {
+            if (c.equalsIgnoreCase(cycle)) {
+                validCycle = true;
+                break;
+            }
+        }
+        if (!validCycle) { 
+            if (tilCycle != null) tilCycle.setError("Selecciona un ciclo válido"); 
+            isValid = false; 
+        }
 
         if (!isValid) StatusHelper.showStatus(getContext(), "Formulario incompleto", "Corrige los campos marcados en rojo.", true);
         return isValid;

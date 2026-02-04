@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
+    android:layout_marginBottom="40dp"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -29,7 +30,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="24dp"
+            android:paddingBottom="150dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -150,17 +152,19 @@
                 android:orientation="horizontal">
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilEditLocality"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp"
-                    android:hint="Localidad">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etEditLocality"
+                    android:hint="Zona">
+                    <AutoCompleteTextView
+                        android:id="@+id/actvEditLocality"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        />
                 </com.google.android.material.textfield.TextInputLayout>
                 <View android:layout_width="12dp" android:layout_height="1dp" />
                 <com.google.android.material.textfield.TextInputLayout
@@ -218,7 +222,7 @@
         android:background="#E6FFFFFF"
         android:clickable="true"
         android:focusable="true"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/ivLogoSpinner"

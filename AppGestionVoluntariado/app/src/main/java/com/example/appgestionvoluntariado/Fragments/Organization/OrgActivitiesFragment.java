@@ -68,9 +68,14 @@ public class OrgActivitiesFragment extends Fragment {
         initViews(view);
         setupTabs();
         setupSearch();
-        loadMyProjects();
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadMyProjects();
     }
 
     private void initViews(View view) {
@@ -91,10 +96,35 @@ public class OrgActivitiesFragment extends Fragment {
         fabAddProject = view.findViewById(R.id.fabAddProject);
 
         // Botón para crear nuevo proyecto
-        fabAddProject.setOnClickListener(v -> getParentFragmentManager().beginTransaction()
-                .replace(R.id.organization_fragment_container, new CreateProjectFragment())
-                .addToBackStack(null)
-                .commit());
+        if (fabAddProject != null) {
+            fabAddProject.setOnClickListener(v -> {
+                Log.d("OrgActivities", "FAB clicked - opening CreateProjectFragment");
+                try {
+                    // Get the activity to access fragment container and viewpager
+                    if (getActivity() != null) {
+                        View fragmentContainer = getActivity().findViewById(R.id.organization_fragment_container);
+                        View viewPager = getActivity().findViewById(R.id.organizationViewPager);
+                        
+                        if (fragmentContainer != null) {
+                            fragmentContainer.setVisibility(View.VISIBLE);
+                        }
+                        if (viewPager != null) {
+                            viewPager.setVisibility(View.GONE);
+                        }
+                        
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.organization_fragment_container, new CreateProjectFragment())
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                } catch (Exception e) {
+                    Log.e("OrgActivities", "Error opening CreateProjectFragment", e);
+                    StatusHelper.showToast(getContext(), "Error al abrir formulario", true);
+                }
+            });
+        } else {
+            Log.e("OrgActivities", "fabAddProject is NULL!");
+        }
     }
 
     private void setupTabs() {
@@ -120,24 +150,43 @@ public class OrgActivitiesFragment extends Fragment {
 
     private void loadMyProjects() {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (logoSpinner != null && rotateAnimation != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
+        if (fabAddProject != null) fabAddProject.setVisibility(View.INVISIBLE);
+
         APIClient.getOrganizationService().getMyProjects(currentStatus)
                 .enqueue(new Callback<List<Project>>() {
                     @Override
                     public void onResponse(Call<List<Project>> call, Response<List<Project>> response) {
                         loadingLayout.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
+                            if (fabAddProject != null) fabAddProject.setVisibility(View.VISIBLE);
                             allProjects = response.body();
-                            StatusHelper.showToast(getContext(), "Cargados: " + allProjects.size(), false); // Debug
                             updateRecyclerView(allProjects);
                         } else {
-                            StatusHelper.showToast(getContext(), "Error: " + response.code(), true);
+                            String errorMsg = "Error " + response.code();
+                            try {
+                                if (response.errorBody() != null) {
+                                    String errorBody = response.errorBody().string();
+                                    org.json.JSONObject jsonError = new org.json.JSONObject(errorBody);
+                                    if (jsonError.has("error")) {
+                                        errorMsg = jsonError.getString("error");
+                                    } else if (jsonError.has("message")) {
+                                        errorMsg = jsonError.getString("message");
+                                    }
+                                }
+                            } catch (Exception e) {
+                                Log.e("OrgActivities", "Error parsing backend response", e);
+                            }
+                            StatusHelper.showStatus(getContext(), "Error", errorMsg, true);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<List<Project>> call, Throwable t) {
                         loadingLayout.setVisibility(View.GONE);
-                        StatusHelper.showToast(getContext(), "Error al cargar: " + t.getMessage(), true);
+                        StatusHelper.showStatus(getContext(), "Error de conexión", "Sin conexión con el servidor", true);
                     }
                 });
     }
@@ -153,17 +202,32 @@ public class OrgActivitiesFragment extends Fragment {
             public void onDelete(Project project) {cancelProject(project);}
             @Override
             public void onApply(Project project) {}
+
             @Override
             public void onEdit(Project project) {
                 CreateProjectFragment fragment = new CreateProjectFragment();
                 Bundle args = new Bundle();
-                args.putSerializable("project", project);
+                // Pass as JSON string to avoid Serializable issues
+                String projectJson = new com.google.gson.Gson().toJson(project);
+                args.putString("project_json", projectJson);
                 fragment.setArguments(args);
 
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.organization_fragment_container, fragment) // Asegúrate que este ID es correcto para tu layout
-                        .addToBackStack(null)
-                        .commit();
+                if (getActivity() != null) {
+                    View fragmentContainer = getActivity().findViewById(R.id.organization_fragment_container);
+                    View viewPager = getActivity().findViewById(R.id.organizationViewPager);
+                    
+                    if (fragmentContainer != null) {
+                        fragmentContainer.setVisibility(View.VISIBLE);
+                    }
+                    if (viewPager != null) {
+                        viewPager.setVisibility(View.GONE);
+                    }
+                    
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.organization_fragment_container, fragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
         }, ViewMode.ORGANIZATION);
         recyclerView.setAdapter(adapter);
@@ -171,6 +235,9 @@ public class OrgActivitiesFragment extends Fragment {
 
     private void cancelProject(Project project) {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (logoSpinner != null && rotateAnimation != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
 
         // Log para ver qué enviamos (útil si hay dudas)
         Log.d("DEBUG_CANCEL", "Cancelando Proyecto ID: " + project.getActivityId());
@@ -242,7 +309,9 @@ public class OrgActivitiesFragment extends Fragment {
         List<Project> filtered = new ArrayList<>();
         String query = text.toLowerCase().trim();
         for (Project p : allProjects) {
-            if (p.getName().toLowerCase().contains(query)) {
+            boolean matchName = p.getName() != null && p.getName().toLowerCase().contains(query);
+            boolean matchDesc = p.getDescription() != null && p.getDescription().toLowerCase().contains(query);
+            if (matchName || matchDesc) {
                 filtered.add(p);
             }
         }

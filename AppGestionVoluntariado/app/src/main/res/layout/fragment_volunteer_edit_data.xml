@@ -29,7 +29,7 @@
         android:paddingStart="24dp"
         android:paddingTop="24dp"
         android:paddingEnd="24dp"
-        android:paddingBottom="100dp">
+        android:paddingBottom="50dp">
 
 
 
@@ -317,7 +317,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="40dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="14dp"
             android:text="Actualizar Información"
             android:backgroundTint="#1A3B85"
             android:textSize="16sp"

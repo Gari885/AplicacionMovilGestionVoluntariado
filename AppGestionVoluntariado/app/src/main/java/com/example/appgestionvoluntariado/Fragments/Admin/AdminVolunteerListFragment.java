@@ -67,9 +67,13 @@ public class AdminVolunteerListFragment extends Fragment {
         initViews(v);
         setupTabs();
         setupSearch();
-        fetchVolunteers();
-
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchVolunteers();
     }
 
     private void initViews(View v) {
@@ -96,7 +100,6 @@ public class AdminVolunteerListFragment extends Fragment {
         });
 
         tabAccepted.setOnClickListener(v -> {
-            // CORRECCIÓN: El backend usa 'ACEPTADO', no 'ACTIVO'
             currentStatus = "ACEPTADO";
             updateTabUI(tabAccepted, tabPending);
             fetchVolunteers();
@@ -105,9 +108,10 @@ public class AdminVolunteerListFragment extends Fragment {
         fabAddVolunteer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, new VolunteerRegisterFragment())
-                        .addToBackStack(null).commit();
+                if (getActivity() instanceof com.example.appgestionvoluntariado.Activities.AdminActivity) {
+                    ((com.example.appgestionvoluntariado.Activities.AdminActivity) getActivity())
+                            .replaceFragment(new VolunteerRegisterFragment());
+                }
             }
         });
     }
@@ -121,6 +125,9 @@ public class AdminVolunteerListFragment extends Fragment {
 
     private void fetchVolunteers() {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (logoSpinner != null && rotateAnimation != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
         adminService.getVolunteers(currentStatus).enqueue(new Callback<List<Volunteer>>() {
             @Override
             public void onResponse(Call<List<Volunteer>> call, Response<List<Volunteer>> response) {
@@ -150,7 +157,7 @@ public class AdminVolunteerListFragment extends Fragment {
             adapter = new VolunteerAdapter(list, new VolunteerAdapter.OnVolunteerActionListener() {
                 @Override
                 public void onAccept(Volunteer volunteer) {
-                    processStatusChange(volunteer, new StatusRequest("ACEPTADO")); // Asegura mayúsculas si el backend lo requiere
+                    processStatusChange(volunteer, new StatusRequest("ACEPTADO"));
                 }
 
                 @Override
@@ -179,13 +186,17 @@ public class AdminVolunteerListFragment extends Fragment {
 
     private void processStatusChange(Volunteer vol, StatusRequest request) {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (logoSpinner != null && rotateAnimation != null) {
+            logoSpinner.startAnimation(rotateAnimation);
+        }
         APIClient.getVolunteerService().updateStatus(vol.getDni(), request)
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
-                        loadingLayout.setVisibility(View.GONE); // Importante ocultarlo aquí también
+                        loadingLayout.setVisibility(View.GONE);
                         if (response.isSuccessful()) {
-                            Toast.makeText(getContext(), "Estado actualizado", Toast.LENGTH_SHORT).show();
+                            String msg = request.getStatus().equalsIgnoreCase("ACEPTADO") ? "Voluntario aceptado" : "Voluntario dado de baja";
+                            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                             fetchVolunteers();
                         } else {
                             Toast.makeText(getContext(), "Error: " + response.code(), Toast.LENGTH_SHORT).show();

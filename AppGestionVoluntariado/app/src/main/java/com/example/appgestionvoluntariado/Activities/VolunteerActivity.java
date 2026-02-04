@@ -71,29 +71,53 @@ public class VolunteerActivity extends AppCompatActivity {
                 });
         }
 
-        // Navegación entre Fragmentos
+        // ViewPager2 Setup
+        androidx.viewpager2.widget.ViewPager2 viewPager = findViewById(R.id.viewPager);
+        com.example.appgestionvoluntariado.Adapters.VolunteerPagerAdapter adapter = 
+            new com.example.appgestionvoluntariado.Adapters.VolunteerPagerAdapter(this);
+        viewPager.setAdapter(adapter);
+
+        // Update replaceFragment to handle visibility
+        // Also handle back navigation if container is visible?
+        // Let's ensure BottomNav interaction clears container if needed.
+        
+        // Sync BottomNav with ViewPager
         bottomNav.setOnItemSelectedListener(item -> {
-            Fragment selected = null;
             int id = item.getItemId();
+            if (id == R.id.nav_search || id == R.id.nav_my_inscriptions) {
+                // Show ViewPager, Hide Container
+                viewPager.setVisibility(View.VISIBLE);
+                findViewById(R.id.fragment_container).setVisibility(View.GONE);
+                
+                // Clear back stack if any
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                     getSupportFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                }
 
-            if (id == R.id.nav_search) selected = new VolunteerExploreFragment();
-            else if (id == R.id.nav_my_inscriptions) selected = new VolunteerMyProjectsFragment();
-
-            if (selected != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, selected).commit();
+                if (id == R.id.nav_search) {
+                    viewPager.setCurrentItem(0, true);
+                } else {
+                    viewPager.setCurrentItem(1, true);
+                }
                 return true;
             }
             return false;
         });
 
-        // Inicio por defecto
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new VolunteerExploreFragment()).commit();
-        }
+        viewPager.registerOnPageChangeCallback(new androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if (position == 0) {
+                    bottomNav.setSelectedItemId(R.id.nav_search);
+                } else if (position == 1) {
+                    bottomNav.setSelectedItemId(R.id.nav_my_inscriptions);
+                }
+            }
+        });
 
         askNotificationPermission();
+        updateFcmToken();
     }
 
     private final androidx.activity.result.ActivityResultLauncher<String> requestPermissionLauncher =
@@ -124,8 +148,48 @@ public class VolunteerActivity extends AppCompatActivity {
         }
     }
 
+    private void updateFcmToken() {
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+            .addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    android.util.Log.e("VolunteerActivity", "ERROR: Fetching FCM registration token failed", task.getException());
+                    return;
+                }
+
+                // Get new FCM registration token
+                String token = task.getResult();
+                
+                // LOG TOKEN FOR DEBUGGING - Check logcat for "FCM_TOKEN"
+                android.util.Log.e("FCM_TOKEN", "========================================");
+                android.util.Log.e("FCM_TOKEN", "TOKEN: " + token);
+                android.util.Log.e("FCM_TOKEN", "========================================");
+                
+                // Send to backend
+                java.util.Map<String, Object> data = new java.util.HashMap<>();
+                data.put("fcmToken", token);
+                
+                com.example.appgestionvoluntariado.Services.APIClient.getVolunteerService()
+                    .updateProfile(data).enqueue(new retrofit2.Callback<Void>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                android.util.Log.d("VolunteerActivity", "Token FCM actualizado correctamente en backend");
+                            } else {
+                                android.util.Log.e("VolunteerActivity", "Error actualizando token en backend: " + response.code());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(retrofit2.Call<Void> call, Throwable t) {
+                            android.util.Log.e("VolunteerActivity", "Error de red actualizando token FCM", t);
+                        }
+                    });
+            });
+    }
+
     private void performLogout() {
         FirebaseAuth.getInstance().signOut();
+        com.example.appgestionvoluntariado.Utils.TokenManager.getInstance(this).clearToken();
         SessionManager.getInstance(this).logout();
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -134,15 +198,17 @@ public class VolunteerActivity extends AppCompatActivity {
     }
 
     private void replaceFragment(Fragment fragment) {
+        // Hide ViewPager, Show Container
+        findViewById(R.id.viewPager).setVisibility(View.GONE);
+        findViewById(R.id.fragment_container).setVisibility(View.VISIBLE);
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null) // Always add to back stack for these overlays so we can return
                 .commit();
     }
 
     private void openNotifications() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new com.example.appgestionvoluntariado.Fragments.NotificationsFragment())
-                .addToBackStack(null) // Add to back stack so user can go back
-                .commit();
+        replaceFragment(new com.example.appgestionvoluntariado.Fragments.NotificationsFragment());
     }
 }

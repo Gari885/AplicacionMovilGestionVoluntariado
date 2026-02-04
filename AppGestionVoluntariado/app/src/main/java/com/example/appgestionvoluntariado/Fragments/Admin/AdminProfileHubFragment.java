@@ -12,6 +12,11 @@ import com.example.appgestionvoluntariado.Activities.MainActivity;
 import com.example.appgestionvoluntariado.R;
 import com.example.appgestionvoluntariado.Utils.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 public class AdminProfileHubFragment extends Fragment {
 
@@ -35,17 +40,29 @@ public class AdminProfileHubFragment extends Fragment {
     }
 
     private void performLogout() {
-        // 1. Cerrar en Firebase
-        FirebaseAuth.getInstance().signOut();
+        // 0. Sign out from Google Client
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
 
-        // 2. Limpiar sesión local
-        SessionManager.getInstance(getContext()).logout();
+        mGoogleSignInClient.revokeAccess().addOnCompleteListener(requireActivity(), task -> {
+            if (getActivity() == null) return;
 
-        // 3. Ir al Login y limpiar el historial de activities
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+            // 1. Cerrar en Firebase
+            FirebaseAuth.getInstance().signOut();
+            com.example.appgestionvoluntariado.Utils.TokenManager.getInstance(getContext()).clearToken();
 
-        if (getActivity() != null) getActivity().finish();
+            // 2. Limpiar sesión local
+            SessionManager.getInstance(getContext()).logout();
+
+            // 3. Ir al Login y limpiar el historial de activities
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+
+            if (getActivity() != null) getActivity().finish();
+        });
     }
 }

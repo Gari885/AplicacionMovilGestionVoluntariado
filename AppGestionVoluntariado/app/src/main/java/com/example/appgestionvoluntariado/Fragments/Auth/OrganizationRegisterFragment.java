@@ -102,6 +102,13 @@ public class OrganizationRegisterFragment extends Fragment {
         btnRegister = view.findViewById(R.id.btnRegister);
         loadingOverlay.setVisibility(View.VISIBLE);
         btnText = btnRegister.getText().toString();
+
+        if (getArguments() != null) {
+            String email = getArguments().getString("email");
+            if (email != null && !email.isEmpty()) {
+                etEmail.setText(email);
+            }
+        }
     }
 
     private void setupToolbar(View view) {
@@ -118,6 +125,21 @@ public class OrganizationRegisterFragment extends Fragment {
 
     private boolean isFormValid() {
         boolean isValid = true;
+
+        String sector = actSector.getText().toString();
+        boolean validSector = false;
+        for (String s : FormData.SECTORS_LIST) {
+            if (s.equalsIgnoreCase(sector)) {
+                validSector = true;
+                break;
+            }
+        }
+        if (!validSector) {
+            tilSector.setError("Seleccione un sector válido");
+            isValid = false;
+        } else {
+            tilSector.setError(null);
+        }
         
         if (getText(etName).isEmpty()) { tilName.setError("Nombre obligatorio"); isValid = false; } else tilName.setError(null);
         

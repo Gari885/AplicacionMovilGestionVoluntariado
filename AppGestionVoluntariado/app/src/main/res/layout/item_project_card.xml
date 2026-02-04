@@ -126,9 +126,6 @@
             android:textColor="#1A3B85"
             android:textSize="12sp"
             android:textStyle="bold"
-            app:icon="@drawable/ic_back_arrow"
-            app:iconPadding="8dp"
-            app:iconTint="#1A3B85"
             app:layout_constraintStart_toEndOf="@+id/btnProjectInfo"
             app:layout_constraintTop_toTopOf="@+id/btnProjectInfo" />
 

@@ -130,7 +130,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ProjectH
                 tvOrgName.setText("🏢 " + project.getOrganizationName());
             }
 
-            if (project.getApprovalStatus().equalsIgnoreCase("aceptada")){
+            if (project.getApprovalStatus() != null && project.getApprovalStatus().equalsIgnoreCase("aceptada")){
                 showStatusLabel = true;
             }
 

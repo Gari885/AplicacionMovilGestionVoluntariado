@@ -28,22 +28,43 @@ public class OrganizationActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.organization_bottom_navigation);
         MaterialToolbar toolbar = findViewById(R.id.topAppBarOrg);
 
+        // ViewPager2 Setup
+        androidx.viewpager2.widget.ViewPager2 viewPager = findViewById(R.id.organizationViewPager);
+        com.example.appgestionvoluntariado.Adapters.OrganizationPagerAdapter adapter = 
+            new com.example.appgestionvoluntariado.Adapters.OrganizationPagerAdapter(this);
+        viewPager.setAdapter(adapter);
+
         bottomNav.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
             int id = item.getItemId();
 
-            if (id == R.id.nav_org_activities) {
-                selectedFragment = new OrgActivitiesFragment();
-            } else if (id == R.id.nav_org_create) {
-                selectedFragment = new CreateProjectFragment();
+            // Tabs
+            viewPager.setVisibility(View.VISIBLE);
+            findViewById(R.id.organization_fragment_container).setVisibility(View.GONE);
+             // Clear back stack
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                 getSupportFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }
 
-            if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.organization_fragment_container, selectedFragment)
-                        .commit();
+            if (id == R.id.nav_org_activities) {
+                viewPager.setCurrentItem(0, true);
+                return true;
+            } else if (id == R.id.nav_org_create) {
+                viewPager.setCurrentItem(1, true);
+                return true;
             }
-            return true;
+            return false;
+        });
+        
+        viewPager.registerOnPageChangeCallback(new androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if (position == 0) {
+                    bottomNav.setSelectedItemId(R.id.nav_org_activities);
+                } else if (position == 1) {
+                    bottomNav.setSelectedItemId(R.id.nav_org_create);
+                }
+            }
         });
 
         toolbar.setOnMenuItemClickListener(item -> {
@@ -70,7 +91,7 @@ public class OrganizationActivity extends AppCompatActivity {
             // Re-bind click listener
             actionView.setOnClickListener(v -> openNotifications());
             
-            android.widget.TextView badge = actionView.findViewById(R.id.tv_notification_badge);
+            TextView badge = actionView.findViewById(R.id.tv_notification_badge);
             
             // Observe Database
             com.example.appgestionvoluntariado.Models.AppDatabase.getDatabase(this)
@@ -89,16 +110,10 @@ public class OrganizationActivity extends AppCompatActivity {
         }
 
         // Pantalla de inicio por defecto
-
-        // Pantalla de inicio por defecto
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.organization_fragment_container, new OrgActivitiesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        }
+        // Managed by viewPager defaults
 
         askNotificationPermission();
+        updateFcmToken();
     }
 
     private final androidx.activity.result.ActivityResultLauncher<String> requestPermissionLauncher =
@@ -129,9 +144,40 @@ public class OrganizationActivity extends AppCompatActivity {
         }
     }
 
+    private void updateFcmToken() {
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+            .addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    android.util.Log.w("OrganizationActivity", "Fetching FCM registration token failed", task.getException());
+                    return;
+                }
+
+                String token = task.getResult();
+                
+                java.util.Map<String, Object> data = new java.util.HashMap<>();
+                data.put("fcmToken", token);
+                
+                com.example.appgestionvoluntariado.Services.APIClient.getOrganizationService()
+                    .updateProfile(data).enqueue(new retrofit2.Callback<Void>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                android.util.Log.d("OrganizationActivity", "Token FCM actualizado correctamente");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(retrofit2.Call<Void> call, Throwable t) {
+                            android.util.Log.e("OrganizationActivity", "Error actualizando token FCM", t);
+                        }
+                    });
+            });
+    }
+
 
     private void performLogout() {
         FirebaseAuth.getInstance().signOut();
+        com.example.appgestionvoluntariado.Utils.TokenManager.getInstance(this).clearToken();
         SessionManager.getInstance(this).logout();
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -140,17 +186,18 @@ public class OrganizationActivity extends AppCompatActivity {
     }
 
     private void replaceFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.organization_fragment_container, fragment)
-                .commit();
-    }
+        // Toggle visibility
+        findViewById(R.id.organizationViewPager).setVisibility(View.GONE);
+        findViewById(R.id.organization_fragment_container).setVisibility(View.VISIBLE);
 
-    private void openNotifications() {
-        Fragment fragment = new com.example.appgestionvoluntariado.Fragments.NotificationsFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.organization_fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private void openNotifications() {
+        replaceFragment(new com.example.appgestionvoluntariado.Fragments.NotificationsFragment());
     }
 
 

@@ -43,7 +43,10 @@ public class AdminCategoriesAddFragment extends Fragment {
     private TextInputEditText etName;
     private TextInputLayout tilName;
     private MaterialButton btnAdd;
-    private android.widget.ProgressBar progressBar;
+    private android.widget.TextView loadingText;
+    private android.widget.ImageView logoSpinner;
+    private android.view.View loadingLayout;
+    private android.view.animation.Animation rotateAnimation;
     private final String[] CATEGORY_TYPES = {"Habilidad", "Interés"};
     private int pendingLoads = 0;
 
@@ -68,7 +71,11 @@ public class AdminCategoriesAddFragment extends Fragment {
         etName = v.findViewById(R.id.etCategoryName);
         tilName = v.findViewById(R.id.tilCategoryName);
         btnAdd = v.findViewById(R.id.btnAddCategory);
-        progressBar = v.findViewById(R.id.progressBar);
+        btnAdd = v.findViewById(R.id.btnAddCategory);
+        loadingLayout = v.findViewById(R.id.layoutLoading);
+        logoSpinner = v.findViewById(R.id.ivLogoSpinner);
+        loadingText = v.findViewById(R.id.tvLoadingText);
+        rotateAnimation = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
     }
 
     private void setupToolbar(View v) {
@@ -88,7 +95,10 @@ public class AdminCategoriesAddFragment extends Fragment {
      * Carga las categorías actuales usando la lógica segura de CategoryManager [cite: 2026-01-17].
      */
     private void loadData() {
-        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+        if (loadingLayout != null) {
+            loadingLayout.setVisibility(View.VISIBLE);
+            if(logoSpinner != null) logoSpinner.startAnimation(rotateAnimation);
+        }
         pendingLoads = 2; // Skills + Interests
 
         new CategoryManager().fetchAllCategories(
@@ -110,8 +120,9 @@ public class AdminCategoriesAddFragment extends Fragment {
 
     private void checkLoadComplete() {
         pendingLoads--;
-        if (pendingLoads <= 0 && progressBar != null) {
-            progressBar.setVisibility(View.GONE);
+        if (pendingLoads <= 0 && loadingLayout != null) {
+            loadingLayout.setVisibility(View.GONE);
+            if(logoSpinner != null) logoSpinner.clearAnimation();
         }
     }
 
@@ -175,7 +186,10 @@ public class AdminCategoriesAddFragment extends Fragment {
     }
 
     private void deleteCategory(int id, String type, Chip chip, ChipGroup group) {
-        progressBar.setVisibility(View.VISIBLE);
+        if (loadingLayout != null) {
+            loadingLayout.setVisibility(View.VISIBLE);
+            if(logoSpinner != null) logoSpinner.startAnimation(rotateAnimation);
+        }
         Call<Void> call = type.equals("skill") ?
                 APIClient.getAdminService().deleteSkill(id) :
                 APIClient.getAdminService().deleteInterest(id);
@@ -185,14 +199,15 @@ public class AdminCategoriesAddFragment extends Fragment {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     group.removeView(chip);
-                    progressBar.setVisibility(View.INVISIBLE);
+                    if (loadingLayout != null) loadingLayout.setVisibility(View.INVISIBLE);
+                    Toast.makeText(getContext(), type.equals("skill") ? "Habilidad eliminada" : "Interés eliminado", Toast.LENGTH_SHORT).show();
                 }else{
                     StatusHelper.showStatus(getContext(),"Error","No se ha podido borrar la " + type + " porque actualmente se esta usando", true);
-                    progressBar.setVisibility(View.INVISIBLE);
+                    if (loadingLayout != null) loadingLayout.setVisibility(View.INVISIBLE);
                 }
             }
             @Override public void onFailure(Call<Void> call, Throwable t) {
-                progressBar.setVisibility(View.INVISIBLE);
+                if (loadingLayout != null) loadingLayout.setVisibility(View.INVISIBLE);
 
             }
         });

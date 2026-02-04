@@ -23,6 +23,10 @@ import com.example.appgestionvoluntariado.Services.APIClient;
 import com.example.appgestionvoluntariado.Services.InscriptionsService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -35,6 +39,8 @@ public class AdminMatchesListFragment extends Fragment {
     private RecyclerView recyclerView;
     private MatchesAdapter adapter;
     private View loadingLayout;
+    private EditText etSearch;
+    private List<Match> fullList = new ArrayList<>();
 
 
     private ImageView logoSpinner;
@@ -43,7 +49,7 @@ public class AdminMatchesListFragment extends Fragment {
 
     private FloatingActionButton fabAddMatch;
 
-    private String currentFilter = "PENDIENTE"; // PENDIENTE o EN CURSO / COMPLETADO
+    private String currentFilter = "PENDIENTE"; // PENDIENTE o EN CURSO / CONFIRMADO
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,20 +57,27 @@ public class AdminMatchesListFragment extends Fragment {
 
         initViews(v);
         setupTabs();
-        loadMatches(); // Carga inicial
-
+        setupSearch();
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateTabsVisuals(currentFilter.equals("PENDIENTE"));
     }
 
     public void initViews(View v){
         loadingLayout = v.findViewById(R.id.layoutLoading);
         tabInProgress = v.findViewById(R.id.tabStatusPending);
         tabCompleted = v.findViewById(R.id.tabStatusCompleted);
+        etSearch = v.findViewById(R.id.etSearchMatch);
         recyclerView = v.findViewById(R.id.rvMatches);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         inscriptionsService = APIClient.getInscriptionService();
         fabAddMatch = v.findViewById(R.id.fabAddMatch);
+        fabAddMatch.setVisibility(View.INVISIBLE);
         fabAddMatch.bringToFront();
         logoSpinner = v.findViewById(R.id.ivLogoSpinner);
         rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
@@ -95,13 +108,17 @@ public class AdminMatchesListFragment extends Fragment {
 
     private void loadMatches() {
         loadingLayout.setVisibility(View.VISIBLE);
+        if (fabAddMatch != null) fabAddMatch.setVisibility(View.INVISIBLE);
+        
         inscriptionsService.getMatches(currentFilter.toUpperCase())
                 .enqueue(new Callback<List<Match>>() {
                     @Override
                     public void onResponse(Call<List<Match>> call, Response<List<Match>> response) {
                         loadingLayout.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
-                            updateAdapter(response.body());
+                            fabAddMatch.setVisibility(View.VISIBLE);
+                            fullList = response.body();
+                            updateAdapter(fullList);
                         }
                     }
                     @Override
@@ -124,17 +141,27 @@ public class AdminMatchesListFragment extends Fragment {
 
     private void updateMatchStatus(Match match, String newStatus) {
         loadingLayout.setVisibility(View.VISIBLE);
-        // Usamos Token de Firebase. Se envía el ID del match en la URL o RequestBody
-
        inscriptionsService.updateStatus(match.getRegistrationId(), new StatusRequest(newStatus))
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
-                        if (response.isSuccessful()) loadMatches();
-                        else loadingLayout.setVisibility(View.GONE);
+                        if (response.isSuccessful()) {
+                            com.example.appgestionvoluntariado.Utils.StatusHelper.showStatus(getContext(), "Éxito", "Match " + newStatus, false);
+                            loadMatches();
+                        }
+                        else {
+                            loadingLayout.setVisibility(View.GONE);
+                            try {
+                                String errorBody = response.errorBody() != null ? response.errorBody().string() : "Error desconocido";
+                                com.example.appgestionvoluntariado.Utils.StatusHelper.showStatus(getContext(), "Error " + response.code(), errorBody, true);
+                            } catch (Exception e) {
+                                com.example.appgestionvoluntariado.Utils.StatusHelper.showStatus(getContext(), "Error", "Fallo al procesar respuesta", true);
+                            }
+                        }
                     }
                     @Override public void onFailure(Call<Void> call, Throwable t) {
                         loadingLayout.setVisibility(View.GONE);
+                        com.example.appgestionvoluntariado.Utils.StatusHelper.showStatus(getContext(), "Error de Conexión", t.getMessage(), true);
                     }
                 });
     }
@@ -149,5 +176,29 @@ public class AdminMatchesListFragment extends Fragment {
         tabInProgress.setTextColor(isFirstTab ? white : blue);
         tabCompleted.setBackgroundResource(isFirstTab ? unselected : selected);
         tabCompleted.setTextColor(isFirstTab ? blue : white);
+    }
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterList(s.toString());
+            }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void filterList(String text) {
+        List<Match> filtered = new ArrayList<>();
+        String query = text.toLowerCase().trim();
+        for (Match m : fullList) {
+            String volName = m.getVolunteerName() != null ? m.getVolunteerName().toLowerCase() : "";
+            String actName = m.getActivityName() != null ? m.getActivityName().toLowerCase() : "";
+            
+            if (volName.contains(query) || actName.contains(query)) {
+                filtered.add(m);
+            }
+        }
+        updateAdapter(filtered);
     }
 }

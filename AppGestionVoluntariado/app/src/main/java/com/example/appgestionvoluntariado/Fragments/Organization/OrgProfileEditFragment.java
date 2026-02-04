@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,21 +36,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Fragment to edit ONG profile using the new ProfileResponse wrapper.
- * Logic in English, UI feedback in Spanish.
- */
 public class OrgProfileEditFragment extends Fragment {
 
-    private TextInputEditText etName, etEmail, etVat, etPhone, etAddress, etLocality, etPostalCode, etDescription;
+    private TextInputEditText etName, etEmail, etVat, etPhone, etAddress, etPostalCode, etDescription;
+
     private TextInputLayout tilName, tilEmail, tilPhone, tilAddress, tilLocality, tilPostalCode, tilDescription,tilSector;
     private MaterialButton btnSave;
     private View loadingOverlay;
+    private TextView tvLoadingText;
 
     private ImageView logoSpinner;
     private android.view.animation.Animation rotateAnimation;
 
-    private AutoCompleteTextView actSector;
+    private AutoCompleteTextView actSector, actLocality;
+
 
     private FirebaseAuth mAuth;
     private final Gson gson = new Gson();
@@ -70,7 +70,7 @@ public class OrgProfileEditFragment extends Fragment {
 
         initViews(view);
         setupToolbar(view);
-        fetchProfileData(); // Fetch using the wrapper logic
+        fetchProfileData();
 
         btnSave.setOnClickListener(v -> {
             if (isFormValid()) {
@@ -87,7 +87,9 @@ public class OrgProfileEditFragment extends Fragment {
         etVat = v.findViewById(R.id.etEditVat);
         etPhone = v.findViewById(R.id.etEditPhone);
         etAddress = v.findViewById(R.id.etEditAddress);
-        etLocality = v.findViewById(R.id.etEditLocality);
+        etAddress = v.findViewById(R.id.etEditAddress);
+        // Locality changed to AutoCompleteTextView:
+        actLocality = v.findViewById(R.id.actvEditLocality);
         etPostalCode = v.findViewById(R.id.etEditPostalCode);
         etDescription = v.findViewById(R.id.etEditDescription);
 
@@ -103,29 +105,25 @@ public class OrgProfileEditFragment extends Fragment {
         actSector = v.findViewById(R.id.actvSector);
         btnSave = v.findViewById(R.id.btnSaveProfile);
         loadingOverlay = v.findViewById(R.id.loadingOverlay);
+        tvLoadingText = v.findViewById(R.id.tvLoadingText);
         logoSpinner = v.findViewById(R.id.ivLogoSpinner);
         
+        
         rotateAnimation = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.rotate_infinite);
-        if (logoSpinner != null) {
-            logoSpinner.startAnimation(rotateAnimation);
-        }
-
-        loadingOverlay.setVisibility(View.VISIBLE);
     }
 
+
     private void fetchProfileData() {
-        toggleLoading(true);
-        // Using AuthAPIService with ProfileResponse as seen in Hub
+        toggleLoading(true, "Cargando perfil...");
         APIClient.getAuthAPIService().getProfile().enqueue(new Callback<ProfileResponse>() {
             @Override
             public void onResponse(@NonNull Call<ProfileResponse> call, @NonNull Response<ProfileResponse> response) {
-                toggleLoading(false);
+                toggleLoading(false, null);
                 if (!isAdded() || getContext() == null) return;
                 if (response.isSuccessful() && response.body() != null) {
                     ProfileResponse wrapper = response.body();
                     if ("organizacion".equalsIgnoreCase(wrapper.getType())) {
                         currentOrg = gson.fromJson(wrapper.getData(), Organization.class);
-                        loadingOverlay.setVisibility(View.INVISIBLE);
                         populateForm(currentOrg);
                     }
                 } else {
@@ -135,7 +133,7 @@ public class OrgProfileEditFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ProfileResponse> call, @NonNull Throwable t) {
-                toggleLoading(false);
+                toggleLoading(false, null);
                 StatusHelper.showStatus(getContext(), "Error de red", "Sin conexión con el servidor", true);
             }
         });
@@ -147,7 +145,8 @@ public class OrgProfileEditFragment extends Fragment {
         etVat.setText(org.getCif());
         etPhone.setText(org.getContactPhone());
         etAddress.setText(org.getAddress());
-        etLocality.setText(org.getLocality());
+        etAddress.setText(org.getAddress());
+        if (actLocality != null) actLocality.setText(org.getLocality(), false);
         etPostalCode.setText(org.getPostalCode());
         etDescription.setText(org.getDescription());
         actSector.setText(org.getSector());
@@ -156,40 +155,30 @@ public class OrgProfileEditFragment extends Fragment {
 
     private void loadSector() {
         actSector.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, FormData.SECTORS_LIST));
+        if (actLocality != null) {
+            actLocality.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, FormData.ZONES_LIST));
+        }
     }
 
     private void handleUpdateProcess() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) return;
-
-        String oldEmail = user.getEmail();
         String newEmail = getText(etEmail);
-        toggleLoading(true);
-
-        if (!newEmail.equalsIgnoreCase(user.getEmail())) {
-            user.updateEmail(newEmail).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    updateBackend(newEmail);
-                } else {
-                    toggleLoading(false);
-                    StatusHelper.showStatus(getContext(), "Seguridad", "Re-autentícate para cambiar el email.", true);
-                }
-            });
-        } else {
-            updateBackend(newEmail);
-        }
+        toggleLoading(true, "Guardando cambios...");
+        StatusHelper.showToast(getContext(), "Guardando cambios...", false);
+        
+        // Call backend directly - no Firebase needed (using JWT auth)
+        updateBackend(newEmail);
     }
 
     private void revertEmail() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null || oldEmail == null) {
-            toggleLoading(false);
+            toggleLoading(false, null);
             return;
         }
 
         // Intentamos volver al email antiguo
         user.updateEmail(oldEmail).addOnCompleteListener(task -> {
-            toggleLoading(false);
+            toggleLoading(false, null);
 
             if (task.isSuccessful()) {
                 // Éxito: Todo ha vuelto a como estaba antes de darle al botón
@@ -210,7 +199,7 @@ public class OrgProfileEditFragment extends Fragment {
         update.put("email" , email);
         update.put("telefono", getText(etPhone));
         update.put("direccion",getText(etAddress));
-        update.put("localidad",getText(etLocality));
+        update.put("localidad",actLocality.getText().toString());
         update.put("cp", getText(etPostalCode));
         update.put("descripcion",getText(etDescription));
         update.put("sector",actSector.getText().toString());
@@ -219,7 +208,7 @@ public class OrgProfileEditFragment extends Fragment {
         APIClient.getOrganizationService().updateProfile(update).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                toggleLoading(false);
+                toggleLoading(false, null);
                 if (response.isSuccessful()) {
                     StatusHelper.showStatus(getContext(), "Éxito", "Perfil actualizado correctamente", false);
                     getParentFragmentManager().popBackStack();
@@ -232,7 +221,7 @@ public class OrgProfileEditFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 revertEmail();
-                toggleLoading(false);
+                toggleLoading(false, null);
                 StatusHelper.showStatus(getContext(), "Error", "Fallo de conexión", true);
             }
         });
@@ -252,9 +241,25 @@ public class OrgProfileEditFragment extends Fragment {
         if (toolbar != null) toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
     }
 
-    private void toggleLoading(boolean isLoading) {
-        if (loadingOverlay != null) loadingOverlay.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        btnSave.setEnabled(!isLoading);
+    private void toggleLoading(boolean isLoading, @Nullable String msg) {
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            if (tvLoadingText != null && msg != null) tvLoadingText.setText(msg);
+            
+            if (isLoading && logoSpinner != null && rotateAnimation != null) {
+                logoSpinner.startAnimation(rotateAnimation);
+            }
+        }
+        if (btnSave != null) {
+            btnSave.setEnabled(!isLoading);
+            if(isLoading) {
+                btnSave.setText("Guardando...");
+                btnSave.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#757575")));
+            } else {
+                btnSave.setText("GUARDAR CAMBIOS");
+                btnSave.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#1A3B85")));
+            }
+        }
     }
 
     private String getText(TextInputEditText et) { return Objects.requireNonNull(et.getText()).toString().trim(); }
