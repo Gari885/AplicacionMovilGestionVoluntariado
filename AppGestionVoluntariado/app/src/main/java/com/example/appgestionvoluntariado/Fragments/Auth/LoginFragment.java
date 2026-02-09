@@ -163,10 +163,10 @@ public class LoginFragment extends Fragment {
                                 String errorBody = response.errorBody().string();
                                 try {
                                     JSONObject jsonObject = new JSONObject(errorBody);
-                                    if (jsonObject.has("message")) {
-                                        errorMsg = jsonObject.getString("message");
-                                    } else if (jsonObject.has("error")) {
+                                    if (jsonObject.has("error")) {
                                         errorMsg = jsonObject.getString("error");
+                                    } else if (jsonObject.has("message")) {
+                                        errorMsg = jsonObject.getString("message");
                                     } else {
                                         errorMsg = errorBody; // Fallback if not standard JSON
                                     }
@@ -194,15 +194,22 @@ public class LoginFragment extends Fragment {
 
     private void processLogin(String role) {
         if (role == null) role = "";
+        
+        android.util.Log.d("LOGIN_DEBUG", "Rol recibido del backend: " + role);
 
-        switch (role.toLowerCase().trim()) {
-            case "voluntario":
+        String normalizedRole = role.toUpperCase().trim();
+        if (normalizedRole.startsWith("ROLE_")) {
+            normalizedRole = normalizedRole.replace("ROLE_", "");
+        }
+
+        switch (normalizedRole) {
+            case "VOLUNTARIO":
                 startActivityAndFinish(VolunteerActivity.class);
                 break;
-            case "organizacion":
+            case "ORGANIZACION":
                 startActivityAndFinish(OrganizationActivity.class);
                 break;
-            case "admin":
+            case "ADMIN":
                 startActivityAndFinish(AdminActivity.class);
                 break;
             default:

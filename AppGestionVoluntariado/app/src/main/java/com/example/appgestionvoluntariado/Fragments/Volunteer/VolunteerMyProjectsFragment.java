@@ -36,7 +36,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
     private RecyclerView recyclerView;
     private ProjectAdapter projectAdapter;
     private com.google.android.material.button.MaterialButton btnTabAccepted, btnTabPending;
-    private String currentStatusFilter = "pendiente"; // Default filter
+    private String currentStatusFilter = "PENDIENTE"; // Default filter
 
     // Listas para el filtrado
     private List<Project> allEnrolledProjects = new ArrayList<>();
@@ -92,8 +92,8 @@ public class VolunteerMyProjectsFragment extends Fragment {
     }
 
     private void setupFilterTabs() {
-        btnTabAccepted.setOnClickListener(v -> switchTab("aceptado"));
-        btnTabPending.setOnClickListener(v -> switchTab("pendiente"));
+        btnTabAccepted.setOnClickListener(v -> switchTab("ACEPTADA"));
+        btnTabPending.setOnClickListener(v -> switchTab("PENDIENTE"));
     }
 
     private void switchTab(String status) {
@@ -104,7 +104,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
     }
 
     private void updateTabStyles() {
-        boolean isAccepted = currentStatusFilter.equals("aceptado");
+        boolean isAccepted = currentStatusFilter.equals("ACEPTADA");
         int blue = android.graphics.Color.parseColor("#1A3B85");
         int white = android.graphics.Color.WHITE;
 
@@ -183,7 +183,7 @@ public class VolunteerMyProjectsFragment extends Fragment {
             },ViewMode.VOLUNTEER_MY_PROJECTS);
 
         // Mostrar etiqueta de estado SOLO si estamos en la pestaña TAB_ACCEPTED
-        projectAdapter.setShowStatusLabel(currentStatusFilter.equals("aceptado"));
+        projectAdapter.setShowStatusLabel(currentStatusFilter.equals("ACEPTADA"));
 
         recyclerView.setAdapter(projectAdapter);
     }

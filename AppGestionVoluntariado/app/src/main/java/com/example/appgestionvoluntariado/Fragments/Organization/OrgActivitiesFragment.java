@@ -49,7 +49,7 @@ public class OrgActivitiesFragment extends Fragment {
 
     private List<Project> allProjects = new ArrayList<>();
 
-    private String currentStatus = "pendiente"; // PENDIENTE o APROBADO
+    private String currentStatus = "PENDIENTE"; // PENDIENTE o APROBADO
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -129,13 +129,13 @@ public class OrgActivitiesFragment extends Fragment {
 
     private void setupTabs() {
         tabPending.setOnClickListener(v -> {
-            currentStatus = "pendiente";
+            currentStatus = "PENDIENTE";
             updateTabUI(tabPending, tabAccepted);
             loadMyProjects();
         });
 
         tabAccepted.setOnClickListener(v -> {
-            currentStatus = "aceptada";
+            currentStatus = "ACEPTADA";
             updateTabUI(tabAccepted, tabPending);
             loadMyProjects();
         });
@@ -243,7 +243,7 @@ public class OrgActivitiesFragment extends Fragment {
         Log.d("DEBUG_CANCEL", "Cancelando Proyecto ID: " + project.getActivityId());
 
         // Asegúrate de que tu interfaz ahora devuelve Call<ResponseBody>
-        APIClient.getProjectsService().changeState(project.getActivityId(), new StatusRequest("cancelado"))
+        APIClient.getProjectsService().changeState(project.getActivityId(), new StatusRequest("CANCELADO"))
                 .enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

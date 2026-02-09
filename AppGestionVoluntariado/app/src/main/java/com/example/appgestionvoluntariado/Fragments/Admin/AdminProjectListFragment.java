@@ -51,7 +51,7 @@ public class AdminProjectListFragment extends Fragment {
     private ViewMode view;
 
     private List<Project> fullList = new ArrayList<>();
-    private String currentStatus = "pendiente";
+    private String currentStatus = "PENDIENTE";
 
     private FloatingActionButton fabAddProject;
 
@@ -64,7 +64,7 @@ public class AdminProjectListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (currentStatus != null && currentStatus.equalsIgnoreCase("aceptada")){
+        if (currentStatus != null && currentStatus.equalsIgnoreCase("ACEPTADA")){
             view = ViewMode.ADMINISTRATOR_ACCEPTED;
             updateTabUI(tabAccepted,tabPending);
         }
@@ -97,14 +97,14 @@ public class AdminProjectListFragment extends Fragment {
 
     private void setupTabs() {
         tabPending.setOnClickListener(v -> {
-            currentStatus = "pendiente";
+            currentStatus = "PENDIENTE";
             view = ViewMode.ADMINISTRATOR_PENDING;
             updateTabUI(tabPending, tabAccepted);
             loadProjects();
         });
 
         tabAccepted.setOnClickListener(v -> {
-            currentStatus = "aceptada";
+            currentStatus = "ACEPTADA";
             view = ViewMode.ADMINISTRATOR_ACCEPTED;
             updateTabUI(tabAccepted, tabPending);
             loadProjects();
@@ -161,17 +161,17 @@ public class AdminProjectListFragment extends Fragment {
             adapter = new ProjectAdapter(list, new ProjectAdapter.OnProjectActionListener() {
                 @Override
                 public void onAccept(Project p) {
-                    updateStatus(p.getActivityId(), "aceptada");
+                    updateStatus(p.getActivityId(), "ACEPTADA");
                 }
 
                 @Override
                 public void onReject(Project p) {
-                    updateStatus(p.getActivityId(), "rechazada");
+                    updateStatus(p.getActivityId(), "RECHAZADA");
                 }
 
                 @Override
                 public void onDelete(Project p) {
-                    updateStatus(p.getActivityId(), "cancelado");
+                    updateStatus(p.getActivityId(), "CANCELADO");
                 }
 
                 @Override
@@ -218,9 +218,9 @@ public class AdminProjectListFragment extends Fragment {
 
                                 // Custom Toast Message
                                 String msg = "Proyecto actualizado";
-                                if (status.equalsIgnoreCase("aceptada")) msg = "Proyecto aceptado";
-                                else if (status.equalsIgnoreCase("rechazada")) msg = "Proyecto rechazado";
-                                else if (status.equalsIgnoreCase("cancelado")) msg = "Proyecto cancelado";
+                                if (status.equalsIgnoreCase("ACEPTADA")) msg = "Proyecto aceptado";
+                                else if (status.equalsIgnoreCase("RECHAZADA")) msg = "Proyecto rechazado";
+                                else if (status.equalsIgnoreCase("CANCELADO")) msg = "Proyecto cancelado";
                                 
                                 StatusHelper.showToast(getContext(), msg, false);
                                 loadProjects();
